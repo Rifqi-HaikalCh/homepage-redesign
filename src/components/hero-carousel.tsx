@@ -9,27 +9,27 @@ const carouselItems = [
   {
     id: 1,
     title: 'Slide 1',
-    image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=400&fit=crop&crop=center'
+    image: '/Slide 1.png'
   },
   {
     id: 2,
     title: 'Slide 2',
-    image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=400&fit=crop&crop=center'
+    image: '/Slide 2.png'
   },
   {
     id: 3,
     title: 'Slide 3',
-    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=400&fit=crop&crop=center'
+    image: '/Slide 3.png'
   },
   {
     id: 4,
     title: 'Slide 4',
-    image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&h=400&fit=crop&crop=center'
+    image: '/Slide 4.png'
   },
   {
     id: 5,
     title: 'Slide 5',
-    image: 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=800&h=400&fit=crop&crop=center'
+    image: '/Slide 5.png'
   }
 ];
 

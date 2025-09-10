@@ -2,23 +2,24 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Utensils, Plane, Heart, Headphones, Clapperboard, Grid3X3 } from 'lucide-react';
+import { Utensils, Cpu, Music, Plane, Heart, Gamepad2, Clapperboard, Sparkles, Youtube, Mic, Video, Baby } from 'lucide-react';
 
 const categories = [
-  { id: 1, icon: Utensils, text: 'Food Influencer' },
-  { id: 2, icon: Plane, text: 'Travel Influencer' },
-  { id: 3, icon: Heart, text: 'Health Influencer' },
-  { id: 4, icon: Headphones, text: 'Music Influencer' },
-  { id: 5, icon: Clapperboard, text: 'Content Creator' },
-  { id: 6, icon: Grid3X3, text: 'Show All' }
+  { id: 1, icon: Utensils, text: 'Food & Beverages' },
+  { id: 2, icon: Cpu, text: 'Technology' },
+  { id: 3, icon: Music, text: 'Entertainment' },
+  { id: 4, icon: Plane, text: 'Travel & Lifestyle' },
+  { id: 5, icon: Heart, text: 'Health & Sport' },
+  { id: 6, icon: Gamepad2, text: 'Gaming' },
+  { id: 7, icon: Clapperboard, text: 'Content Creator' },
+  { id: 8, icon: Sparkles, text: 'Beauty & Fashion' },
+  { id: 9, icon: Youtube, text: 'Youtuber' },
+  { id: 10, icon: Mic, text: 'DJ & Penyanyi' },
+  { id: 11, icon: Video, text: 'Tiktok' },
+  { id: 12, icon: Baby, text: 'Mom & Kids' }
 ];
 
 export default function ContentCarousel() {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  const handleShowAllClick = () => {
-    setIsExpanded(!isExpanded);
-  };
 
   const containerVariants = {
     collapsed: {
@@ -65,14 +66,13 @@ export default function ContentCarousel() {
         </div>
 
         <motion.div
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-4xl mx-auto"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-5xl mx-auto"
           variants={containerVariants}
           initial="collapsed"
-          animate={isExpanded ? "expanded" : "collapsed"}
+          animate="expanded"
         >
-          {categories.map((category, index) => {
+          {categories.map((category) => {
             const Icon = category.icon;
-            const isShowAll = category.id === 6;
             
             return (
               <motion.div
@@ -83,33 +83,14 @@ export default function ContentCarousel() {
                   transition: { duration: 0.2 }
                 }}
                 whileTap={{ scale: 0.95 }}
-                className={`
-                  relative group cursor-pointer
-                  ${isShowAll ? 'col-span-2 md:col-span-3 lg:col-span-6' : ''}
-                `}
-                onClick={isShowAll ? handleShowAllClick : undefined}
+                className="relative group cursor-pointer"
               >
-                <div className={`
-                  bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl 
-                  transition-all duration-300 border border-gray-100 dark:border-gray-700
-                  group-hover:border-[#7124A8]/30 dark:group-hover:border-[#7124A8]/30
-                  ${isShowAll ? 'bg-gradient-to-r from-[#7124A8] to-[#5a1d87] text-white' : ''}
-                  ${isShowAll ? 'hover:from-[#5a1d87] hover:to-[#4a1570]' : ''}
-                `}>
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
                   <div className="flex flex-col items-center text-center space-y-3">
-                    <div className={`
-                      p-3 rounded-xl transition-all duration-300 group-hover:scale-110
-                      ${isShowAll ? 'bg-white/20' : 'bg-[#7124A8]/10 group-hover:bg-[#7124A8]/20'}
-                    `}>
-                      <Icon className={`
-                        w-8 h-8 transition-colors duration-300
-                        ${isShowAll ? 'text-white' : 'text-[#7124A8] group-hover:text-[#5a1d87]'}
-                      `} />
+                    <div className="p-3 rounded-xl transition-all duration-300 group-hover:scale-110 bg-[#7124A8]/10 group-hover:bg-[#7124A8]/20">
+                      <Icon className="w-8 h-8 transition-colors duration-300 text-[#7124A8] group-hover:text-[#5a1d87]" />
                     </div>
-                    <h3 className={`
-                      font-semibold text-sm transition-colors duration-300
-                      ${isShowAll ? 'text-white' : 'text-gray-900 dark:text-white group-hover:text-[#7124A8]'}
-                    `}>
+                    <h3 className="font-semibold text-sm transition-colors duration-300 text-gray-900 dark:text-white group-hover:text-[#7124A8]">
                       {category.text}
                     </h3>
                   </div>

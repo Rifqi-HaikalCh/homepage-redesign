@@ -1,0 +1,177 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { Instagram } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+
+const otherInfluencersData = [
+  {
+    id: 7,
+    name: 'Sari Indah',
+    contentType: 'Beauty & Skincare',
+    instagram: '@sariindah',
+    followers: '45.2K',
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=680&h=1020&fit=crop&crop=center'
+  },
+  {
+    id: 8,
+    name: 'Maya Putri',
+    contentType: 'Lifestyle & Fashion',
+    instagram: '@mayaputri',
+    followers: '38.7K',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=680&h=1020&fit=crop&crop=center'
+  },
+  {
+    id: 9,
+    name: 'Dewi Lestari',
+    contentType: 'Travel & Food',
+    instagram: '@dewilestari',
+    followers: '52.1K',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=680&h=1020&fit=crop&crop=center'
+  },
+  {
+    id: 10,
+    name: 'Rina Safitri',
+    contentType: 'Art & Creative',
+    instagram: '@rinasafitri',
+    followers: '41.9K',
+    avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=680&h=1020&fit=crop&crop=center'
+  }
+];
+
+export default function OtherInfluencers() {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 30,
+      scale: 0.95
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.6,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }
+    }
+  };
+
+  return (
+    <section className="py-16 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-950 dark:to-purple-950">
+      <div className="container mx-auto px-6">
+        <div className="text-center mb-12">
+          <div className="flex justify-between items-center mb-6">
+            <div></div>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Influencer Lainnya
+            </h2>
+            <Link href="/influencer">
+              <Button variant="outline" className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                Lihat Semua Influencer
+              </Button>
+            </Link>
+          </div>
+          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            Temukan lebih banyak influencer berbakat untuk kolaborasi brand Anda
+          </p>
+        </div>
+
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
+          {otherInfluencersData.map((influencer) => (
+            <motion.div
+              key={influencer.id}
+              variants={cardVariants}
+              whileHover={{ 
+                y: -8,
+                transition: { duration: 0.3 }
+              }}
+              className="group"
+            >
+              <Link href={`/influencer/${influencer.id}`}>
+                {/* Glassmorphism Card */}
+                <div className="relative h-96 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer">
+                  {/* Background Image */}
+                  <div className="absolute inset-0">
+                    <img
+                      src={influencer.avatar}
+                      alt={influencer.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      style={{ aspectRatio: '680/1020' }}
+                    />
+                  </div>
+
+                  {/* Glassmorphism Layer - Only on bottom portion */}
+                  <div className="absolute bottom-0 left-0 right-0 h-32 backdrop-blur-[15px] bg-gradient-to-t from-white/40 via-white/20 to-transparent border-t border-white/30 rounded-b-3xl">
+                    {/* Content Container */}
+                    <div className="relative h-full flex flex-col justify-between p-6">
+                      {/* Top Section - Name & Content Type */}
+                      <div className="text-center">
+                        <h3 className="text-xl font-bold text-white mb-1 drop-shadow-lg" style={{
+                          textShadow: '0 2px 8px rgba(0,0,0,0.5)'
+                        }}>
+                          {influencer.name}
+                        </h3>
+                        <p className="text-white/90 text-sm font-medium drop-shadow-md">
+                          {influencer.contentType}
+                        </p>
+                      </div>
+
+                      {/* Bottom Section */}
+                      <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-3 border border-white/40">
+                        <div className="flex items-center justify-between">
+                          {/* Instagram Info */}
+                          <div className="flex items-center space-x-2">
+                            <Instagram className="w-4 h-4 text-white" />
+                            <div>
+                              <p className="text-white text-xs font-medium">
+                                {influencer.instagram}
+                              </p>
+                              <p className="text-white/80 text-xs">
+                                {influencer.followers}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* View Detail Button */}
+                          <Button 
+                            className="bg-white hover:bg-gray-50 text-gray-900 text-xs px-3 py-1 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                            size="sm"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            View Detail
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Additional Glow Effect on Hover */}
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/0 via-purple-400/0 to-pink-400/0 group-hover:from-blue-400/10 group-hover:via-purple-400/5 group-hover:to-pink-400/10 transition-all duration-500 pointer-events-none" />
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+
+      </div>
+    </section>
+  );
+}

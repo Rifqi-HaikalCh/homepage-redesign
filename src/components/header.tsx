@@ -25,23 +25,27 @@ export default function Header() {
 
   return (
     <header 
-      className={`sticky top-0 z-50 transition-all duration-300 ${
+      className={`sticky top-0 z-50 transition-all duration-500 ${
         isScrolled 
-          ? 'backdrop-blur-lg bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/50 dark:border-gray-700/50' 
+          ? 'backdrop-blur-xl bg-white/70 dark:bg-gray-900/70 border-b border-white/20 dark:border-gray-700/30 shadow-lg shadow-black/5 dark:shadow-black/20' 
           : 'bg-transparent'
       }`}
     >
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-bold text-[#7124A8]">
-            BrandLogo
+          <div className="flex items-center">
+            <img 
+              src="/dapur-buzzer-logo.png" 
+              alt="Dapur Buzzer Logo" 
+              className="h-10 w-auto"
+            />
           </div>
           
           <div className="relative flex-1 max-w-md mx-8">
             <div className="relative flex items-center">
               <Search className="absolute left-3 w-4 h-4 text-gray-400 dark:text-gray-500 z-10" />
               <Input
-                className="pl-10 pr-16 py-2 w-full rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-800/50 focus:bg-white dark:focus:bg-gray-800 transition-colors text-gray-900 dark:text-gray-100"
+                className="pl-10 pr-16 py-2 w-full rounded-full border border-white/30 dark:border-gray-600/50 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm focus:bg-white/80 dark:focus:bg-gray-800/80 focus:border-[#7124A8]/50 transition-all duration-300 text-gray-900 dark:text-gray-100 shadow-sm"
                 placeholder="Cari produk & transaksi"
               />
               <div className="absolute right-3 z-10">
@@ -56,7 +60,7 @@ export default function Header() {
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="rounded-full w-10 h-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+            className="rounded-full w-10 h-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/30 dark:border-gray-600/50 hover:bg-white/80 dark:hover:bg-gray-800/80 hover:border-[#7124A8]/30 text-gray-700 dark:text-gray-300 transition-all duration-300 shadow-sm"
           >
             {theme === 'dark' ? (
               <Sun className="w-5 h-5" />

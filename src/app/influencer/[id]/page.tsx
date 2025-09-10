@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Instagram, TrendingUp, Users, Heart, MessageCircle, Eye } from 'lucide-react';
+import { ArrowLeft, Instagram, TrendingUp, Users, Heart, MessageCircle, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
@@ -194,58 +194,182 @@ export default function InfluencerDetail() {
         </div>
       </div>
 
-      {/* Top Carousel */}
-      <section className="py-8 bg-gray-50 dark:bg-gray-800">
+      {/* 3D Coverflow Carousel */}
+      <section className="py-12 bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900 dark:from-black dark:via-gray-900 dark:to-purple-950 overflow-hidden">
         <div className="container mx-auto px-6">
-          <div className="flex justify-center items-center space-x-6 overflow-x-auto pb-4">
-            {influencersData.map((influencer, index) => (
-              <motion.div
-                key={influencer.id}
-                className={`flex-shrink-0 cursor-pointer relative ${
-                  index === selectedIndex ? 'z-10' : 'z-0'
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleInfluencerSelect(index)}
-              >
-                <motion.div
-                  className={`w-16 h-24 rounded-2xl overflow-hidden border-4 transition-all duration-300 ${
-                    index === selectedIndex
-                      ? 'border-[#7124A8] shadow-lg shadow-[#7124A8]/20 scale-110'
-                      : 'border-white dark:border-gray-600 scale-90 opacity-70'
-                  }`}
-                  animate={{
-                    scale: index === selectedIndex ? 1.1 : 0.9,
-                    opacity: index === selectedIndex ? 1 : 0.7
-                  }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <img
-                    src={influencer.avatar}
-                    alt={influencer.name}
-                    className="w-full h-full object-cover"
-                    style={{
-                      aspectRatio: '680/1020'
-                    }}
-                  />
-                </motion.div>
+          <div className="relative h-80 flex items-center justify-center perspective-1000">
+            <div className="relative w-full max-w-6xl flex items-center justify-center">
+              {influencersData.map((influencer, index) => {
+                const offset = index - selectedIndex;
+                const isActive = index === selectedIndex;
                 
-                {index === selectedIndex && (
+                // Calculate position and styling based on offset from center
+                const getCardTransform = () => {
+                  if (offset === 0) {
+                    // Active card - center position
+                    return {
+                      transform: 'translateX(0px) translateZ(0px) rotateY(0deg) scale(1)',
+                      zIndex: 50,
+                      opacity: 1,
+                      filter: 'brightness(1) contrast(1.1)'
+                    };
+                  } else if (Math.abs(offset) === 1) {
+                    // Adjacent cards
+                    const direction = offset > 0 ? 1 : -1;
+                    return {
+                      transform: `translateX(${direction * 180}px) translateZ(-100px) rotateY(${-direction * 45}deg) scale(0.8)`,
+                      zIndex: 40,
+                      opacity: 0.7,
+                      filter: 'brightness(0.8)'
+                    };
+                  } else if (Math.abs(offset) === 2) {
+                    // Second level cards
+                    const direction = offset > 0 ? 1 : -1;
+                    return {
+                      transform: `translateX(${direction * 320}px) translateZ(-200px) rotateY(${-direction * 60}deg) scale(0.6)`,
+                      zIndex: 30,
+                      opacity: 0.4,
+                      filter: 'brightness(0.6)'
+                    };
+                  } else {
+                    // Hidden cards
+                    const direction = offset > 0 ? 1 : -1;
+                    return {
+                      transform: `translateX(${direction * 400}px) translateZ(-300px) rotateY(${-direction * 75}deg) scale(0.4)`,
+                      zIndex: 20,
+                      opacity: 0,
+                      filter: 'brightness(0.4)'
+                    };
+                  }
+                };
+
+                const cardStyle = getCardTransform();
+
+                return (
                   <motion.div
-                    className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-[#7124A8] rounded-full"
-                    layoutId="selectedIndicator"
-                  />
-                )}
-              </motion.div>
+                    key={influencer.id}
+                    className="absolute cursor-pointer"
+                    style={{
+                      ...cardStyle,
+                      transformStyle: 'preserve-3d',
+                    }}
+                    animate={cardStyle}
+                    transition={{ 
+                      duration: 0.5, 
+                      ease: [0.25, 0.46, 0.45, 0.94]
+                    }}
+                    whileHover={isActive ? {} : { 
+                      scale: isActive ? 1.05 : Math.abs(offset) === 1 ? 0.85 : 0.65 
+                    }}
+                    onClick={() => handleInfluencerSelect(index)}
+                  >
+                    <div className="relative w-48 h-64 group">
+                      {/* Card Background with Glow Effect */}
+                      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br transition-all duration-500 ${
+                        isActive 
+                          ? 'from-purple-500/20 via-pink-500/20 to-blue-500/20 shadow-2xl shadow-purple-500/25' 
+                          : 'from-gray-700/50 to-gray-800/50 shadow-lg'
+                      }`} />
+                      
+                      {/* Premium Shine Effect */}
+                      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/10 via-transparent to-white/5 transition-opacity duration-500 ${
+                        isActive ? 'opacity-100' : 'opacity-30'
+                      }`} />
+                      
+                      {/* Image Container */}
+                      <div className="relative w-full h-full rounded-2xl overflow-hidden border border-white/10">
+                        <img
+                          src={influencer.avatar}
+                          alt={influencer.name}
+                          className="w-full h-full object-cover transition-all duration-500"
+                          style={{ aspectRatio: '680/1020' }}
+                        />
+                        
+                        {/* Overlay Gradient */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                        
+                        {/* Content Overlay - Only show on active card */}
+                        <AnimatePresence>
+                          {isActive && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 20 }}
+                              transition={{ duration: 0.3, delay: 0.2 }}
+                              className="absolute bottom-0 left-0 right-0 p-6 text-white"
+                            >
+                              <h3 className="text-xl font-bold mb-1 font-sans">
+                                {influencer.name}
+                              </h3>
+                              <p className="text-purple-300 text-sm font-medium mb-2 font-sans">
+                                {influencer.contentType}
+                              </p>
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm text-gray-300 font-sans">
+                                  {influencer.city}
+                                </span>
+                                <div className="px-3 py-1 bg-purple-500/30 backdrop-blur-sm rounded-full border border-purple-400/30">
+                                  <span className="text-xs font-semibold text-purple-200 font-sans">
+                                    Available
+                                  </span>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                      
+                      {/* Active Card Ring Effect */}
+                      {isActive && (
+                        <motion.div
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          className="absolute -inset-2 rounded-3xl border-2 border-purple-400/30 animate-pulse"
+                        />
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Navigation Arrows */}
+            <button
+              onClick={() => handleInfluencerSelect(selectedIndex > 0 ? selectedIndex - 1 : influencersData.length - 1)}
+              className="absolute left-8 top-1/2 -translate-y-1/2 z-60 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-300 flex items-center justify-center group"
+            >
+              <ChevronLeft className="w-6 h-6 text-white group-hover:text-purple-300 transition-colors" />
+            </button>
+
+            <button
+              onClick={() => handleInfluencerSelect(selectedIndex < influencersData.length - 1 ? selectedIndex + 1 : 0)}
+              className="absolute right-8 top-1/2 -translate-y-1/2 z-60 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all duration-300 flex items-center justify-center group"
+            >
+              <ChevronRight className="w-6 h-6 text-white group-hover:text-purple-300 transition-colors" />
+            </button>
+          </div>
+
+          {/* Carousel Indicators */}
+          <div className="flex justify-center mt-8 space-x-2">
+            {influencersData.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => handleInfluencerSelect(index)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === selectedIndex
+                    ? 'bg-purple-400 w-8 shadow-lg shadow-purple-400/50'
+                    : 'bg-white/30 hover:bg-white/50'
+                }`}
+              />
             ))}
           </div>
         </div>
       </section>
 
       {/* Detail Content */}
-      <section className="py-8">
+      <section className="py-8 bg-[#F5F7FA] dark:bg-gray-950 min-h-screen">
         <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto relative overflow-hidden">
+          <div className="max-w-7xl mx-auto relative overflow-hidden">
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
                 key={selectedIndex}
@@ -259,152 +383,176 @@ export default function InfluencerDetail() {
                   opacity: { duration: 0.4 }
                 }}
               >
-                <div className="grid md:grid-cols-3 gap-8">
-                  {/* Profile Section */}
-                  <div className="md:col-span-1">
-                    <Card className="bg-white dark:bg-gray-800 shadow-xl">
+                <div className="grid lg:grid-cols-4 gap-6">
+                  {/* Left Column - Profile & Information */}
+                  <div className="lg:col-span-1 space-y-6">
+                    {/* Profile Card */}
+                    <Card className="bg-white dark:bg-gray-900 shadow-sm border-0 rounded-2xl">
                       <CardContent className="p-6 text-center">
-                        <div className="w-40 h-60 mx-auto rounded-2xl overflow-hidden border-4 border-[#7124A8]/20 mb-4">
+                        <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-gray-100 dark:border-gray-700 mb-4 shadow-md">
                           <img
                             src={selectedInfluencer.avatar}
                             alt={selectedInfluencer.name}
                             className="w-full h-full object-cover"
-                            style={{
-                              aspectRatio: '680/1020'
-                            }}
                           />
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                        <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-1 font-sans">
                           {selectedInfluencer.name}
                         </h2>
-                        <p className="text-[#7124A8] font-medium mb-4">
+                        <p className="text-[#7124A8] font-medium text-sm mb-6 font-sans">
                           {selectedInfluencer.contentType}
                         </p>
-                        <div className="flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm mb-6">
-                          <Users className="w-4 h-4 mr-2" />
-                          {selectedInfluencer.city}
-                        </div>
-                        <Button className="w-full bg-[#7124A8] hover:bg-[#5a1d87] text-white">
-                          Book Collaboration
+                        <Button className="w-full bg-[#7124A8] hover:bg-[#5a1d87] text-white rounded-xl py-3 font-semibold font-sans transition-all duration-300 shadow-md hover:shadow-lg">
+                          Book Now
                         </Button>
+                      </CardContent>
+                    </Card>
+
+                    {/* Information Card */}
+                    <Card className="bg-white dark:bg-gray-900 shadow-sm border-0 rounded-2xl">
+                      <CardContent className="p-6">
+                        <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 font-sans">Information:</h3>
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
+                            <span className="text-sm font-medium text-gray-600 dark:text-gray-400 font-sans">Nama Lengkap</span>
+                            <span className="text-sm font-semibold text-gray-800 dark:text-white font-sans">{selectedInfluencer.name}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 border-b border-gray-100 dark:border-gray-700">
+                            <span className="text-sm font-medium text-gray-600 dark:text-gray-400 font-sans">Kota Asal</span>
+                            <span className="text-sm font-semibold text-gray-800 dark:text-white font-sans">{selectedInfluencer.city}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2">
+                            <span className="text-sm font-medium text-gray-600 dark:text-gray-400 font-sans">Status</span>
+                            <span className="text-sm font-semibold text-green-600 font-sans">Available</span>
+                          </div>
+                        </div>
                       </CardContent>
                     </Card>
                   </div>
 
-                  {/* Stats Section */}
-                  <div className="md:col-span-2 space-y-6">
-                    {/* Instagram Stats */}
-                    <Card className="bg-white dark:bg-gray-800 shadow-lg">
+                  {/* Right Section - Service Cards & Portfolio */}
+                  <div className="lg:col-span-3 space-y-6">
+                    {/* Service Cards Row */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {/* Instagram Summary Card */}
+                      <Card className="bg-white dark:bg-gray-900 shadow-sm border-0 rounded-2xl">
+                        <CardContent className="p-6">
+                          <div className="flex items-center mb-4">
+                            <Instagram className="w-5 h-5 text-[#E4405F] mr-2" />
+                            <h3 className="text-lg font-bold text-gray-800 dark:text-white font-sans">
+                              Summary Instagram
+                            </h3>
+                          </div>
+                          
+                          <div className="space-y-4">
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-[#7124A8] font-sans">
+                                @{selectedInfluencer.instagram.handle}
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 font-sans">Followers</div>
+                                <div className="text-xl font-bold text-gray-800 dark:text-white font-sans">
+                                  {selectedInfluencer.instagram.followers}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 font-sans">Engagement Rate</div>
+                                <div className="text-xl font-bold text-green-600 font-sans">
+                                  {selectedInfluencer.instagram.engagementRate}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 font-sans">Average Like</div>
+                                <div className="text-lg font-bold text-gray-800 dark:text-white font-sans">
+                                  {selectedInfluencer.instagram.avgLikes}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 font-sans">Average Comment</div>
+                                <div className="text-lg font-bold text-gray-800 dark:text-white font-sans">
+                                  {selectedInfluencer.instagram.avgComments}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* TikTok Summary Card */}
+                      <Card className="bg-white dark:bg-gray-900 shadow-sm border-0 rounded-2xl">
+                        <CardContent className="p-6">
+                          <div className="flex items-center mb-4">
+                            <div className="w-5 h-5 bg-black dark:bg-white rounded-sm mr-2 flex items-center justify-center">
+                              <span className="text-white dark:text-black text-xs font-bold">T</span>
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-800 dark:text-white font-sans">
+                              Summary TikTok
+                            </h3>
+                          </div>
+                          
+                          <div className="space-y-4">
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-[#7124A8] font-sans">
+                                {selectedInfluencer.tiktok.handle}
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 font-sans">Followers</div>
+                                <div className="text-xl font-bold text-gray-800 dark:text-white font-sans">
+                                  {selectedInfluencer.tiktok.followers}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 font-sans">Engagement Rate</div>
+                                <div className="text-xl font-bold text-green-600 font-sans">
+                                  {selectedInfluencer.tiktok.engagementRate}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 font-sans">Average Like</div>
+                                <div className="text-lg font-bold text-gray-800 dark:text-white font-sans">
+                                  {selectedInfluencer.tiktok.avgLikes}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 font-sans">Average View</div>
+                                <div className="text-lg font-bold text-gray-800 dark:text-white font-sans">
+                                  {selectedInfluencer.tiktok.avgViews}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Portfolio Card */}
+                    <Card className="bg-white dark:bg-gray-900 shadow-sm border-0 rounded-2xl">
                       <CardContent className="p-6">
-                        <div className="flex items-center mb-4">
-                          <Instagram className="w-6 h-6 text-[#E4405F] mr-3" />
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                            Instagram Summary
-                          </h3>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                          <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <div className="text-2xl font-bold text-[#7124A8]">
-                              @{selectedInfluencer.instagram.handle}
+                        <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-6 font-sans">Portfolio</h3>
+                        <div className="grid md:grid-cols-3 gap-4">
+                          {/* Portfolio items - placeholder for now */}
+                          {[1, 2, 3, 4, 5, 6].map((item) => (
+                            <div key={item} className="aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center">
+                              <div className="text-center">
+                                <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                                  <span className="text-gray-400 dark:text-gray-500 text-sm font-sans">#{item}</span>
+                                </div>
+                                <span className="text-xs text-gray-500 dark:text-gray-400 font-sans">Portfolio {item}</span>
+                              </div>
                             </div>
-                            <div className="text-sm text-gray-600 dark:text-gray-400">Handle</div>
-                          </div>
-                          <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <div className="text-2xl font-bold text-[#7124A8]">
-                              {selectedInfluencer.instagram.followers}
-                            </div>
-                            <div className="text-sm text-gray-600 dark:text-gray-400">Followers</div>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-4">
-                          <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                            <div className="flex items-center justify-center mb-1">
-                              <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
-                              <span className="text-lg font-bold text-green-600">
-                                {selectedInfluencer.instagram.engagementRate}
-                              </span>
-                            </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">Engagement</div>
-                          </div>
-                          <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                            <div className="flex items-center justify-center mb-1">
-                              <Heart className="w-4 h-4 text-red-500 mr-1" />
-                              <span className="text-lg font-bold text-red-500">
-                                {selectedInfluencer.instagram.avgLikes}
-                              </span>
-                            </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">Avg Likes</div>
-                          </div>
-                          <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                            <div className="flex items-center justify-center mb-1">
-                              <MessageCircle className="w-4 h-4 text-blue-500 mr-1" />
-                              <span className="text-lg font-bold text-blue-500">
-                                {selectedInfluencer.instagram.avgComments}
-                              </span>
-                            </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">Avg Comments</div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* TikTok Stats */}
-                    <Card className="bg-white dark:bg-gray-800 shadow-lg">
-                      <CardContent className="p-6">
-                        <div className="flex items-center mb-4">
-                          <div className="w-6 h-6 bg-black dark:bg-white rounded-full mr-3 flex items-center justify-center">
-                            <span className="text-white dark:text-black text-xs font-bold">T</span>
-                          </div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                            TikTok Summary
-                          </h3>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4 mb-4">
-                          <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <div className="text-2xl font-bold text-[#7124A8]">
-                              {selectedInfluencer.tiktok.handle}
-                            </div>
-                            <div className="text-sm text-gray-600 dark:text-gray-400">Handle</div>
-                          </div>
-                          <div className="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <div className="text-2xl font-bold text-[#7124A8]">
-                              {selectedInfluencer.tiktok.followers}
-                            </div>
-                            <div className="text-sm text-gray-600 dark:text-gray-400">Followers</div>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-4">
-                          <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                            <div className="flex items-center justify-center mb-1">
-                              <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
-                              <span className="text-lg font-bold text-green-600">
-                                {selectedInfluencer.tiktok.engagementRate}
-                              </span>
-                            </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">Engagement</div>
-                          </div>
-                          <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                            <div className="flex items-center justify-center mb-1">
-                              <Heart className="w-4 h-4 text-red-500 mr-1" />
-                              <span className="text-lg font-bold text-red-500">
-                                {selectedInfluencer.tiktok.avgLikes}
-                              </span>
-                            </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">Avg Likes</div>
-                          </div>
-                          <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                            <div className="flex items-center justify-center mb-1">
-                              <Eye className="w-4 h-4 text-purple-500 mr-1" />
-                              <span className="text-lg font-bold text-purple-500">
-                                {selectedInfluencer.tiktok.avgViews}
-                              </span>
-                            </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400">Avg Views</div>
-                          </div>
+                          ))}
                         </div>
                       </CardContent>
                     </Card>
