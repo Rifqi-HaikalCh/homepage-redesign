@@ -1,6 +1,7 @@
 import Header from '@/components/header';
 import HeroCarousel from '@/components/hero-carousel';
-import CategoryFilter from '@/components/category-filter';
+import ContentCarousel from '@/components/content-carousel';
+import RecommendedInfluencer from '@/components/recommended-influencer';
 import RecommendationCards from '@/components/recommendation-cards';
 import TestimonialStack from '@/components/testimonial-stack';
 import Footer from '@/components/footer';
@@ -11,7 +12,8 @@ export default function Home() {
       <Header />
       <main>
         <HeroCarousel />
-        <CategoryFilter />
+        <ContentCarousel />
+        <RecommendedInfluencer />
         <RecommendationCards />
         <TestimonialStack />
       </main>
