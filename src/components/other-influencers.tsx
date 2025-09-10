@@ -63,7 +63,8 @@ export default function OtherInfluencers() {
       scale: 1,
       transition: {
         duration: 0.6,
-        ease: [0.25, 0.46, 0.45, 0.94]
+        // --- PERBAIKAN: Mengganti array dengan string "easeOut" ---
+        ease: "easeOut" 
       }
     }
   };
@@ -106,64 +107,46 @@ export default function OtherInfluencers() {
               className="group"
             >
               <Link href={`/influencer/${influencer.id}`}>
-                {/* Glassmorphism Card */}
                 <div className="relative h-96 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer">
-                  {/* Background Image */}
-                  <div className="absolute inset-0">
-                    <img
-                      src={influencer.avatar}
-                      alt={influencer.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      style={{ aspectRatio: '680/1020' }}
-                    />
+                  <img
+                    src={influencer.avatar}
+                    alt={influencer.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    style={{ aspectRatio: '680/1020' }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                  <div className="absolute top-0 left-0 right-0 p-4 bg-black/20 backdrop-blur-sm rounded-t-3xl">
+                    <h3 className="text-lg font-bold text-white text-center drop-shadow-lg">
+                      {influencer.name}
+                    </h3>
+                    <p className="text-white/90 text-xs text-center font-medium drop-shadow-md">
+                      {influencer.contentType}
+                    </p>
                   </div>
-
-                  {/* Glassmorphism Layer - Only on bottom portion */}
-                  <div className="absolute bottom-0 left-0 right-0 h-32 backdrop-blur-[15px] bg-gradient-to-t from-white/40 via-white/20 to-transparent border-t border-white/30 rounded-b-3xl">
-                    {/* Content Container */}
-                    <div className="relative h-full flex flex-col justify-between p-6">
-                      {/* Top Section - Name & Content Type */}
-                      <div className="text-center">
-                        <h3 className="text-xl font-bold text-white mb-1 drop-shadow-lg" style={{
-                          textShadow: '0 2px 8px rgba(0,0,0,0.5)'
-                        }}>
-                          {influencer.name}
-                        </h3>
-                        <p className="text-white/90 text-sm font-medium drop-shadow-md">
-                          {influencer.contentType}
-                        </p>
-                      </div>
-
-                      {/* Bottom Section */}
-                      <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-3 border border-white/40">
-                        <div className="flex items-center justify-between">
-                          {/* Instagram Info */}
-                          <div className="flex items-center space-x-2">
-                            <Instagram className="w-4 h-4 text-white" />
-                            <div>
-                              <p className="text-white text-xs font-medium">
-                                {influencer.instagram}
-                              </p>
-                              <p className="text-white/80 text-xs">
-                                {influencer.followers}
-                              </p>
-                            </div>
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-3 border border-white/40">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Instagram className="w-4 h-4 text-white" />
+                          <div>
+                            <p className="text-white text-xs font-medium">
+                              {influencer.instagram}
+                            </p>
+                            <p className="text-white/80 text-xs">
+                              {influencer.followers}
+                            </p>
                           </div>
-
-                          {/* View Detail Button */}
-                          <Button 
-                            className="bg-white hover:bg-gray-50 text-gray-900 text-xs px-3 py-1 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-0"
-                            size="sm"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            View Detail
-                          </Button>
                         </div>
+                        <Button 
+                          className="bg-white hover:bg-gray-50 text-gray-900 text-xs px-3 py-1 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                          size="sm"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          View Detail
+                        </Button>
                       </div>
                     </div>
                   </div>
-
-                  {/* Additional Glow Effect on Hover */}
                   <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/0 via-purple-400/0 to-pink-400/0 group-hover:from-blue-400/10 group-hover:via-purple-400/5 group-hover:to-pink-400/10 transition-all duration-500 pointer-events-none" />
                 </div>
               </Link>

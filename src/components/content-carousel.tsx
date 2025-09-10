@@ -2,55 +2,43 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Utensils, Cpu, Music, Plane, Heart, Gamepad2, Clapperboard, Sparkles, Youtube, Mic, Video, Baby } from 'lucide-react';
+import { 
+  Utensils, Cpu, Music, Plane, Heart, Gamepad2, 
+  Clapperboard, Sparkles, Youtube, Mic, Video, Baby, 
+  ChevronLeft, ChevronRight 
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link'; // Import Link
 
 const categories = [
-  { id: 1, icon: Utensils, text: 'Food & Beverages' },
-  { id: 2, icon: Cpu, text: 'Technology' },
-  { id: 3, icon: Music, text: 'Entertainment' },
-  { id: 4, icon: Plane, text: 'Travel & Lifestyle' },
-  { id: 5, icon: Heart, text: 'Health & Sport' },
-  { id: 6, icon: Gamepad2, text: 'Gaming' },
-  { id: 7, icon: Clapperboard, text: 'Content Creator' },
-  { id: 8, icon: Sparkles, text: 'Beauty & Fashion' },
-  { id: 9, icon: Youtube, text: 'Youtuber' },
-  { id: 10, icon: Mic, text: 'DJ & Penyanyi' },
-  { id: 11, icon: Video, text: 'Tiktok' },
-  { id: 12, icon: Baby, text: 'Mom & Kids' }
+  { id: 1, icon: Utensils, text: 'Food & Beverages', link: '/content/food' },
+  { id: 2, icon: Cpu, text: 'Technology', link: '/content/tech' },
+  { id: 3, icon: Music, text: 'Entertainment', link: '/content/entertainment' },
+  { id: 4, icon: Plane, text: 'Travel & Lifestyle', link: '/content/travel' },
+  { id: 5, icon: Heart, text: 'Health & Sport', link: '/content/health' },
+  { id: 6, icon: Gamepad2, text: 'Gaming', link: '/content/gaming' },
+  { id: 7, icon: Clapperboard, text: 'Content Creator', link: '/content/creator' },
+  { id: 8, icon: Sparkles, text: 'Beauty & Fashion', link: '/content/beauty' },
+  { id: 9, icon: Youtube, text: 'Youtuber', link: '/content/youtube' },
+  { id: 10, icon: Mic, text: 'DJ & Penyanyi', link: '/content/dj-singer' },
+  { id: 11, icon: Video, text: 'Tiktok', link: '/content/tiktok' },
+  { id: 12, icon: Baby, text: 'Mom & Kids', link: '/content/mom-kids' }
 ];
 
-export default function ContentCarousel() {
+const ITEMS_PER_PAGE = 4;
 
-  const containerVariants = {
-    collapsed: {
-      height: 'auto'
-    },
-    expanded: {
-      height: 'auto',
-      transition: {
-        duration: 0.8,
-        ease: [0.25, 0.46, 0.45, 0.94],
-        when: 'beforeChildren',
-        staggerChildren: 0.1
-      }
-    }
+export default function ContentCarousel() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const totalPages = Math.ceil(categories.length / ITEMS_PER_PAGE);
+  const maxIndex = totalPages - 1;
+
+  const next = () => {
+    setCurrentIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
   };
 
-  const itemVariants = {
-    collapsed: {
-      x: 0,
-      y: 0,
-      scale: 1
-    },
-    expanded: {
-      x: 0,
-      y: 0,
-      scale: 1,
-      transition: {
-        duration: 0.6,
-        ease: [0.25, 0.46, 0.45, 0.94]
-      }
-    }
+  const prev = () => {
+    setCurrentIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
   };
 
   return (
@@ -65,40 +53,57 @@ export default function ContentCarousel() {
           </p>
         </div>
 
-        <motion.div
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-5xl mx-auto"
-          variants={containerVariants}
-          initial="collapsed"
-          animate="expanded"
-        >
-          {categories.map((category) => {
-            const Icon = category.icon;
-            
-            return (
-              <motion.div
-                key={category.id}
-                variants={itemVariants}
-                whileHover={{ 
-                  scale: 1.05,
-                  transition: { duration: 0.2 }
-                }}
-                whileTap={{ scale: 0.95 }}
-                className="relative group cursor-pointer"
-              >
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
-                  <div className="flex flex-col items-center text-center space-y-3">
-                    <div className="p-3 rounded-xl transition-all duration-300 group-hover:scale-110 bg-[#7124A8]/10 group-hover:bg-[#7124A8]/20">
-                      <Icon className="w-8 h-8 transition-colors duration-300 text-[#7124A8] group-hover:text-[#5a1d87]" />
-                    </div>
-                    <h3 className="font-semibold text-sm transition-colors duration-300 text-gray-900 dark:text-white group-hover:text-[#7124A8]">
-                      {category.text}
-                    </h3>
-                  </div>
+        <div className="relative max-w-5xl mx-auto">
+          <div className="overflow-hidden py-4"> {/* Menambahkan padding vertikal di sini */}
+            <motion.div
+              className="flex"
+              animate={{ x: `-${currentIndex * 100}%` }}
+              transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
+            >
+              {Array.from({ length: totalPages }).map((_, pageIndex) => (
+                <div key={pageIndex} className="grid grid-cols-4 gap-4 flex-shrink-0 w-full">
+                  {categories.slice(pageIndex * ITEMS_PER_PAGE, (pageIndex + 1) * ITEMS_PER_PAGE).map((category) => {
+                    const Icon = category.icon;
+                    return (
+                      <Link href={category.link} key={category.id} className="group"> {/* Link membungkus seluruh kartu */}
+                        <motion.div
+                          whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)" }} // Efek hover shadow & scale
+                          whileTap={{ scale: 0.95 }} // Efek klik
+                          className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700 h-full flex flex-col justify-center items-center cursor-pointer"
+                        >
+                          <div className="flex flex-col items-center text-center space-y-3">
+                            <div className="p-3 rounded-xl transition-all duration-300 group-hover:scale-110 bg-[#7124A8]/10 group-hover:bg-[#7124A8]/20">
+                              <Icon className="w-8 h-8 transition-colors duration-300 text-[#7124A8] group-hover:text-[#5a1d87]" />
+                            </div>
+                            <h3 className="font-semibold text-sm transition-colors duration-300 text-gray-900 dark:text-white group-hover:text-[#7124A8]">
+                              {category.text}
+                            </h3>
+                          </div>
+                        </motion.div>
+                      </Link>
+                    );
+                  })}
                 </div>
-              </motion.div>
-            );
-          })}
-        </motion.div>
+              ))}
+            </motion.div>
+          </div>
+
+          <Button
+            size="icon"
+            onClick={prev}
+            className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-12 h-12 rounded-full bg-white shadow-lg hover:scale-110 transition-transform text-gray-800 hover:bg-white z-10"
+          >
+            <ChevronLeft />
+          </Button>
+          
+          <Button
+            size="icon"
+            onClick={next}
+            className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-12 h-12 rounded-full bg-white shadow-lg hover:scale-110 transition-transform text-gray-800 hover:bg-white z-10"
+          >
+            <ChevronRight />
+          </Button>
+        </div>
       </div>
     </section>
   );
