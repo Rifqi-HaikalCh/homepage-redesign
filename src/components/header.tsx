@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Moon, Sun } from 'lucide-react';
+import { Search, Moon, Sun, User } from 'lucide-react'; // Import Ikon User
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/theme-provider';
+import Link from 'next/link'; // Import Link
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -56,18 +57,34 @@ export default function Header() {
             </div>
           </div>
           
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="rounded-full w-10 h-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/30 dark:border-gray-600/50 hover:bg-white/80 dark:hover:bg-gray-800/80 hover:border-[#7124A8]/30 text-gray-700 dark:text-gray-300 transition-all duration-300 shadow-sm"
-          >
-            {theme === 'dark' ? (
-              <Sun className="w-5 h-5" />
-            ) : (
-              <Moon className="w-5 h-5" />
-            )}
-          </Button>
+          {/* --- MULAI PERUBAHAN --- */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="rounded-full w-10 h-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/30 dark:border-gray-600/50 hover:bg-white/80 dark:hover:bg-gray-800/80 hover:border-[#7124A8]/30 text-gray-700 dark:text-gray-300 transition-all duration-300 shadow-sm"
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </Button>
+
+            {/* Tombol Ikon Profil */}
+            <Link href="/profile">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full w-10 h-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/30 dark:border-gray-600/50 hover:bg-white/80 dark:hover:bg-gray-800/80 hover:border-[#7124A8]/30 text-gray-700 dark:text-gray-300 transition-all duration-300 shadow-sm"
+              >
+                <User className="w-5 h-5" />
+              </Button>
+            </Link>
+          </div>
+          {/* --- AKHIR PERUBAHAN --- */}
+          
         </div>
       </div>
     </header>

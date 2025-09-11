@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Filter, ChevronDown, Instagram } from 'lucide-react';
+import { Search, Filter, ChevronDown, Instagram, Plus, Edit, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,6 +9,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
+import SecondaryHeader from '@/components/secondary-header';
+import { ConfirmDeleteModal, InfluencerFormModal } from '@/components/glassmorphism-modal';
 
 const allInfluencersData = [
   {
@@ -108,19 +110,78 @@ const cities = ['Semua', 'Jakarta', 'Bandung', 'Surabaya', 'Bali', 'Yogyakarta',
 const followerRanges = ['Semua', '0-50K', '50K-100K', '100K-200K', '200K+'];
 
 export default function InfluencerListPage() {
+  const [influencers, setInfluencers] = useState(allInfluencersData);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedContentType, setSelectedContentType] = useState('Semua');
   const [selectedCity, setSelectedCity] = useState('Semua');
   const [selectedFollowerRange, setSelectedFollowerRange] = useState('Semua');
+  
+  // Modal states
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
+  const [selectedInfluencer, setSelectedInfluencer] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const parseFollowers = (followers: string) => {
     const num = parseFloat(followers.replace('K', ''));
     return num;
   };
 
+  // CRUD functions
+  const handleAddInfluencer = () => {
+    setFormMode('add');
+    setSelectedInfluencer(null);
+    setIsFormModalOpen(true);
+  };
+
+  const handleEditInfluencer = (influencer: any) => {
+    setFormMode('edit');
+    setSelectedInfluencer(influencer);
+    setIsFormModalOpen(true);
+  };
+
+  const handleDeleteInfluencer = (influencer: any) => {
+    setSelectedInfluencer(influencer);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    setInfluencers(prev => prev.filter(inf => inf.id !== selectedInfluencer?.id));
+    setIsDeleteModalOpen(false);
+    setSelectedInfluencer(null);
+    setIsLoading(false);
+  };
+
+  const handleSaveInfluencer = async (data: any) => {
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    if (formMode === 'add') {
+      const newInfluencer = {
+        ...data,
+        id: Math.max(...influencers.map(inf => inf.id)) + 1,
+      };
+      setInfluencers(prev => [...prev, newInfluencer]);
+    } else {
+      setInfluencers(prev => prev.map(inf => 
+        inf.id === selectedInfluencer?.id ? { ...inf, ...data } : inf
+      ));
+    }
+    
+    setIsFormModalOpen(false);
+    setSelectedInfluencer(null);
+    setIsLoading(false);
+  };
+
   const filterInfluencers = () => {
-    return allInfluencersData.filter(influencer => {
+    return influencers.filter(influencer => {
       const matchesSearch = influencer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            influencer.contentType.toLowerCase().includes(searchTerm.toLowerCase());
       
@@ -164,21 +225,19 @@ export default function InfluencerListPage() {
       scale: 1,
       transition: {
         duration: 0.6,
-        ease: [0.25, 0.46, 0.45, 0.94]
+        ease: "easeOut"
       }
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 transition-all duration-500">
-      {/* Glossy Glass Background Effect */}
       <div className="fixed inset-0 bg-gradient-to-br from-white/30 via-transparent to-purple-100/20 dark:from-gray-900/50 dark:via-transparent dark:to-purple-900/10 pointer-events-none" />
       <div className="fixed inset-0 backdrop-blur-[0.5px] pointer-events-none" />
       
       <div className="relative z-10">
-        <Header />
+        <SecondaryHeader title="Semua Influencer" backUrl="/" />
         <main className="container mx-auto px-6 py-8">
-          {/* Page Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Semua Influencer
@@ -188,9 +247,7 @@ export default function InfluencerListPage() {
             </p>
           </div>
 
-          {/* Search and Filter Bar */}
           <div className="flex flex-col md:flex-row gap-4 mb-8">
-            {/* Search Bar */}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
               <Input
@@ -201,7 +258,6 @@ export default function InfluencerListPage() {
               />
             </div>
 
-            {/* Filter Button */}
             <div className="relative">
               <Button
                 variant="outline"
@@ -213,7 +269,6 @@ export default function InfluencerListPage() {
                 <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`} />
               </Button>
 
-              {/* Filter Dropdown */}
               <AnimatePresence>
                 {isFilterOpen && (
                   <motion.div
@@ -224,7 +279,6 @@ export default function InfluencerListPage() {
                     className="absolute top-full mt-2 right-0 w-80 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-4 z-50"
                   >
                     <div className="space-y-4">
-                      {/* Content Type Filter */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Jenis Konten
@@ -240,7 +294,6 @@ export default function InfluencerListPage() {
                         </select>
                       </div>
 
-                      {/* City Filter */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Daerah
@@ -256,7 +309,6 @@ export default function InfluencerListPage() {
                         </select>
                       </div>
 
-                      {/* Followers Filter */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Followers
@@ -278,14 +330,24 @@ export default function InfluencerListPage() {
             </div>
           </div>
 
-          {/* Results Count */}
-          <div className="mb-6">
+          <div className="flex justify-between items-center mb-6">
             <p className="text-gray-600 dark:text-gray-400">
-              Menampilkan {filteredInfluencers.length} dari {allInfluencersData.length} influencer
+              Menampilkan {filteredInfluencers.length} dari {influencers.length} influencer
             </p>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Button
+                onClick={handleAddInfluencer}
+                className="bg-[#7124A8] hover:bg-[#5a1d87] text-white flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Tambah Influencer
+              </Button>
+            </motion.div>
           </div>
 
-          {/* Influencer Grid */}
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
             initial="hidden"
@@ -308,70 +370,82 @@ export default function InfluencerListPage() {
                 }}
                 className="group"
               >
+                {/* --- KODE KARTU YANG DIPERBARUI --- */}
                 <Link href={`/influencer/${influencer.id}`}>
-                  {/* Glassmorphism Card */}
                   <div className="relative h-96 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer">
-                    {/* Background Image */}
-                    <div className="absolute inset-0">
-                      <img
-                        src={influencer.avatar}
-                        alt={influencer.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        style={{ aspectRatio: '680/1020' }}
-                      />
+                    <img
+                      src={influencer.avatar}
+                      alt={influencer.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      style={{ aspectRatio: '680/1020' }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    <div className="absolute top-0 left-0 right-0 p-4 bg-black/20 backdrop-blur-sm rounded-t-3xl">
+                      <h3 className="text-lg font-bold text-white text-center drop-shadow-lg">
+                        {influencer.name}
+                      </h3>
+                      <p className="text-white/90 text-xs text-center font-medium drop-shadow-md">
+                        {influencer.contentType}
+                      </p>
                     </div>
-
-                    {/* Glassmorphism Layer - Only on bottom portion */}
-                    <div className="absolute bottom-0 left-0 right-0 h-32 backdrop-blur-[15px] bg-gradient-to-t from-white/40 via-white/20 to-transparent border-t border-white/30 rounded-b-3xl">
-                      {/* Content Container */}
-                      <div className="relative h-full flex flex-col justify-between p-6">
-                        {/* Top Section - Name & Content Type */}
-                        <div className="text-center">
-                          <h3 className="text-xl font-bold text-white mb-1 drop-shadow-lg" style={{
-                            textShadow: '0 2px 8px rgba(0,0,0,0.5)'
-                          }}>
-                            {influencer.name}
-                          </h3>
-                          <p className="text-white/90 text-sm font-medium drop-shadow-md">
-                            {influencer.contentType}
-                          </p>
-                        </div>
-
-                        {/* Bottom Section */}
-                        <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-3 border border-white/40">
-                          <div className="flex items-center justify-between">
-                            {/* Instagram Info */}
-                            <div className="flex items-center space-x-2">
-                              <Instagram className="w-4 h-4 text-white" />
-                              <div>
-                                <p className="text-white text-xs font-medium">
-                                  {influencer.instagram}
-                                </p>
-                                <p className="text-white/80 text-xs">
-                                  {influencer.followers}
-                                </p>
-                              </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-3 border border-white/40">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <Instagram className="w-4 h-4 text-white" />
+                            <div>
+                              <p className="text-white text-xs font-medium">
+                                {influencer.instagram}
+                              </p>
+                              <p className="text-white/80 text-xs">
+                                {influencer.followers}
+                              </p>
                             </div>
-
-                            {/* View Detail Button */}
-                            <Button 
-                              className="bg-white hover:bg-gray-50 text-gray-900 text-xs px-3 py-1 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-0"
-                              size="sm"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              View Detail
-                            </Button>
                           </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            className="bg-white hover:bg-gray-50 text-gray-900 text-xs px-2 py-1 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-0 flex-1"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                            }}
+                          >
+                            View Detail
+                          </Button>
+                          <Button 
+                            className="bg-blue-500 hover:bg-blue-600 text-white text-xs p-1 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              handleEditInfluencer(influencer);
+                            }}
+                          >
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                          <Button 
+                            className="bg-red-500 hover:bg-red-600 text-white text-xs p-1 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              handleDeleteInfluencer(influencer);
+                            }}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
                         </div>
                       </div>
                     </div>
+                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/0 via-purple-400/0 to-pink-400/0 group-hover:from-blue-400/10 group-hover:via-purple-400/5 group-hover:to-pink-400/10 transition-all duration-500 pointer-events-none" />
                   </div>
                 </Link>
               </motion.div>
             ))}
           </motion.div>
 
-          {/* No Results */}
           {filteredInfluencers.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-500 dark:text-gray-400 text-lg">
@@ -382,6 +456,24 @@ export default function InfluencerListPage() {
         </main>
         <Footer />
       </div>
+      
+      {/* Modals */}
+      <ConfirmDeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        itemName={selectedInfluencer?.name || ''}
+        isLoading={isLoading}
+      />
+      
+      <InfluencerFormModal
+        isOpen={isFormModalOpen}
+        onClose={() => setIsFormModalOpen(false)}
+        onSave={handleSaveInfluencer}
+        initialData={selectedInfluencer || {}}
+        isLoading={isLoading}
+        mode={formMode}
+      />
     </div>
   );
 }

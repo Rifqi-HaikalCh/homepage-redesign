@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Users, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
 
 const packages = [
   {
@@ -183,13 +184,15 @@ export default function RecommendationCards() {
         </div>
 
         <div className="text-center mt-8">
-          <Button 
-            variant="outline" 
-            size="lg"
-            className="border-[#7124A8] text-[#7124A8] hover:bg-[#7124A8] hover:text-white dark:border-[#7124A8] dark:text-[#7124A8] dark:hover:bg-[#7124A8] dark:hover:text-white transition-all duration-300 px-8"
-          >
-            Lihat Semua Paket
-          </Button>
+          <Link href="/packages">
+            <Button 
+              variant="outline" 
+              size="lg"
+              className="border-[#7124A8] text-[#7124A8] hover:bg-[#7124A8] hover:text-white dark:border-[#7124A8] dark:text-[#7124A8] dark:hover:bg-[#7124A8] dark:hover:text-white transition-all duration-300 px-8"
+            >
+              Lihat Semua Paket
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

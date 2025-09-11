@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import SecondaryHeader from '@/components/secondary-header';
 
 const influencersData = [
   {
@@ -176,22 +177,13 @@ export default function InfluencerDetail() {
   const selectedInfluencer = influencersData[selectedIndex];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              Influencer Detail
-            </h1>
-            <div className="w-10"></div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-purple-950 dark:to-blue-950 transition-all duration-500">
+      {/* Glossy Glass Background Effect */}
+      <div className="fixed inset-0 bg-gradient-to-br from-white/30 via-transparent to-purple-100/20 dark:from-gray-900/50 dark:via-transparent dark:to-purple-900/10 pointer-events-none" />
+      <div className="fixed inset-0 backdrop-blur-[0.5px] pointer-events-none" />
+      
+      <div className="relative z-10">
+        <SecondaryHeader title="Influencer Detail" backUrl="/influencer" />
       </div>
 
       {/* 3D Coverflow Carousel */}

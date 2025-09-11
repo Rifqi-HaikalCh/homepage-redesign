@@ -1,0 +1,158 @@
+'use client';
+
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
+
+export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    // Simulasi login process
+    setTimeout(() => {
+      setIsLoading(false);
+      // Redirect to home or dashboard
+      window.location.href = '/';
+    }, 2000);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-purple-950 dark:to-blue-950 transition-all duration-500">
+      {/* Glossy Glass Background Effect */}
+      <div className="fixed inset-0 bg-gradient-to-br from-white/30 via-transparent to-purple-100/20 dark:from-gray-900/50 dark:via-transparent dark:to-purple-900/10 pointer-events-none" />
+      <div className="fixed inset-0 backdrop-blur-[0.5px] pointer-events-none" />
+      
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-6">
+        {/* Back Button */}
+        <Link href="/" className="absolute top-6 left-6">
+          <Button variant="ghost" className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+            <ArrowLeft className="w-4 h-4" />
+            Kembali
+          </Button>
+        </Link>
+
+        <motion.div
+          initial={{ opacity: 0, y: 50, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="w-full max-w-md"
+        >
+          <Card className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl shadow-2xl border border-white/30 dark:border-gray-700/30 rounded-3xl overflow-hidden">
+            <CardContent className="p-8">
+              {/* Logo and Title */}
+              <div className="text-center mb-8">
+                <div className="flex justify-center mb-4">
+                  <img 
+                    src="/dapur-buzzer-logo.png" 
+                    alt="Dapur Buzzer Logo" 
+                    className="h-12 w-auto"
+                  />
+                </div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Masuk ke Akun Anda
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Selamat datang kembali! Silakan masuk untuk melanjutkan.
+                </p>
+              </div>
+
+              {/* Login Form */}
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10 bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm focus:bg-white/80 dark:focus:bg-gray-800/80"
+                      placeholder="masukkan@email.com"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10 pr-10 bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm focus:bg-white/80 dark:focus:bg-gray-800/80"
+                      placeholder="Masukkan password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      className="rounded border-gray-300 text-[#7124A8] focus:ring-[#7124A8]"
+                    />
+                    <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                      Ingat saya
+                    </span>
+                  </label>
+                  <Link href="/forgot-password" className="text-sm text-[#7124A8] hover:text-[#5a1d87]">
+                    Lupa password?
+                  </Link>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-[#7124A8] hover:bg-[#5a1d87] text-white py-3 rounded-xl font-semibold transition-all duration-300"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span className="ml-2">Masuk...</span>
+                    </div>
+                  ) : (
+                    'Masuk'
+                  )}
+                </Button>
+              </form>
+
+              {/* Register Link */}
+              <div className="mt-6 text-center">
+                <p className="text-gray-600 dark:text-gray-400">
+                  Belum punya akun?{' '}
+                  <Link href="/register" className="text-[#7124A8] hover:text-[#5a1d87] font-medium">
+                    Daftar sekarang
+                  </Link>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
