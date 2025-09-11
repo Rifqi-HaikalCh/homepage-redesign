@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -93,13 +94,6 @@ export default function LoginPage() {
       <div className="fixed inset-0 backdrop-blur-[0.5px] pointer-events-none" />
       
       <div className="relative z-10 min-h-screen flex items-center justify-center p-6">
-        {/* Back Button */}
-        <Link href="/" className="absolute top-6 left-6">
-          <Button variant="ghost" className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
-            <ArrowLeft className="w-4 h-4" />
-            Kembali
-          </Button>
-        </Link>
 
         <motion.div
           initial={{ opacity: 0, y: 50, scale: 0.9 }}
@@ -112,10 +106,13 @@ export default function LoginPage() {
               {/* Logo and Title */}
               <div className="text-center mb-8">
                 <div className="flex justify-center mb-4">
-                  <img 
+                  <Image 
                     src="/dapur-buzzer-logo.png" 
                     alt="Dapur Buzzer Logo" 
-                    className="h-12 w-auto"
+                    width={140}
+                    height={48}
+                    className="h-12 w-auto object-contain"
+                    priority
                   />
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
