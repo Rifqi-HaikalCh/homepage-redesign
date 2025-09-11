@@ -18,9 +18,18 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   
-  const { signIn, setGuestMode } = useAuth();
+  const { user, signIn, setGuestMode, loading } = useAuth();
   const router = useRouter();
+
+  // Auto redirect when user is authenticated
+  useEffect(() => {
+    if (user && !loading) {
+      setIsRedirecting(true);
+      router.push('/');
+    }
+  }, [user, loading, router]);
 
   // Countdown timer untuk rate limiting
   useEffect(() => {
@@ -44,11 +53,7 @@ export default function LoginPage() {
     
     try {
       await signIn(email, password);
-      // Add small delay to ensure auth state is updated
-      setTimeout(() => {
-        router.push('/');
-        router.refresh(); // Force refresh to update the page
-      }, 100);
+      // Redirect akan ditangani oleh useEffect yang memantau perubahan user state
     } catch (error: unknown) {
       if (error instanceof Error && error.message.includes('Terlalu banyak percobaan')) {
         const seconds = error.message.match(/(\d+) detik/)?.[1];
@@ -68,6 +73,18 @@ export default function LoginPage() {
     setGuestMode();
     router.push('/');
   };
+
+  // Show redirecting state
+  if (isRedirecting || (user && !loading)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-purple-950 dark:to-blue-950">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7124A8] mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Mengarahkan ke halaman utama...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-purple-950 dark:to-blue-950 transition-all duration-500">
