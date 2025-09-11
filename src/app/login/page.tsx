@@ -7,23 +7,37 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const { signIn, setGuestMode } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     
-    // Simulasi login process
-    setTimeout(() => {
+    try {
+      await signIn(email, password);
+      router.push('/');
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
       setIsLoading(false);
-      // Redirect to home or dashboard
-      window.location.href = '/';
-    }, 2000);
+    }
+  };
+
+  const handleGuestMode = () => {
+    setGuestMode();
+    router.push('/');
   };
 
   return (
@@ -65,6 +79,13 @@ export default function LoginPage() {
                   Selamat datang kembali! Silakan masuk untuk melanjutkan.
                 </p>
               </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-6">
+                  <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+                </div>
+              )}
 
               {/* Login Form */}
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -139,6 +160,18 @@ export default function LoginPage() {
                   )}
                 </Button>
               </form>
+
+              {/* Guest Mode Button */}
+              <div className="mt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleGuestMode}
+                  className="w-full border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Masuk sebagai Tamu
+                </Button>
+              </div>
 
               {/* Register Link */}
               <div className="mt-6 text-center">

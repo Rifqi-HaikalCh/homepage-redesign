@@ -6,14 +6,48 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Mail, Lock, User, ArrowRight, ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 type Step = 1 | 2 | 3;
 
 export default function RegisterPage() {
   const [step, setStep] = useState<Step>(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  // Form data
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    fullName: '',
+    username: '',
+    role: 'client' as 'admin' | 'client'
+  });
+
+  const { signUp } = useAuth();
+  const router = useRouter();
 
   const nextStep = () => setStep(prev => prev < 3 ? (prev + 1) as Step : prev);
   const prevStep = () => setStep(prev => prev > 1 ? (prev - 1) as Step : prev);
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      await signUp(formData.email, formData.password, formData.role);
+      router.push('/login?message=Registration successful, please login');
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const cardVariants = {
     hidden: { opacity: 0, y: 50, scale: 0.8 },
@@ -128,7 +162,10 @@ export default function RegisterPage() {
                       <Input 
                         type="email" 
                         placeholder="masukkan@email.com" 
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
                         className="pl-10 h-12 rounded-lg bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm focus:bg-white/80 dark:focus:bg-gray-800/80" 
+                        required
                       />
                     </div>
                     <div className="relative">
@@ -136,7 +173,11 @@ export default function RegisterPage() {
                       <Input 
                         type="password" 
                         placeholder="Masukkan password" 
+                        value={formData.password}
+                        onChange={(e) => handleInputChange('password', e.target.value)}
                         className="pl-10 h-12 rounded-lg bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm focus:bg-white/80 dark:focus:bg-gray-800/80" 
+                        required
+                        minLength={6}
                       />
                     </div>
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -161,15 +202,34 @@ export default function RegisterPage() {
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <Input 
                         placeholder="Nama Lengkap" 
+                        value={formData.fullName}
+                        onChange={(e) => handleInputChange('fullName', e.target.value)}
                         className="pl-10 h-12 rounded-lg bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm focus:bg-white/80 dark:focus:bg-gray-800/80" 
+                        required
                       />
                     </div>
                      <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <Input 
                         placeholder="Username" 
+                        value={formData.username}
+                        onChange={(e) => handleInputChange('username', e.target.value)}
                         className="pl-10 h-12 rounded-lg bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm focus:bg-white/80 dark:focus:bg-gray-800/80" 
+                        required
                       />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Role
+                      </label>
+                      <select
+                        value={formData.role}
+                        onChange={(e) => handleInputChange('role', e.target.value)}
+                        className="w-full p-3 h-12 rounded-lg border border-white/30 dark:border-gray-600/30 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 backdrop-blur-sm"
+                      >
+                        <option value="client">Client</option>
+                        <option value="admin">Admin</option>
+                      </select>
                     </div>
                     <div className="flex gap-4">
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-1/2">
@@ -197,15 +257,27 @@ export default function RegisterPage() {
                   >
                     <h2 className="font-semibold text-lg text-gray-800 dark:text-gray-200">Ready to Go!</h2>
                     <p className="text-gray-600 dark:text-gray-300">You're all set. Click below to create your account.</p>
+                    
+                    {/* Error Message */}
+                    {error && (
+                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 w-full">
+                        <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+                      </div>
+                    )}
+                    
                      <div className="flex gap-4 w-full pt-4">
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-1/2">
-                         <Button onClick={handlePrev} variant="outline" className="w-full h-12 rounded-lg">
+                         <Button onClick={handlePrev} variant="outline" className="w-full h-12 rounded-lg" disabled={isLoading}>
                           <ArrowLeft className="w-4 h-4 mr-2" /> Back
                         </Button>
                       </motion.div>
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-1/2">
-                         <Button className="w-full h-12 bg-[#7124A8] hover:bg-[#5a1d87] text-white font-bold rounded-lg text-base">
-                          Buat Akun
+                         <Button 
+                           onClick={handleSubmit} 
+                           disabled={isLoading}
+                           className="w-full h-12 bg-[#7124A8] hover:bg-[#5a1d87] text-white font-bold rounded-lg text-base"
+                         >
+                          {isLoading ? 'Membuat Akun...' : 'Buat Akun'}
                         </Button>
                       </motion.div>
                     </div>
@@ -223,6 +295,7 @@ export default function RegisterPage() {
           </div>
         </div>
       </motion.div>
+      </div>
     </div>
   );
 }
