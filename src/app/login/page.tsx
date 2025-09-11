@@ -44,7 +44,11 @@ export default function LoginPage() {
     
     try {
       await signIn(email, password);
-      router.push('/');
+      // Add small delay to ensure auth state is updated
+      setTimeout(() => {
+        router.push('/');
+        router.refresh(); // Force refresh to update the page
+      }, 100);
     } catch (error: unknown) {
       if (error instanceof Error && error.message.includes('Terlalu banyak percobaan')) {
         const seconds = error.message.match(/(\d+) detik/)?.[1];

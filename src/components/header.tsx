@@ -1,15 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Moon, Sun, User } from 'lucide-react'; // Import Ikon User
+import { Search, Moon, Sun, User, LogOut, LogIn } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/theme-provider';
-import Link from 'next/link'; // Import Link
+import { useAuth } from '@/contexts/AuthContext';
+import Link from 'next/link';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { user, role, signOut, loading } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,6 +24,14 @@ export default function Header() {
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
   };
 
   return (
@@ -57,8 +67,7 @@ export default function Header() {
             </div>
           </div>
           
-          {/* --- MULAI PERUBAHAN --- */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
@@ -72,18 +81,67 @@ export default function Header() {
               )}
             </Button>
 
-            {/* Tombol Ikon Profil */}
-            <Link href="/profile">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full w-10 h-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/30 dark:border-gray-600/50 hover:bg-white/80 dark:hover:bg-gray-800/80 hover:border-[#7124A8]/30 text-gray-700 dark:text-gray-300 transition-all duration-300 shadow-sm"
-              >
-                <User className="w-5 h-5" />
-              </Button>
-            </Link>
+            {!loading && (
+              <>
+                {user ? (
+                  <div className="flex items-center gap-2">
+                    {/* Role Badge */}
+                    <div className="px-3 py-1 rounded-full text-xs font-medium bg-[#7124A8]/10 text-[#7124A8] border border-[#7124A8]/20">
+                      {role === 'admin' && '👑 Admin'}
+                      {role === 'client' && '👤 Client'}
+                      {role === 'influencer' && '⭐ Influencer'}
+                      {role === 'guest' && '👋 Guest'}
+                    </div>
+                    
+                    {/* Profile Button */}
+                    <Link href="/profile">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full w-10 h-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/30 dark:border-gray-600/50 hover:bg-white/80 dark:hover:bg-gray-800/80 hover:border-[#7124A8]/30 text-gray-700 dark:text-gray-300 transition-all duration-300 shadow-sm"
+                      >
+                        <User className="w-5 h-5" />
+                      </Button>
+                    </Link>
+                    
+                    {/* Sign Out Button */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleSignOut}
+                      className="rounded-full w-10 h-10 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/30 dark:border-gray-600/50 hover:bg-white/80 dark:hover:bg-gray-800/80 hover:border-red-500/30 text-gray-700 dark:text-gray-300 hover:text-red-500 transition-all duration-300 shadow-sm"
+                    >
+                      <LogOut className="w-5 h-5" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    {/* Login Button */}
+                    <Link href="/login">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-full px-4 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-white/30 dark:border-gray-600/50 hover:bg-white/80 dark:hover:bg-gray-800/80 hover:border-[#7124A8]/30 text-gray-700 dark:text-gray-300 transition-all duration-300 shadow-sm"
+                      >
+                        <LogIn className="w-4 h-4 mr-2" />
+                        Masuk
+                      </Button>
+                    </Link>
+                    
+                    {/* Register Button */}
+                    <Link href="/register">
+                      <Button
+                        size="sm"
+                        className="rounded-full px-4 bg-[#7124A8] hover:bg-[#5a1d87] text-white transition-all duration-300 shadow-sm"
+                      >
+                        Daftar
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </>
+            )}
           </div>
-          {/* --- AKHIR PERUBAHAN --- */}
           
         </div>
       </div>
