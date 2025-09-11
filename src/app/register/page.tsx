@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,8 @@ export default function RegisterPage() {
   const [step, setStep] = useState<Step>(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   
   // Form data
   const [formData, setFormData] = useState({
@@ -31,11 +33,26 @@ export default function RegisterPage() {
   const nextStep = () => setStep(prev => prev < 3 ? (prev + 1) as Step : prev);
   const prevStep = () => setStep(prev => prev > 1 ? (prev - 1) as Step : prev);
 
+  // Countdown timer untuk rate limiting
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (isRateLimited && countdown === 0) {
+      setIsRateLimited(false);
+      setError('');
+    }
+  }, [countdown, isRateLimited]);
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async () => {
+    if (isRateLimited) return;
+    
     setIsLoading(true);
     setError('');
     
@@ -43,6 +60,14 @@ export default function RegisterPage() {
       await signUp(formData.email, formData.password, formData.role);
       router.push('/login?message=Registration successful, please login');
     } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('Terlalu banyak percobaan')) {
+        // Extract retry time dari error message
+        const seconds = error.message.match(/(\d+) detik/)?.[1];
+        if (seconds) {
+          setCountdown(parseInt(seconds));
+          setIsRateLimited(true);
+        }
+      }
       const message = error instanceof Error ? error.message : 'Registration failed';
       setError(message);
     } finally {
@@ -261,8 +286,31 @@ export default function RegisterPage() {
                     
                     {/* Error Message */}
                     {error && (
-                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 w-full">
-                        <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+                      <div className={`border rounded-lg p-3 w-full ${
+                        isRateLimited 
+                          ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
+                          : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                      }`}>
+                        <p className={`text-sm ${
+                          isRateLimited 
+                            ? 'text-orange-600 dark:text-orange-400'
+                            : 'text-red-600 dark:text-red-400'
+                        }`}>
+                          {error}
+                        </p>
+                        {isRateLimited && countdown > 0 && (
+                          <div className="mt-2 p-2 bg-orange-100 dark:bg-orange-900/40 rounded text-center">
+                            <p className="text-orange-700 dark:text-orange-300 text-sm font-semibold">
+                              Coba lagi dalam: {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
+                            </p>
+                            <div className="w-full bg-orange-200 dark:bg-orange-800 rounded-full h-1 mt-1">
+                              <div 
+                                className="bg-orange-500 h-1 rounded-full transition-all duration-1000"
+                                style={{ width: `${100 - (countdown / 60) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                     
@@ -275,10 +323,14 @@ export default function RegisterPage() {
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-1/2">
                          <Button 
                            onClick={handleSubmit} 
-                           disabled={isLoading}
-                           className="w-full h-12 bg-[#7124A8] hover:bg-[#5a1d87] text-white font-bold rounded-lg text-base"
+                           disabled={isLoading || isRateLimited}
+                           className={`w-full h-12 font-bold rounded-lg text-base ${
+                             isRateLimited 
+                               ? 'bg-gray-400 cursor-not-allowed'
+                               : 'bg-[#7124A8] hover:bg-[#5a1d87]'
+                           } text-white`}
                          >
-                          {isLoading ? 'Membuat Akun...' : 'Buat Akun'}
+                          {isLoading ? 'Membuat Akun...' : isRateLimited ? `Tunggu ${countdown}s` : 'Buat Akun'}
                         </Button>
                       </motion.div>
                     </div>

@@ -22,9 +22,44 @@ export async function POST(request: Request) {
     });
 
   } catch (error: unknown) {
+    console.error('Registration error:', error);
     const message = error instanceof Error ? error.message : 'Gagal mendaftar';
+    
+    if (message.includes('User already registered')) {
+      return NextResponse.json(
+        { error: 'Email sudah terdaftar. Silakan gunakan email lain atau login.' },
+        { status: 400 }
+      );
+    }
+    
+    if (message.includes('Password should be at least 6 characters')) {
+      return NextResponse.json(
+        { error: 'Password minimal harus 6 karakter.' },
+        { status: 400 }
+      );
+    }
+    
+    if (message.includes('For security purposes, you can only request this after')) {
+      const seconds = message.match(/(\d+) seconds/)?.[1] || '60';
+      return NextResponse.json(
+        { 
+          error: `Terlalu banyak percobaan registrasi. Silakan coba lagi setelah ${seconds} detik.`,
+          rateLimited: true,
+          retryAfter: parseInt(seconds)
+        },
+        { status: 429 }
+      );
+    }
+    
+    if (message.includes('Invalid email format')) {
+      return NextResponse.json(
+        { error: 'Format email tidak valid. Gunakan email yang benar.' },
+        { status: 400 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: message },
+      { error: `Terjadi kesalahan saat registrasi: ${message}` },
       { status: 400 }
     );
   }
@@ -42,22 +77,6 @@ export async function PUT(request: Request) {
       );
     }
 
-    // Check if Supabase is properly configured
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      console.error('Supabase environment variables are not set');
-      return NextResponse.json(
-        { error: 'Server configuration error. Please check Supabase settings.' },
-        { status: 500 }
-      );
-    }
-
-    if (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY === 'your_supabase_anon_key_here') {
-      console.error('Supabase anon key is not configured properly');
-      return NextResponse.json(
-        { error: 'Server configuration error. Supabase key not configured.' },
-        { status: 500 }
-      );
-    }
 
     const result = await signIn(email, password);
 
@@ -72,23 +91,34 @@ export async function PUT(request: Request) {
     console.error('Auth error:', error);
     const message = error instanceof Error ? error.message : 'Gagal login';
     
-    // Check for specific Supabase errors
     if (message.includes('Invalid login credentials')) {
       return NextResponse.json(
-        { error: 'Email atau password salah' },
+        { error: 'Email atau password yang Anda masukkan salah.' },
         { status: 401 }
       );
     }
     
-    if (message.includes('Invalid API key')) {
+    if (message.includes('For security purposes, you can only request this after')) {
+      const seconds = message.match(/(\d+) seconds/)?.[1] || '60';
       return NextResponse.json(
-        { error: 'Server configuration error' },
+        { 
+          error: `Terlalu banyak percobaan login. Silakan coba lagi setelah ${seconds} detik.`,
+          rateLimited: true,
+          retryAfter: parseInt(seconds)
+        },
+        { status: 429 }
+      );
+    }
+    
+    if (message.includes('Invalid API key') || message.includes('Server configuration error')) {
+      return NextResponse.json(
+        { error: 'Kesalahan konfigurasi server. Pastikan environment variables Supabase sudah benar.' },
         { status: 500 }
       );
     }
     
     return NextResponse.json(
-      { error: message },
+      { error: `Terjadi kesalahan: ${message}` },
       { status: 401 }
     );
   }

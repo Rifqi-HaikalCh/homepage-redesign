@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,12 +16,29 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [countdown, setCountdown] = useState(0);
   
   const { signIn, setGuestMode } = useAuth();
   const router = useRouter();
 
+  // Countdown timer untuk rate limiting
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (isRateLimited && countdown === 0) {
+      setIsRateLimited(false);
+      setError('');
+    }
+  }, [countdown, isRateLimited]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isRateLimited) return;
+    
     setIsLoading(true);
     setError('');
     
@@ -29,6 +46,13 @@ export default function LoginPage() {
       await signIn(email, password);
       router.push('/');
     } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('Terlalu banyak percobaan')) {
+        const seconds = error.message.match(/(\d+) detik/)?.[1];
+        if (seconds) {
+          setCountdown(parseInt(seconds));
+          setIsRateLimited(true);
+        }
+      }
       const message = error instanceof Error ? error.message : 'Login failed';
       setError(message);
     } finally {
@@ -79,23 +103,33 @@ export default function LoginPage() {
                 <p className="text-gray-600 dark:text-gray-400">
                   Selamat datang kembali! Silakan masuk untuk melanjutkan.
                 </p>
-                {process.env.NODE_ENV === 'development' && (
-                  <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                    <p className="text-blue-600 dark:text-blue-400 text-xs">
-                      🚧 <strong>Development Mode:</strong> Masukkan email dan password apa saja untuk testing.
-                    </p>
-                  </div>
-                )}
               </div>
 
               {/* Error Message */}
               {error && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-6">
-                  <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
-                  {error.includes('Server configuration error') && (
-                    <div className="mt-2 text-xs text-red-500 dark:text-red-300">
-                      <p>💡 <strong>Development Note:</strong></p>
-                      <p>Supabase belum dikonfigurasi. Untuk testing, coba masukkan email dan password apa saja.</p>
+                <div className={`border rounded-lg p-3 mb-6 ${
+                  isRateLimited 
+                    ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
+                    : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                }`}>
+                  <p className={`text-sm ${
+                    isRateLimited 
+                      ? 'text-orange-600 dark:text-orange-400'
+                      : 'text-red-600 dark:text-red-400'
+                  }`}>
+                    {error}
+                  </p>
+                  {isRateLimited && countdown > 0 && (
+                    <div className="mt-2 p-2 bg-orange-100 dark:bg-orange-900/40 rounded text-center">
+                      <p className="text-orange-700 dark:text-orange-300 text-sm font-semibold">
+                        Coba lagi dalam: {Math.floor(countdown / 60)}:{(countdown % 60).toString().padStart(2, '0')}
+                      </p>
+                      <div className="w-full bg-orange-200 dark:bg-orange-800 rounded-full h-1 mt-1">
+                        <div 
+                          className="bg-orange-500 h-1 rounded-full transition-all duration-1000"
+                          style={{ width: `${100 - (countdown / 60) * 100}%` }}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
@@ -161,14 +195,20 @@ export default function LoginPage() {
 
                 <Button
                   type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-[#7124A8] hover:bg-[#5a1d87] text-white py-3 rounded-xl font-semibold transition-all duration-300"
+                  disabled={isLoading || isRateLimited}
+                  className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 ${
+                    isRateLimited 
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-[#7124A8] hover:bg-[#5a1d87]'
+                  } text-white`}
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                       <span className="ml-2">Masuk...</span>
                     </div>
+                  ) : isRateLimited ? (
+                    `Tunggu ${countdown}s`
                   ) : (
                     'Masuk'
                   )}
