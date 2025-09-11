@@ -3,9 +3,10 @@
 import { motion, Variants } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Edit, LogOut, Instagram } from 'lucide-react';
+import { Edit, LogOut, Instagram, User, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import SecondaryHeader from '@/components/secondary-header';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Data statis yang diperkaya, mirip dengan data influencer
 const userData = {
@@ -30,7 +31,73 @@ const userData = {
   portfolioItems: 6,
 };
 
+// Guest Login Prompt Component
+const GuestLoginPrompt = () => (
+  <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-purple-950 dark:to-blue-950 transition-all duration-500">
+    <div className="fixed inset-0 bg-gradient-to-br from-white/30 via-transparent to-purple-100/20 dark:from-gray-900/50 dark:via-transparent dark:to-purple-900/10 pointer-events-none" />
+    <div className="fixed inset-0 backdrop-blur-[0.5px] pointer-events-none" />
+    
+    <div className="relative z-10">
+      <SecondaryHeader title="Profile" backUrl="/" />
+      
+      <div className="flex items-center justify-center min-h-[80vh] p-4">
+        <motion.div
+          initial={{ opacity: 0, y: 30, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
+          <Card className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl shadow-2xl border border-white/30 dark:border-gray-700/30 rounded-3xl max-w-md w-full">
+            <CardContent className="p-8 text-center">
+              <div className="w-20 h-20 bg-[#7124A8]/10 dark:bg-[#7124A8]/20 rounded-full mx-auto mb-6 flex items-center justify-center">
+                <User className="w-10 h-10 text-[#7124A8]" />
+              </div>
+              
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Akses Profile Terbatas
+              </h1>
+              
+              <p className="text-gray-600 dark:text-gray-400 mb-8">
+                Untuk melihat dan mengelola profile Anda, silakan masuk terlebih dahulu atau buat akun baru.
+              </p>
+              
+              <div className="space-y-4">
+                <Link href="/login" className="block">
+                  <Button className="w-full bg-[#7124A8] hover:bg-[#5a1d87] text-white py-3 rounded-xl flex items-center justify-center gap-3">
+                    <User className="w-5 h-5" />
+                    Masuk ke Akun
+                  </Button>
+                </Link>
+                
+                <Link href="/register" className="block">
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-[#7124A8]/30 text-[#7124A8] hover:bg-[#7124A8]/10 py-3 rounded-xl flex items-center justify-center gap-3"
+                  >
+                    <UserPlus className="w-5 h-5" />
+                    Buat Akun Baru
+                  </Button>
+                </Link>
+              </div>
+              
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-6">
+                Dengan membuat akun, Anda dapat menyimpan preferensi dan mengakses semua fitur platform.
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </div>
+  </div>
+);
+
 export default function ProfilePage() {
+  const { role } = useAuth();
+  
+  // Show guest login prompt if user is a guest
+  if (role === 'guest') {
+    return <GuestLoginPrompt />;
+  }
+
   const containerVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
@@ -179,22 +246,38 @@ export default function ProfilePage() {
             <Card className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl shadow-2xl border border-white/30 dark:border-gray-700/30 rounded-3xl">
               <CardContent className="p-6">
                 <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-6 font-sans">Portofolio</h3>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {Array.from({ length: userData.portfolioItems }).map((_, index) => (
-                    <motion.div
-                      key={index}
-                      className="aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center cursor-pointer"
-                      whileHover={{ scale: 1.05, backgroundColor: '#f3e8ff' }}
-                    >
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                          <span className="text-gray-400 dark:text-gray-500 text-sm font-sans">#{index + 1}</span>
-                        </div>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 font-sans">Project {index + 1}</span>
+                {userData.portfolioItems === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                      <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                        <span className="text-gray-400 dark:text-gray-500 text-lg">📁</span>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
+                    </div>
+                    <h4 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Portfolio Belum Diupload
+                    </h4>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">
+                      Mulai upload karya terbaik Anda untuk menarik klien potensial
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid md:grid-cols-3 gap-4">
+                    {Array.from({ length: userData.portfolioItems }).map((_, index) => (
+                      <motion.div
+                        key={index}
+                        className="aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center cursor-pointer"
+                        whileHover={{ scale: 1.05, backgroundColor: '#f3e8ff' }}
+                      >
+                        <div className="text-center">
+                          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                            <span className="text-gray-400 dark:text-gray-500 text-sm font-sans">#{index + 1}</span>
+                          </div>
+                          <span className="text-xs text-gray-500 dark:text-gray-400 font-sans">Project {index + 1}</span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>

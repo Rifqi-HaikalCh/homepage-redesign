@@ -50,9 +50,9 @@ export async function POST(request: Request) {
     const packageData = await request.json();
     
     // Validate required fields
-    const { title, description, price, icon, category = 'Custom' } = packageData;
+    const { title, description, price } = packageData;
     
-    if (!title || !description || !price || !icon) {
+    if (!title || !description || !price) {
       return NextResponse.json(
         { error: 'Semua field harus diisi' },
         { status: 400 }
@@ -64,9 +64,7 @@ export async function POST(request: Request) {
       .insert([{
         title,
         description,
-        price,
-        icon,
-        category
+        price
       }])
       .select()
       .single();

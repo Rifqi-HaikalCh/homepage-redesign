@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, Plus, Edit, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,8 +16,6 @@ interface Package {
   title: string;
   description: string;
   price: string;
-  icon: string;
-  category: string;
 }
 
 const initialPackagesData = [
@@ -25,41 +23,31 @@ const initialPackagesData = [
     id: 1,
     title: 'Paket Endorsement 10 Micro Influencer',
     description: 'Kampanye endorsement dengan 10 micro influencer pilihan',
-    price: 'Rp 2.500.000',
-    icon: '🎯',
-    category: 'Endorsement'
+    price: 'Rp 2.500.000'
   },
   {
     id: 2,
     title: 'Paket Paid Promote 10 Micro Influencer',
     description: 'Promosi berbayar melalui 10 micro influencer terverifikasi',
-    price: 'Rp 1.500.000',
-    icon: '📢',
-    category: 'Paid Promote'
+    price: 'Rp 1.500.000'
   },
   {
     id: 3,
     title: 'Paket Produk Review 10 Micro Influencer',
     description: 'Review produk mendalam oleh 10 micro influencer',
-    price: 'Rp 2.000.000',
-    icon: '⭐',
-    category: 'Review'
+    price: 'Rp 2.000.000'
   },
   {
     id: 4,
     title: 'Paket Bundle TikTok + Instagram Story 10 Micro Influencer',
     description: 'Konten multi-platform TikTok dan Instagram Story',
-    price: 'Rp 3.500.000',
-    icon: '📱',
-    category: 'Bundle'
+    price: 'Rp 3.500.000'
   },
   {
     id: 5,
     title: 'Paket Kampanye Viral 100 Micro Influencer',
     description: 'Kampanye viral massal dengan 100 micro influencer',
-    price: 'Rp 25.000.000',
-    icon: '🚀',
-    category: 'Viral'
+    price: 'Rp 25.000.000'
   }
 ];
 
@@ -67,7 +55,7 @@ const categories = ['Semua', 'Endorsement', 'Paid Promote', 'Review', 'Bundle', 
 const priceRanges = ['Semua', '0-2 Juta', '2-5 Juta', '5-10 Juta', '10 Juta+'];
 
 export default function PackagesPage() {
-  const [packages, setPackages] = useState(initialPackagesData);
+  const [packages, setPackages] = useState<Package[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('Semua');
@@ -79,6 +67,33 @@ export default function PackagesPage() {
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+
+  // Fetch packages data
+  const fetchPackages = async () => {
+    try {
+      setIsDataLoading(true);
+      const response = await fetch('/api/packages');
+      if (response.ok) {
+        const data = await response.json();
+        setPackages(data);
+      } else {
+        console.error('Failed to fetch packages');
+        // Fallback to dummy data if API fails
+        setPackages(initialPackagesData);
+      }
+    } catch (error) {
+      console.error('Error fetching packages:', error);
+      // Fallback to dummy data if API fails
+      setPackages(initialPackagesData);
+    } finally {
+      setIsDataLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPackages();
+  }, []);
 
   // CRUD functions
   const handleAddPackage = () => {
@@ -99,11 +114,24 @@ export default function PackagesPage() {
   };
 
   const confirmDelete = async () => {
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    if (!selectedPackage) return;
     
-    setPackages(prev => prev.filter(pkg => pkg.id !== selectedPackage?.id));
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/packages?id=${selectedPackage.id}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        // Refresh the data
+        await fetchPackages();
+      } else {
+        console.error('Failed to delete package');
+      }
+    } catch (error) {
+      console.error('Error deleting package:', error);
+    }
+    
     setIsDeleteModalOpen(false);
     setSelectedPackage(null);
     setIsLoading(false);
@@ -111,20 +139,36 @@ export default function PackagesPage() {
 
   const handleSavePackage = async (data: Partial<Package>) => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    if (formMode === 'add') {
-      const newPackage: Package = {
-        ...data,
-        id: Math.max(...packages.map(pkg => pkg.id)) + 1,
-        category: 'Custom',
-      } as Package;
-      setPackages(prev => [...prev, newPackage]);
-    } else {
-      setPackages(prev => prev.map(pkg => 
-        pkg.id === selectedPackage?.id ? { ...pkg, ...data } : pkg
-      ));
+    try {
+      let response;
+      
+      if (formMode === 'add') {
+        response = await fetch('/api/packages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+      } else {
+        response = await fetch('/api/packages', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ ...data, id: selectedPackage?.id })
+        });
+      }
+      
+      if (response.ok) {
+        // Refresh the data
+        await fetchPackages();
+      } else {
+        console.error('Failed to save package');
+      }
+    } catch (error) {
+      console.error('Error saving package:', error);
     }
     
     setIsFormModalOpen(false);
@@ -142,7 +186,7 @@ export default function PackagesPage() {
       const matchesSearch = pkg.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            pkg.description.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesCategory = selectedCategory === 'Semua' || pkg.category === selectedCategory;
+      const matchesCategory = true; // Remove category filtering since it's not in the database
       
       let matchesPrice = true;
       if (selectedPriceRange !== 'Semua') {
@@ -289,19 +333,40 @@ export default function PackagesPage() {
             </motion.div>
           </div>
 
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.1
+          {isDataLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="animate-pulse">
+                  <div className="h-72 bg-gray-200 dark:bg-gray-700 rounded-3xl"></div>
+                </div>
+              ))}
+            </div>
+          ) : filteredPackages.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                <span className="text-gray-400 dark:text-gray-500 text-2xl">📦</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Tidak Ada Paket
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
+                Belum ada paket yang tersedia atau sesuai dengan filter yang dipilih
+              </p>
+            </div>
+          ) : (
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.1
+                  }
                 }
-              }
-            }}
-          >
-            {filteredPackages.map((pkg) => (
+              }}
+            >
+              {filteredPackages.map((pkg) => (
               <motion.div
                 key={pkg.id}
                 variants={cardVariants}
@@ -314,7 +379,7 @@ export default function PackagesPage() {
                 <Card className="overflow-hidden bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl shadow-2xl border border-white/30 dark:border-gray-700/30 rounded-3xl hover:shadow-2xl transition-shadow duration-300">
                   <CardContent className="p-6">
                     <div className="text-center mb-6">
-                      <div className="text-4xl mb-4">{pkg.icon}</div>
+                      <div className="text-4xl mb-4">📦</div>
                       <div className="bg-[#7124A8]/10 dark:bg-[#7124A8]/20 text-[#7124A8] px-4 py-2 rounded-full text-lg font-bold mb-4">
                         {pkg.price}
                       </div>
@@ -355,15 +420,8 @@ export default function PackagesPage() {
                   </CardContent>
                 </Card>
               </motion.div>
-            ))}
-          </motion.div>
-
-          {filteredPackages.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400 text-lg">
-                Tidak ada paket yang sesuai dengan filter yang dipilih
-              </p>
-            </div>
+              ))}
+            </motion.div>
           )}
         </main>
         <Footer />

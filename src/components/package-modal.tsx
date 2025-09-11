@@ -8,7 +8,6 @@ interface PackageFormData {
   title: string;
   description: string;
   price: string;
-  icon: string;
 }
 
 interface PackageFormModalProps {
@@ -36,7 +35,6 @@ export function PackageFormModal({
       title: formData.get('title') as string,
       description: formData.get('description') as string,
       price: formData.get('price') as string,
-      icon: formData.get('icon') as string,
     };
     
     onSave(data);
@@ -84,19 +82,6 @@ export function PackageFormModal({
             name="price"
             defaultValue={initialData.price || ''}
             placeholder="Rp 2.500.000"
-            required
-            className="bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Icon (Emoji)
-          </label>
-          <Input
-            name="icon"
-            defaultValue={initialData.icon || ''}
-            placeholder="🎯"
             required
             className="bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm"
           />

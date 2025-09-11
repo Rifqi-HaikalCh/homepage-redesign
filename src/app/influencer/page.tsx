@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, Instagram, Plus, Edit, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -13,103 +13,114 @@ import { ConfirmDeleteModal, InfluencerFormModal } from '@/components/glassmorph
 interface Influencer {
   id: number;
   name: string;
-  contentType: string;
+  content_type: string;
   instagram: string;
   followers: string;
   city: string;
   avatar: string;
+  engagement_rate: string;
 }
 
 const allInfluencersData = [
   {
     id: 1,
     name: 'Khansa Mariska',
-    contentType: 'Lifestyle & Fashion',
+    content_type: 'Lifestyle & Fashion',
     instagram: '@khansa_mariska',
     followers: '76.8K',
     city: 'Jakarta',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=680&h=1020&fit=crop&crop=center'
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=680&h=1020&fit=crop&crop=center',
+    engagement_rate: '5.4%'
   },
   {
     id: 2,
     name: 'Rina Salsabila',
-    contentType: 'Beauty & Skincare',
+    content_type: 'Beauty & Skincare',
     instagram: '@rinasalsabila',
     followers: '92.3K',
     city: 'Bandung',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=680&h=1020&fit=crop&crop=center'
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=680&h=1020&fit=crop&crop=center',
+    engagement_rate: '6.2%'
   },
   {
     id: 3,
     name: 'Dimas Anggara',
-    contentType: 'Tech & Gaming',
+    content_type: 'Tech & Gaming',
     instagram: '@dimasanggara',
     followers: '154.7K',
     city: 'Surabaya',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=680&h=1020&fit=crop&crop=center'
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=680&h=1020&fit=crop&crop=center',
+    engagement_rate: '4.8%'
   },
   {
     id: 4,
     name: 'Sarah Octavia',
-    contentType: 'Travel & Food',
+    content_type: 'Travel & Food',
     instagram: '@sarahoctavia',
     followers: '128.9K',
     city: 'Bali',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=680&h=1020&fit=crop&crop=center'
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=680&h=1020&fit=crop&crop=center',
+    engagement_rate: '7.1%'
   },
   {
     id: 5,
     name: 'Arya Pratama',
-    contentType: 'Fitness & Health',
+    content_type: 'Fitness & Health',
     instagram: '@aryapratama',
     followers: '67.2K',
     city: 'Yogyakarta',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=680&h=1020&fit=crop&crop=center'
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=680&h=1020&fit=crop&crop=center',
+    engagement_rate: '5.9%'
   },
   {
     id: 6,
     name: 'Luna Maharani',
-    contentType: 'Art & Creative',
+    content_type: 'Art & Creative',
     instagram: '@lunamaharani',
     followers: '203.4K',
     city: 'Medan',
-    avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=680&h=1020&fit=crop&crop=center'
+    avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=680&h=1020&fit=crop&crop=center',
+    engagement_rate: '4.3%'
   },
   {
     id: 7,
     name: 'Sari Indah',
-    contentType: 'Beauty & Skincare',
+    content_type: 'Beauty & Skincare',
     instagram: '@sariindah',
     followers: '45.2K',
     city: 'Solo',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=680&h=1020&fit=crop&crop=center'
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=680&h=1020&fit=crop&crop=center',
+    engagement_rate: '6.8%'
   },
   {
     id: 8,
     name: 'Maya Putri',
-    contentType: 'Lifestyle & Fashion',
+    content_type: 'Lifestyle & Fashion',
     instagram: '@mayaputri',
     followers: '38.7K',
     city: 'Malang',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=680&h=1020&fit=crop&crop=center'
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=680&h=1020&fit=crop&crop=center',
+    engagement_rate: '5.2%'
   },
   {
     id: 9,
     name: 'Dewi Lestari',
-    contentType: 'Travel & Food',
+    content_type: 'Travel & Food',
     instagram: '@dewilestari',
     followers: '52.1K',
     city: 'Semarang',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=680&h=1020&fit=crop&crop=center'
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=680&h=1020&fit=crop&crop=center',
+    engagement_rate: '6.5%'
   },
   {
     id: 10,
     name: 'Rina Safitri',
-    contentType: 'Art & Creative',
+    content_type: 'Art & Creative',
     instagram: '@rinasafitri',
     followers: '41.9K',
     city: 'Palembang',
-    avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=680&h=1020&fit=crop&crop=center'
+    avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=680&h=1020&fit=crop&crop=center',
+    engagement_rate: '4.7%'
   }
 ];
 
@@ -118,7 +129,7 @@ const cities = ['Semua', 'Jakarta', 'Bandung', 'Surabaya', 'Bali', 'Yogyakarta',
 const followerRanges = ['Semua', '0-50K', '50K-100K', '100K-200K', '200K+'];
 
 export default function InfluencerListPage() {
-  const [influencers, setInfluencers] = useState(allInfluencersData);
+  const [influencers, setInfluencers] = useState<Influencer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedContentType, setSelectedContentType] = useState('Semua');
@@ -131,6 +142,33 @@ export default function InfluencerListPage() {
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
   const [selectedInfluencer, setSelectedInfluencer] = useState<Influencer | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+
+  // Fetch influencers data
+  const fetchInfluencers = async () => {
+    try {
+      setIsDataLoading(true);
+      const response = await fetch('/api/influencers');
+      if (response.ok) {
+        const data = await response.json();
+        setInfluencers(data);
+      } else {
+        console.error('Failed to fetch influencers');
+        // Fallback to dummy data if API fails
+        setInfluencers(allInfluencersData);
+      }
+    } catch (error) {
+      console.error('Error fetching influencers:', error);
+      // Fallback to dummy data if API fails
+      setInfluencers(allInfluencersData);
+    } finally {
+      setIsDataLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInfluencers();
+  }, []);
 
   const parseFollowers = (followers: string) => {
     const num = parseFloat(followers.replace('K', ''));
@@ -156,11 +194,24 @@ export default function InfluencerListPage() {
   };
 
   const confirmDelete = async () => {
-    setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    if (!selectedInfluencer) return;
     
-    setInfluencers(prev => prev.filter(inf => inf.id !== selectedInfluencer?.id));
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/influencers?id=${selectedInfluencer.id}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        // Refresh the data
+        await fetchInfluencers();
+      } else {
+        console.error('Failed to delete influencer');
+      }
+    } catch (error) {
+      console.error('Error deleting influencer:', error);
+    }
+    
     setIsDeleteModalOpen(false);
     setSelectedInfluencer(null);
     setIsLoading(false);
@@ -168,19 +219,36 @@ export default function InfluencerListPage() {
 
   const handleSaveInfluencer = async (data: Partial<Influencer>) => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    if (formMode === 'add') {
-      const newInfluencer: Influencer = {
-        ...data,
-        id: Math.max(...influencers.map(inf => inf.id)) + 1,
-      } as Influencer;
-      setInfluencers(prev => [...prev, newInfluencer]);
-    } else {
-      setInfluencers(prev => prev.map(inf => 
-        inf.id === selectedInfluencer?.id ? { ...inf, ...data } : inf
-      ));
+    try {
+      let response;
+      
+      if (formMode === 'add') {
+        response = await fetch('/api/influencers', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+      } else {
+        response = await fetch('/api/influencers', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ ...data, id: selectedInfluencer?.id })
+        });
+      }
+      
+      if (response.ok) {
+        // Refresh the data
+        await fetchInfluencers();
+      } else {
+        console.error('Failed to save influencer');
+      }
+    } catch (error) {
+      console.error('Error saving influencer:', error);
     }
     
     setIsFormModalOpen(false);
@@ -191,9 +259,9 @@ export default function InfluencerListPage() {
   const filterInfluencers = () => {
     return influencers.filter(influencer => {
       const matchesSearch = influencer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           influencer.contentType.toLowerCase().includes(searchTerm.toLowerCase());
+                           influencer.content_type.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesContentType = selectedContentType === 'Semua' || influencer.contentType === selectedContentType;
+      const matchesContentType = selectedContentType === 'Semua' || influencer.content_type === selectedContentType;
       const matchesCity = selectedCity === 'Semua' || influencer.city === selectedCity;
       
       let matchesFollowers = true;
@@ -356,19 +424,40 @@ export default function InfluencerListPage() {
             </motion.div>
           </div>
 
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.1
+          {isDataLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div key={index} className="animate-pulse">
+                  <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded-3xl"></div>
+                </div>
+              ))}
+            </div>
+          ) : filteredInfluencers.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                <span className="text-gray-400 dark:text-gray-500 text-2xl">👥</span>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Tidak Ada Influencer
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
+                Belum ada data influencer yang tersedia atau sesuai dengan filter yang dipilih
+              </p>
+            </div>
+          ) : (
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.1
+                  }
                 }
-              }
-            }}
-          >
-            {filteredInfluencers.map((influencer) => (
+              }}
+            >
+              {filteredInfluencers.map((influencer) => (
               <motion.div
                 key={influencer.id}
                 variants={cardVariants}
@@ -393,7 +482,7 @@ export default function InfluencerListPage() {
                         {influencer.name}
                       </h3>
                       <p className="text-white/90 text-xs text-center font-medium drop-shadow-md">
-                        {influencer.contentType}
+                        {influencer.content_type}
                       </p>
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -451,15 +540,8 @@ export default function InfluencerListPage() {
                   </div>
                 </Link>
               </motion.div>
-            ))}
-          </motion.div>
-
-          {filteredInfluencers.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400 text-lg">
-                Tidak ada influencer yang sesuai dengan filter yang dipilih
-              </p>
-            </div>
+              ))}
+            </motion.div>
           )}
         </main>
         <Footer />

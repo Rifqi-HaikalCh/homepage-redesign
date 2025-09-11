@@ -110,11 +110,12 @@ export function ConfirmDeleteModal({
 
 interface InfluencerFormData {
   name: string;
-  contentType: string;
+  content_type: string;
   instagram: string;
   followers: string;
   city: string;
   avatar: string;
+  engagement_rate: string;
 }
 
 interface InfluencerFormModalProps {
@@ -140,11 +141,12 @@ export function InfluencerFormModal({
     
     const data: InfluencerFormData = {
       name: formData.get('name') as string,
-      contentType: formData.get('contentType') as string,
+      content_type: formData.get('content_type') as string,
       instagram: formData.get('instagram') as string,
       followers: formData.get('followers') as string,
       city: formData.get('city') as string,
       avatar: formData.get('avatar') as string,
+      engagement_rate: formData.get('engagement_rate') as string,
     };
     
     onSave(data);
@@ -175,8 +177,8 @@ export function InfluencerFormModal({
             Jenis Konten
           </label>
           <select
-            name="contentType"
-            defaultValue={initialData.contentType || ''}
+            name="content_type"
+            defaultValue={initialData.content_type || ''}
             required
             className="w-full p-2 rounded-lg border border-white/30 dark:border-gray-600/30 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 backdrop-blur-sm"
           >
@@ -237,6 +239,19 @@ export function InfluencerFormModal({
             name="avatar"
             defaultValue={initialData.avatar || ''}
             placeholder="https://images.unsplash.com/..."
+            required
+            className="bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Engagement Rate
+          </label>
+          <Input
+            name="engagement_rate"
+            defaultValue={initialData.engagement_rate || ''}
+            placeholder="5.4%"
             required
             className="bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm"
           />

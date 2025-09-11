@@ -50,9 +50,9 @@ export async function POST(request: Request) {
     const influencerData = await request.json();
     
     // Validate required fields
-    const { name, content_type, instagram, followers, city, avatar } = influencerData;
+    const { name, content_type, instagram, followers, city, avatar, engagement_rate } = influencerData;
     
-    if (!name || !content_type || !instagram || !followers || !city || !avatar) {
+    if (!name || !content_type || !instagram || !followers || !city || !avatar || !engagement_rate) {
       return NextResponse.json(
         { error: 'Semua field harus diisi' },
         { status: 400 }
@@ -67,7 +67,8 @@ export async function POST(request: Request) {
         instagram,
         followers,
         city,
-        avatar
+        avatar,
+        engagement_rate
       }])
       .select()
       .single();
