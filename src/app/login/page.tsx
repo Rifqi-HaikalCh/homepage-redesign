@@ -20,16 +20,16 @@ export default function LoginPage() {
   const [countdown, setCountdown] = useState(0);
   const [isRedirecting, setIsRedirecting] = useState(false);
   
-  const { user, signIn, setGuestMode, loading } = useAuth();
+  const { user, signIn, setGuestMode } = useAuth();
   const router = useRouter();
 
   // Auto redirect when user is authenticated
   useEffect(() => {
-    if (user && !loading) {
+    if (user) {
       setIsRedirecting(true);
       router.push('/');
     }
-  }, [user, loading, router]);
+  }, [user, router]);
 
   // Countdown timer untuk rate limiting
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function LoginPage() {
     
     try {
       await signIn(email, password);
-      // Redirect akan ditangani oleh useEffect yang memantau perubahan user state
+      // `onAuthStateChange` listener akan memperbarui state dan memicu useEffect redirect
     } catch (error: unknown) {
       if (error instanceof Error && error.message.includes('Terlalu banyak percobaan')) {
         const seconds = error.message.match(/(\d+) detik/)?.[1];
@@ -75,7 +75,7 @@ export default function LoginPage() {
   };
 
   // Show redirecting state
-  if (isRedirecting || (user && !loading)) {
+  if (isRedirecting || user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-purple-950 dark:to-blue-950">
         <div className="text-center">

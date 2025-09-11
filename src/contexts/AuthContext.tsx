@@ -99,16 +99,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(data.error || 'Login failed');
     }
 
-    // Refresh auth state after successful login
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      setSession(session);
-      setUser(session.user);
-      const userRole = await getUserRole(session.user.id);
-      setRole(userRole || 'guest');
-      // Clear guest mode if it was set
-      localStorage.removeItem('guest-mode');
-    }
+    // HAPUS bagian refresh manual dari sini
+    // `onAuthStateChange` akan menangani pembaruan state secara otomatis
+    localStorage.removeItem('guest-mode');
 
     return data;
   };
