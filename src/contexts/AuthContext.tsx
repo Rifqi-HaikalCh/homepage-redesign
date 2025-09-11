@@ -7,9 +7,9 @@ import { User, Session } from '@supabase/supabase-js';
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  role: 'admin' | 'client' | 'guest';
+  role: 'admin' | 'client' | 'influencer' | 'guest';
   loading: boolean;
-  signUp: (email: string, password: string, role?: 'admin' | 'client') => Promise<void>;
+  signUp: (email: string, password: string, role?: 'admin' | 'client' | 'influencer') => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   setGuestMode: () => void;
@@ -20,7 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [role, setRole] = useState<'admin' | 'client' | 'guest'>('guest');
+  const [role, setRole] = useState<'admin' | 'client' | 'influencer' | 'guest'>('guest');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, userRole: 'admin' | 'client' = 'client') => {
+  const signUp = async (email: string, password: string, userRole: 'admin' | 'client' | 'influencer' = 'client') => {
     const response = await fetch('/api/auth', {
       method: 'POST',
       headers: {

@@ -40,9 +40,9 @@ export async function POST(request: Request) {
 
     const role = await getUserRole(user.id);
     
-    if (role !== 'admin') {
+    if (role !== 'admin' && role !== 'influencer') {
       return NextResponse.json(
-        { error: 'Akses ditolak. Hanya admin yang dapat menambah influencer.' },
+        { error: 'Akses ditolak. Hanya admin atau influencer yang dapat menambah profil influencer.' },
         { status: 403 }
       );
     }
@@ -62,6 +62,7 @@ export async function POST(request: Request) {
     const { data, error } = await supabase
       .from('influencers')
       .insert([{
+        user_id: user.id,
         name,
         content_type,
         instagram,
@@ -108,9 +109,9 @@ export async function PUT(request: Request) {
 
     const role = await getUserRole(user.id);
     
-    if (role !== 'admin') {
+    if (role !== 'admin' && role !== 'influencer') {
       return NextResponse.json(
-        { error: 'Akses ditolak. Hanya admin yang dapat mengupdate influencer.' },
+        { error: 'Akses ditolak. Hanya admin atau influencer yang dapat mengupdate profil influencer.' },
         { status: 403 }
       );
     }
@@ -124,10 +125,17 @@ export async function PUT(request: Request) {
       );
     }
 
-    const { data, error } = await supabase
+    // If user is influencer (not admin), they can only edit their own profile
+    let query = supabase
       .from('influencers')
       .update(updateData)
-      .eq('id', id)
+      .eq('id', id);
+
+    if (role === 'influencer') {
+      query = query.eq('user_id', user.id);
+    }
+
+    const { data, error } = await query
       .select()
       .single();
 

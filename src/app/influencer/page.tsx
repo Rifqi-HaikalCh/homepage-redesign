@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Search, Filter, ChevronDown, Instagram, Plus, Edit, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ const cities = ['Semua', 'Jakarta', 'Bandung', 'Surabaya', 'Bali', 'Yogyakarta',
 const followerRanges = ['Semua', '0-50K', '50K-100K', '100K-200K', '200K+'];
 
 export default function InfluencerListPage() {
+  const { role } = useAuth();
   const [influencers, setInfluencers] = useState<Influencer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -306,18 +308,20 @@ export default function InfluencerListPage() {
             <p className="text-gray-600 dark:text-gray-400">
               Menampilkan {filteredInfluencers.length} dari {influencers.length} influencer
             </p>
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Button
-                onClick={handleAddInfluencer}
-                className="bg-[#7124A8] hover:bg-[#5a1d87] text-white flex items-center gap-2"
+            {(role === 'admin' || role === 'influencer') && (
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <Plus className="w-4 h-4" />
-                Tambah Influencer
-              </Button>
-            </motion.div>
+                <Button
+                  onClick={handleAddInfluencer}
+                  className="bg-[#7124A8] hover:bg-[#5a1d87] text-white flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  {role === 'influencer' ? 'Buat Profil Saya' : 'Tambah Influencer'}
+                </Button>
+              </motion.div>
+            )}
           </div>
 
           {isDataLoading ? (
@@ -407,28 +411,32 @@ export default function InfluencerListPage() {
                           >
                             View Detail
                           </Button>
-                          <Button 
-                            className="bg-blue-500 hover:bg-blue-600 text-white text-xs p-1 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border-0"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              e.preventDefault();
-                              handleEditInfluencer(influencer);
-                            }}
-                          >
-                            <Edit className="w-3 h-3" />
-                          </Button>
-                          <Button 
-                            className="bg-red-500 hover:bg-red-600 text-white text-xs p-1 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border-0"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              e.preventDefault();
-                              handleDeleteInfluencer(influencer);
-                            }}
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
+                          {role === 'admin' && (
+                            <>
+                              <Button 
+                                className="bg-blue-500 hover:bg-blue-600 text-white text-xs p-1 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  e.preventDefault();
+                                  handleEditInfluencer(influencer);
+                                }}
+                              >
+                                <Edit className="w-3 h-3" />
+                              </Button>
+                              <Button 
+                                className="bg-red-500 hover:bg-red-600 text-white text-xs p-1 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  e.preventDefault();
+                                  handleDeleteInfluencer(influencer);
+                                }}
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>

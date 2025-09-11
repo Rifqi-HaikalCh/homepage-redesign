@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS public.users_roles (
 -- 2. Create influencers table
 CREATE TABLE IF NOT EXISTS public.influencers (
     id BIGSERIAL PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     content_type TEXT NOT NULL,
     instagram TEXT NOT NULL,
@@ -30,7 +31,8 @@ CREATE TABLE IF NOT EXISTS public.influencers (
     avatar TEXT NOT NULL,
     engagement_rate TEXT NOT NULL DEFAULT '0%',
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id)
 );
 
 -- 3. Create packages table
@@ -74,14 +76,37 @@ ON public.influencers
 FOR SELECT 
 USING (true);
 
--- Admin can manage influencers
-CREATE POLICY "Admin can manage influencers" 
+-- Admin can manage all influencers, influencers can manage their own profile
+CREATE POLICY "Admin can manage all influencers" 
 ON public.influencers 
 FOR ALL 
 USING (
     EXISTS (
         SELECT 1 FROM public.users_roles 
         WHERE user_id = auth.uid() AND role = 'admin'
+    )
+);
+
+-- Influencers can create and update their own profile
+CREATE POLICY "Influencers can manage own profile" 
+ON public.influencers 
+FOR INSERT 
+WITH CHECK (
+    auth.uid() = user_id AND 
+    EXISTS (
+        SELECT 1 FROM public.users_roles 
+        WHERE user_id = auth.uid() AND role = 'influencer'
+    )
+);
+
+CREATE POLICY "Influencers can update own profile" 
+ON public.influencers 
+FOR UPDATE 
+USING (
+    auth.uid() = user_id AND 
+    EXISTS (
+        SELECT 1 FROM public.users_roles 
+        WHERE user_id = auth.uid() AND role = 'influencer'
     )
 );
 

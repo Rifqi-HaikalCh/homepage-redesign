@@ -36,7 +36,7 @@ export interface Package {
 
 export interface UserRole {
   user_id: string;
-  role: 'admin' | 'client' | 'guest';
+  role: 'admin' | 'client' | 'influencer' | 'guest';
 }
 
 // Auth helper functions
@@ -56,7 +56,7 @@ export const getUserRole = async (userId: string) => {
   return data?.role || 'guest';
 };
 
-export const signUp = async (email: string, password: string, role: 'admin' | 'client' = 'client') => {
+export const signUp = async (email: string, password: string, role: 'admin' | 'client' | 'influencer' = 'client') => {
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,

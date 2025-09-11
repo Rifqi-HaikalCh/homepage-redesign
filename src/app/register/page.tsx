@@ -24,7 +24,7 @@ export default function RegisterPage() {
     password: '',
     fullName: '',
     username: '',
-    role: 'client' as 'admin' | 'client'
+    role: 'client' as 'admin' | 'client' | 'influencer'
   });
 
   const { signUp } = useAuth();
@@ -253,7 +253,8 @@ export default function RegisterPage() {
                         onChange={(e) => handleInputChange('role', e.target.value)}
                         className="w-full p-3 h-12 rounded-lg border border-white/30 dark:border-gray-600/30 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 backdrop-blur-sm"
                       >
-                        <option value="client">Client</option>
+                        <option value="client">Client (Saya ingin booking talent)</option>
+                        <option value="influencer">Influencer (Saya adalah talent)</option>
                         <option value="admin">Admin</option>
                       </select>
                     </div>
