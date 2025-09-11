@@ -21,108 +21,6 @@ interface Influencer {
   engagement_rate: string;
 }
 
-const allInfluencersData = [
-  {
-    id: 1,
-    name: 'Khansa Mariska',
-    content_type: 'Lifestyle & Fashion',
-    instagram: '@khansa_mariska',
-    followers: '76.8K',
-    city: 'Jakarta',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=680&h=1020&fit=crop&crop=center',
-    engagement_rate: '5.4%'
-  },
-  {
-    id: 2,
-    name: 'Rina Salsabila',
-    content_type: 'Beauty & Skincare',
-    instagram: '@rinasalsabila',
-    followers: '92.3K',
-    city: 'Bandung',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=680&h=1020&fit=crop&crop=center',
-    engagement_rate: '6.2%'
-  },
-  {
-    id: 3,
-    name: 'Dimas Anggara',
-    content_type: 'Tech & Gaming',
-    instagram: '@dimasanggara',
-    followers: '154.7K',
-    city: 'Surabaya',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=680&h=1020&fit=crop&crop=center',
-    engagement_rate: '4.8%'
-  },
-  {
-    id: 4,
-    name: 'Sarah Octavia',
-    content_type: 'Travel & Food',
-    instagram: '@sarahoctavia',
-    followers: '128.9K',
-    city: 'Bali',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=680&h=1020&fit=crop&crop=center',
-    engagement_rate: '7.1%'
-  },
-  {
-    id: 5,
-    name: 'Arya Pratama',
-    content_type: 'Fitness & Health',
-    instagram: '@aryapratama',
-    followers: '67.2K',
-    city: 'Yogyakarta',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=680&h=1020&fit=crop&crop=center',
-    engagement_rate: '5.9%'
-  },
-  {
-    id: 6,
-    name: 'Luna Maharani',
-    content_type: 'Art & Creative',
-    instagram: '@lunamaharani',
-    followers: '203.4K',
-    city: 'Medan',
-    avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=680&h=1020&fit=crop&crop=center',
-    engagement_rate: '4.3%'
-  },
-  {
-    id: 7,
-    name: 'Sari Indah',
-    content_type: 'Beauty & Skincare',
-    instagram: '@sariindah',
-    followers: '45.2K',
-    city: 'Solo',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=680&h=1020&fit=crop&crop=center',
-    engagement_rate: '6.8%'
-  },
-  {
-    id: 8,
-    name: 'Maya Putri',
-    content_type: 'Lifestyle & Fashion',
-    instagram: '@mayaputri',
-    followers: '38.7K',
-    city: 'Malang',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=680&h=1020&fit=crop&crop=center',
-    engagement_rate: '5.2%'
-  },
-  {
-    id: 9,
-    name: 'Dewi Lestari',
-    content_type: 'Travel & Food',
-    instagram: '@dewilestari',
-    followers: '52.1K',
-    city: 'Semarang',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=680&h=1020&fit=crop&crop=center',
-    engagement_rate: '6.5%'
-  },
-  {
-    id: 10,
-    name: 'Rina Safitri',
-    content_type: 'Art & Creative',
-    instagram: '@rinasafitri',
-    followers: '41.9K',
-    city: 'Palembang',
-    avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=680&h=1020&fit=crop&crop=center',
-    engagement_rate: '4.7%'
-  }
-];
 
 const contentTypes = ['Semua', 'Lifestyle & Fashion', 'Beauty & Skincare', 'Tech & Gaming', 'Travel & Food', 'Fitness & Health', 'Art & Creative'];
 const cities = ['Semua', 'Jakarta', 'Bandung', 'Surabaya', 'Bali', 'Yogyakarta', 'Medan', 'Solo', 'Malang', 'Semarang', 'Palembang'];
@@ -154,13 +52,11 @@ export default function InfluencerListPage() {
         setInfluencers(data);
       } else {
         console.error('Failed to fetch influencers');
-        // Fallback to dummy data if API fails
-        setInfluencers(allInfluencersData);
+        setInfluencers([]);
       }
     } catch (error) {
       console.error('Error fetching influencers:', error);
-      // Fallback to dummy data if API fails
-      setInfluencers(allInfluencersData);
+      setInfluencers([]);
     } finally {
       setIsDataLoading(false);
     }

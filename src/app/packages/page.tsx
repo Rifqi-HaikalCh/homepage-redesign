@@ -18,38 +18,6 @@ interface Package {
   price: string;
 }
 
-const initialPackagesData = [
-  {
-    id: 1,
-    title: 'Paket Endorsement 10 Micro Influencer',
-    description: 'Kampanye endorsement dengan 10 micro influencer pilihan',
-    price: 'Rp 2.500.000'
-  },
-  {
-    id: 2,
-    title: 'Paket Paid Promote 10 Micro Influencer',
-    description: 'Promosi berbayar melalui 10 micro influencer terverifikasi',
-    price: 'Rp 1.500.000'
-  },
-  {
-    id: 3,
-    title: 'Paket Produk Review 10 Micro Influencer',
-    description: 'Review produk mendalam oleh 10 micro influencer',
-    price: 'Rp 2.000.000'
-  },
-  {
-    id: 4,
-    title: 'Paket Bundle TikTok + Instagram Story 10 Micro Influencer',
-    description: 'Konten multi-platform TikTok dan Instagram Story',
-    price: 'Rp 3.500.000'
-  },
-  {
-    id: 5,
-    title: 'Paket Kampanye Viral 100 Micro Influencer',
-    description: 'Kampanye viral massal dengan 100 micro influencer',
-    price: 'Rp 25.000.000'
-  }
-];
 
 const categories = ['Semua', 'Endorsement', 'Paid Promote', 'Review', 'Bundle', 'Viral'];
 const priceRanges = ['Semua', '0-2 Juta', '2-5 Juta', '5-10 Juta', '10 Juta+'];
@@ -79,13 +47,11 @@ export default function PackagesPage() {
         setPackages(data);
       } else {
         console.error('Failed to fetch packages');
-        // Fallback to dummy data if API fails
-        setPackages(initialPackagesData);
+        setPackages([]);
       }
     } catch (error) {
       console.error('Error fetching packages:', error);
-      // Fallback to dummy data if API fails
-      setPackages(initialPackagesData);
+      setPackages([]);
     } finally {
       setIsDataLoading(false);
     }

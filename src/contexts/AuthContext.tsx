@@ -33,6 +33,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         const userRole = await getUserRole(session.user.id);
         setRole(userRole || 'guest');
+      } else {
+        // Check if user has chosen guest mode previously
+        const guestMode = localStorage.getItem('guest-mode');
+        if (guestMode === 'true') {
+          setRole('guest');
+        }
       }
       
       setLoading(false);
@@ -115,6 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setSession(null);
     setRole('guest');
+    localStorage.setItem('guest-mode', 'true');
   };
 
   const value = {

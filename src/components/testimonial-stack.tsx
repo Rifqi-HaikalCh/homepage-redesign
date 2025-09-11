@@ -5,51 +5,30 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const testimonials = [
-  {
-    id: 1,
-    quote: "This platform completely transformed my career. The courses are incredibly well-structured and the instructors are top-notch professionals.",
-    author: "Sarah Johnson",
-    role: "Full Stack Developer",
-    company: "TechCorp",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=100&h=100&fit=crop&crop=center"
-  },
-  {
-    id: 2,
-    quote: "I've tried many online learning platforms, but none come close to the quality and engagement I found here. Highly recommended!",
-    author: "Michael Chen",
-    role: "UX Designer",
-    company: "DesignStudio",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=center"
-  },
-  {
-    id: 3,
-    quote: "The interactive content and real-world projects helped me build a portfolio that landed me my dream job. Thank you for this amazing experience!",
-    author: "Emily Rodriguez",
-    role: "Data Scientist",
-    company: "DataTech Solutions",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=center"
-  },
-  {
-    id: 4,
-    quote: "As a complete beginner, I was worried about keeping up. But the step-by-step approach made everything so clear and achievable.",
-    author: "David Thompson",
-    role: "Marketing Manager",
-    company: "GrowthCorp",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=center"
-  },
-  {
-    id: 5,
-    quote: "The community support and mentorship opportunities are invaluable. I've made connections that will last a lifetime.",
-    author: "Lisa Wang",
-    role: "Product Manager",
-    company: "InnovateTech",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=center"
-  }
-];
+
+interface Testimonial {
+  id: number;
+  quote: string;
+  author: string;
+  role: string;
+  company: string;
+  avatar: string;
+}
 
 export default function TestimonialStack() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // For now, just show empty state since we don't have testimonials API
+  useState(() => {
+    setIsLoading(false);
+    setTestimonials([]);
+  });
+
+  if (testimonials.length === 0) {
+    return null; // Don't render testimonial section if no data
+  }
 
   const nextTestimonial = () => {
     setCurrentIndex((prevIndex) => 

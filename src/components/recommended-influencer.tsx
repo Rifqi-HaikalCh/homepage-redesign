@@ -7,18 +7,45 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 
-const influencersData = [
-  { id: 1, name: 'Khansa Mariska', contentType: 'Lifestyle & Fashion', instagram: '@khansa_mariska', followers: '76.8K', city: 'Jakarta', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=680&h=1020&fit=crop&crop=center', engagementRate: '6.7%' },
-  { id: 2, name: 'Rina Salsabila', contentType: 'Beauty & Skincare', instagram: '@rinasalsabila', followers: '92.3K', city: 'Bandung', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=680&h=1020&fit=crop&crop=center', engagementRate: '8.2%' },
-  { id: 3, name: 'Dimas Anggara', contentType: 'Tech & Gaming', instagram: '@dimasanggara', followers: '154.7K', city: 'Surabaya', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=680&h=1020&fit=crop&crop=center', engagementRate: '5.4%' },
-  { id: 4, name: 'Sarah Octavia', contentType: 'Travel & Food', instagram: '@sarahoctavia', followers: '128.9K', city: 'Bali', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=680&h=1020&fit=crop&crop=center', engagementRate: '7.1%' },
-  { id: 5, name: 'Arya Pratama', contentType: 'Fitness & Health', instagram: '@aryapratama', followers: '67.2K', city: 'Yogyakarta', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=680&h=1020&fit=crop&crop=center', engagementRate: '9.3%' },
-  { id: 6, name: 'Luna Maharani', contentType: 'Art & Creative', instagram: '@lunamaharani', followers: '203.4K', city: 'Medan', avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=680&h=1020&fit=crop&crop=center', engagementRate: '4.8%' }
-];
+
+interface Influencer {
+  id: number;
+  name: string;
+  content_type: string;
+  instagram: string;
+  followers: string;
+  city: string;
+  avatar: string;
+  engagement_rate: string;
+}
 
 export default function RecommendedInfluencer() {
-  const [currentIndex, setCurrentIndex] = useState(2);
+  const [influencersData, setInfluencersData] = useState<Influencer[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoRotating, setIsAutoRotating] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch influencers from API
+  useEffect(() => {
+    const fetchInfluencers = async () => {
+      try {
+        const response = await fetch('/api/influencers');
+        if (response.ok) {
+          const data = await response.json();
+          setInfluencersData(data.slice(0, 6)); // Limit to 6 for carousel
+        } else {
+          setInfluencersData([]);
+        }
+      } catch (error) {
+        console.error('Error fetching influencers:', error);
+        setInfluencersData([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInfluencers();
+  }, []);
 
   const nextInfluencer = () => {
     setCurrentIndex(prev => (prev + 1) % influencersData.length);
@@ -41,6 +68,39 @@ export default function RecommendedInfluencer() {
 
 
   const activeInfluencer = influencersData[currentIndex];
+  
+  // Show loading or empty state
+  if (isLoading) {
+    return (
+      <section className="py-16 bg-gray-50 dark:bg-gray-800">
+        <div className="container mx-auto px-6">
+          <div className="text-center">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64 mx-auto mb-4"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-96 mx-auto"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+  
+  if (influencersData.length === 0) {
+    return (
+      <section className="py-16 bg-gray-50 dark:bg-gray-800">
+        <div className="container mx-auto px-6">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              Recommended Influencer
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Belum ada data influencer yang tersedia
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   const getInfluencerStyle = (index: number) => {
     const offset = index - currentIndex;
@@ -111,7 +171,7 @@ export default function RecommendedInfluencer() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
                       <h4 className="font-semibold text-sm mb-1">{influencer.name}</h4>
-                      <p className="text-xs opacity-90">{influencer.contentType}</p>
+                      <p className="text-xs opacity-90">{influencer.content_type}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -133,7 +193,7 @@ export default function RecommendedInfluencer() {
                       {activeInfluencer.name}
                     </h3>
                     <p className="text-[#7124A8] font-semibold text-md mb-6">
-                      {activeInfluencer.contentType}
+                      {activeInfluencer.content_type}
                     </p>
                     <div className="space-y-4 mb-8 text-sm">
                       <div className="flex items-center text-gray-600 dark:text-gray-300">
@@ -150,7 +210,7 @@ export default function RecommendedInfluencer() {
                       </div>
                       <div className="flex items-center text-gray-600 dark:text-gray-300">
                         <TrendingUp className="w-4 h-4 mr-3 text-[#7124A8]" />
-                        <span>{activeInfluencer.engagementRate} Engagement Rate</span>
+                        <span>{activeInfluencer.engagement_rate} Engagement Rate</span>
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">

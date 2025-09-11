@@ -28,7 +28,7 @@ const userData = {
     avgLikes: '500',
     avgViews: '10.5K'
   },
-  portfolioItems: 6,
+  portfolioItems: 0,
 };
 
 // Guest Login Prompt Component

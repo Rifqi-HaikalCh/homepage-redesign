@@ -22,10 +22,11 @@ const contentData = {
 
 export async function GET(
   request: Request,
-  { params }: { params: { category: string } }
+  { params }: { params: Promise<{ category: string }> }
 ) {
   try {
-    const category = params.category as keyof typeof contentData;
+    const resolvedParams = await params;
+    const category = resolvedParams.category as keyof typeof contentData;
     
     if (!contentData[category]) {
       return NextResponse.json(
