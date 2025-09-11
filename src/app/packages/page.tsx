@@ -5,11 +5,20 @@ import { Search, Filter, ChevronDown, Plus, Edit, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import SecondaryHeader from '@/components/secondary-header';
 import Footer from '@/components/footer';
 import { ConfirmDeleteModal } from '@/components/glassmorphism-modal';
 import { PackageFormModal } from '@/components/package-modal';
+
+interface Package {
+  id: number;
+  title: string;
+  description: string;
+  price: string;
+  icon: string;
+  category: string;
+}
 
 const initialPackagesData = [
   {
@@ -68,7 +77,7 @@ export default function PackagesPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
-  const [selectedPackage, setSelectedPackage] = useState<any>(null);
+  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // CRUD functions
@@ -78,13 +87,13 @@ export default function PackagesPage() {
     setIsFormModalOpen(true);
   };
 
-  const handleEditPackage = (pkg: any) => {
+  const handleEditPackage = (pkg: Package) => {
     setFormMode('edit');
     setSelectedPackage(pkg);
     setIsFormModalOpen(true);
   };
 
-  const handleDeletePackage = (pkg: any) => {
+  const handleDeletePackage = (pkg: Package) => {
     setSelectedPackage(pkg);
     setIsDeleteModalOpen(true);
   };
@@ -100,17 +109,17 @@ export default function PackagesPage() {
     setIsLoading(false);
   };
 
-  const handleSavePackage = async (data: any) => {
+  const handleSavePackage = async (data: Partial<Package>) => {
     setIsLoading(true);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     if (formMode === 'add') {
-      const newPackage = {
+      const newPackage: Package = {
         ...data,
         id: Math.max(...packages.map(pkg => pkg.id)) + 1,
         category: 'Custom',
-      };
+      } as Package;
       setPackages(prev => [...prev, newPackage]);
     } else {
       setPackages(prev => prev.map(pkg => 
@@ -160,7 +169,7 @@ export default function PackagesPage() {
 
   const filteredPackages = filterPackages();
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { 
       opacity: 0, 
       y: 30,

@@ -4,13 +4,21 @@ import { useState } from 'react';
 import { Search, Filter, ChevronDown, Instagram, Plus, Edit, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import Link from 'next/link';
-import Header from '@/components/header';
 import Footer from '@/components/footer';
 import SecondaryHeader from '@/components/secondary-header';
 import { ConfirmDeleteModal, InfluencerFormModal } from '@/components/glassmorphism-modal';
+
+interface Influencer {
+  id: number;
+  name: string;
+  contentType: string;
+  instagram: string;
+  followers: string;
+  city: string;
+  avatar: string;
+}
 
 const allInfluencersData = [
   {
@@ -121,7 +129,7 @@ export default function InfluencerListPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
-  const [selectedInfluencer, setSelectedInfluencer] = useState<any>(null);
+  const [selectedInfluencer, setSelectedInfluencer] = useState<Influencer | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const parseFollowers = (followers: string) => {
@@ -136,13 +144,13 @@ export default function InfluencerListPage() {
     setIsFormModalOpen(true);
   };
 
-  const handleEditInfluencer = (influencer: any) => {
+  const handleEditInfluencer = (influencer: Influencer) => {
     setFormMode('edit');
     setSelectedInfluencer(influencer);
     setIsFormModalOpen(true);
   };
 
-  const handleDeleteInfluencer = (influencer: any) => {
+  const handleDeleteInfluencer = (influencer: Influencer) => {
     setSelectedInfluencer(influencer);
     setIsDeleteModalOpen(true);
   };
@@ -158,16 +166,16 @@ export default function InfluencerListPage() {
     setIsLoading(false);
   };
 
-  const handleSaveInfluencer = async (data: any) => {
+  const handleSaveInfluencer = async (data: Partial<Influencer>) => {
     setIsLoading(true);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     if (formMode === 'add') {
-      const newInfluencer = {
+      const newInfluencer: Influencer = {
         ...data,
         id: Math.max(...influencers.map(inf => inf.id)) + 1,
-      };
+      } as Influencer;
       setInfluencers(prev => [...prev, newInfluencer]);
     } else {
       setInfluencers(prev => prev.map(inf => 
@@ -213,7 +221,7 @@ export default function InfluencerListPage() {
 
   const filteredInfluencers = filterInfluencers();
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { 
       opacity: 0, 
       y: 30,

@@ -17,9 +17,10 @@ export async function GET() {
     }
 
     return NextResponse.json(data);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Gagal mengambil data paket';
     return NextResponse.json(
-      { error: error.message || 'Gagal mengambil data paket' },
+      { error: message },
       { status: 500 }
     );
   }
@@ -82,9 +83,10 @@ export async function POST(request: Request) {
       data
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Gagal menambah paket';
     return NextResponse.json(
-      { error: error.message || 'Gagal menambah paket' },
+      { error: message },
       { status: 500 }
     );
   }
@@ -139,9 +141,10 @@ export async function PUT(request: Request) {
       data
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Gagal mengupdate paket';
     return NextResponse.json(
-      { error: error.message || 'Gagal mengupdate paket' },
+      { error: message },
       { status: 500 }
     );
   }
@@ -194,9 +197,10 @@ export async function DELETE(request: Request) {
       message: 'Paket berhasil dihapus'
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Gagal menghapus paket';
     return NextResponse.json(
-      { error: error.message || 'Gagal menghapus paket' },
+      { error: message },
       { status: 500 }
     );
   }

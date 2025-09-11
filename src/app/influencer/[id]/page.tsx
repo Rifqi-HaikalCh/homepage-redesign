@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Instagram, TrendingUp, Users, Heart, MessageCircle, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Instagram, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import SecondaryHeader from '@/components/secondary-header';
 

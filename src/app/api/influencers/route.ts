@@ -17,9 +17,10 @@ export async function GET() {
     }
 
     return NextResponse.json(data);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Gagal mengambil data influencer';
     return NextResponse.json(
-      { error: error.message || 'Gagal mengambil data influencer' },
+      { error: message },
       { status: 500 }
     );
   }
@@ -83,9 +84,10 @@ export async function POST(request: Request) {
       data
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Gagal menambah influencer';
     return NextResponse.json(
-      { error: error.message || 'Gagal menambah influencer' },
+      { error: message },
       { status: 500 }
     );
   }
@@ -140,9 +142,10 @@ export async function PUT(request: Request) {
       data
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Gagal mengupdate influencer';
     return NextResponse.json(
-      { error: error.message || 'Gagal mengupdate influencer' },
+      { error: message },
       { status: 500 }
     );
   }
@@ -195,9 +198,10 @@ export async function DELETE(request: Request) {
       message: 'Influencer berhasil dihapus'
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Gagal menghapus influencer';
     return NextResponse.json(
-      { error: error.message || 'Gagal menghapus influencer' },
+      { error: message },
       { status: 500 }
     );
   }

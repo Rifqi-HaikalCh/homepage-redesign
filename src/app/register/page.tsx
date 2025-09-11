@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -42,14 +42,15 @@ export default function RegisterPage() {
     try {
       await signUp(formData.email, formData.password, formData.role);
       router.push('/login?message=Registration successful, please login');
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Registration failed';
+      setError(message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 50, scale: 0.8 },
     visible: { 
       opacity: 1, 
@@ -57,12 +58,12 @@ export default function RegisterPage() {
       scale: 1,
       transition: { 
         duration: 0.6,
-        ease: [0.4, 0, 0.2, 1] 
+        ease: "easeOut" 
       }
     },
   };
 
-  const stepVariants = {
+  const stepVariants: Variants = {
     hidden: (direction: number) => ({
       x: direction > 0 ? '100%' : '-100%',
       opacity: 0
@@ -256,7 +257,7 @@ export default function RegisterPage() {
                     className="space-y-6 absolute w-full text-center flex flex-col items-center justify-center h-full"
                   >
                     <h2 className="font-semibold text-lg text-gray-800 dark:text-gray-200">Ready to Go!</h2>
-                    <p className="text-gray-600 dark:text-gray-300">You're all set. Click below to create your account.</p>
+                    <p className="text-gray-600 dark:text-gray-300">You&apos;re all set. Click below to create your account.</p>
                     
                     {/* Error Message */}
                     {error && (

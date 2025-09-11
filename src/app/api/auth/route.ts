@@ -21,9 +21,10 @@ export async function POST(request: Request) {
       role: result.role
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Gagal mendaftar';
     return NextResponse.json(
-      { error: error.message || 'Gagal mendaftar' },
+      { error: message },
       { status: 400 }
     );
   }
@@ -50,9 +51,10 @@ export async function PUT(request: Request) {
       role: result.role
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Gagal login';
     return NextResponse.json(
-      { error: error.message || 'Gagal login' },
+      { error: message },
       { status: 401 }
     );
   }
@@ -72,9 +74,10 @@ export async function DELETE() {
 
     return NextResponse.json({ message: 'Logout berhasil' });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Gagal logout';
     return NextResponse.json(
-      { error: error.message || 'Gagal logout' },
+      { error: message },
       { status: 500 }
     );
   }

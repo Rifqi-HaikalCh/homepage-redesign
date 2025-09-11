@@ -50,17 +50,14 @@ const testimonials = [
 
 export default function TestimonialStack() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
 
   const nextTestimonial = () => {
-    setDirection(1);
     setCurrentIndex((prevIndex) => 
       prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1
     );
   };
 
   const prevTestimonial = () => {
-    setDirection(-1);
     setCurrentIndex((prevIndex) => 
       prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
     );
@@ -112,30 +109,6 @@ export default function TestimonialStack() {
     }
   };
 
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 300 : -300,
-      rotate: direction > 0 ? 15 : -15,
-      scale: 0.8,
-      opacity: 0,
-      zIndex: 1
-    }),
-    center: {
-      zIndex: 10,
-      x: 0,
-      y: 0,
-      rotate: 0,
-      scale: 1,
-      opacity: 1
-    },
-    exit: (direction: number) => ({
-      zIndex: 1,
-      x: direction < 0 ? 300 : -300,
-      rotate: direction < 0 ? 15 : -15,
-      scale: 0.8,
-      opacity: 0
-    })
-  };
 
   return (
     <section className="py-16 bg-gradient-to-br from-[#7124A8]/5 via-white to-purple-50">
@@ -230,7 +203,6 @@ export default function TestimonialStack() {
                       : 'bg-gray-300 hover:bg-gray-400'
                   }`}
                   onClick={() => {
-                    setDirection(index > currentIndex ? 1 : -1);
                     setCurrentIndex(index);
                   }}
                 />

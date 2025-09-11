@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -51,7 +51,7 @@ export default function OtherInfluencers() {
     }
   };
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { 
       opacity: 0, 
       y: 30,
@@ -63,7 +63,6 @@ export default function OtherInfluencers() {
       scale: 1,
       transition: {
         duration: 0.6,
-        // --- PERBAIKAN: Mengganti array dengan string "easeOut" ---
         ease: "easeOut" 
       }
     }
