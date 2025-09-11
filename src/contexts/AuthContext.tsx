@@ -99,20 +99,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(data.error || 'Login failed');
     }
 
-    // --- AWAL PERUBAHAN ---
-    // Perbarui state secara manual dengan data dari respons API.
-    // Ini adalah kunci untuk memastikan redirect terjadi secara instan.
-    if (data.user && data.session && data.role) {
+    // Immediate state update for successful login
+    if (data.user) {
       setUser(data.user);
-      setSession(data.session);
-      setRole(data.role);
+      setSession(data.session || null);
+      setRole(data.role || 'client');
+      localStorage.removeItem('guest-mode');
     }
-    // --- AKHIR PERUBAHAN ---
 
-    localStorage.removeItem('guest-mode');
-
-    // Kita tidak perlu mengembalikan data lagi karena state sudah diperbarui,
-    // tapi tidak masalah jika tetap ada.
     return data;
   };
 

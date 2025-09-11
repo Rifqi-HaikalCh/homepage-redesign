@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -55,13 +54,10 @@ export default function ForgotPasswordPage() {
             <CardContent className="p-8">
               <div className="text-center mb-8">
                 <div className="flex justify-center mb-4">
-                  <Image 
+                  <img 
                     src="/dapur-buzzer-logo.png" 
                     alt="Dapur Buzzer Logo" 
-                    width={140}
-                    height={48}
                     className="h-12 w-auto object-contain"
-                    priority
                   />
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">

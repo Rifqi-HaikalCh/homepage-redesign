@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/theme-provider';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -47,13 +46,10 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <Image 
+              <img 
                 src="/dapur-buzzer-logo.png" 
                 alt="Dapur Buzzer Logo" 
-                width={120}
-                height={40}
                 className="h-10 w-auto object-contain"
-                priority
               />
             </Link>
           </div>

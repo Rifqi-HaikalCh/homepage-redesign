@@ -9,7 +9,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -54,7 +53,7 @@ export default function LoginPage() {
     
     try {
       await signIn(email, password);
-      // `onAuthStateChange` listener akan memperbarui state dan memicu useEffect redirect
+      // useEffect will handle redirect automatically
     } catch (error: unknown) {
       if (error instanceof Error && error.message.includes('Terlalu banyak percobaan')) {
         const seconds = error.message.match(/(\d+) detik/)?.[1];
@@ -106,13 +105,10 @@ export default function LoginPage() {
               {/* Logo and Title */}
               <div className="text-center mb-8">
                 <div className="flex justify-center mb-4">
-                  <Image 
+                  <img 
                     src="/dapur-buzzer-logo.png" 
                     alt="Dapur Buzzer Logo" 
-                    width={140}
-                    height={48}
                     className="h-12 w-auto object-contain"
-                    priority
                   />
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">

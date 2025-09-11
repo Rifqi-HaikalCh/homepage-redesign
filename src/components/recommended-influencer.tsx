@@ -25,20 +25,50 @@ export default function RecommendedInfluencer() {
   const [isAutoRotating, setIsAutoRotating] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch influencers from API
+  // Fallback sample data
+  const sampleInfluencers: Influencer[] = [
+    {
+      id: 1,
+      name: "Sarah Johnson",
+      content_type: "Lifestyle & Fashion",
+      instagram: "@sarahjohnson",
+      followers: "85.2K",
+      city: "Jakarta",
+      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=400&h=400&fit=crop",
+      engagement_rate: "6.8%"
+    },
+    {
+      id: 2,
+      name: "Michael Chen",
+      content_type: "Tech & Gaming",
+      instagram: "@michaelchen",
+      followers: "120.5K",
+      city: "Bandung",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+      engagement_rate: "5.4%"
+    }
+  ];
+
+  // Fetch influencers from API with fallback
   useEffect(() => {
     const fetchInfluencers = async () => {
       try {
         const response = await fetch('/api/influencers');
         if (response.ok) {
           const data = await response.json();
-          setInfluencersData(data.slice(0, 6)); // Limit to 6 for carousel
+          if (data && data.length > 0) {
+            setInfluencersData(data.slice(0, 6));
+          } else {
+            // Use sample data if no data in database
+            setInfluencersData(sampleInfluencers);
+          }
         } else {
-          setInfluencersData([]);
+          console.warn('API returned error, using sample data');
+          setInfluencersData(sampleInfluencers);
         }
       } catch (error) {
-        console.error('Error fetching influencers:', error);
-        setInfluencersData([]);
+        console.error('Error fetching influencers, using sample data:', error);
+        setInfluencersData(sampleInfluencers);
       } finally {
         setIsLoading(false);
       }
