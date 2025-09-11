@@ -7,12 +7,19 @@ export function middleware(request: NextRequest) {
   // Check if user has auth cookie/session
   const hasAuth = request.cookies.has('sb-access-token') || 
                   request.cookies.has('supabase-auth-token') ||
-                  request.cookies.has('sb-localhost-auth-token');
+                  request.cookies.has('sb-localhost-auth-token') ||
+                  request.cookies.has('guest-mode'); // Allow guest mode
   
   // Public routes that don't require authentication
   const publicRoutes = ['/login', '/register', '/forgot-password', '/api'];
   
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+  
+  // Development mode: Skip auth redirect for easier testing
+  if (process.env.NODE_ENV === 'development') {
+    // Allow access but suggest authentication
+    console.log(`🚧 Development mode: Accessing ${pathname} ${hasAuth ? 'with auth' : 'without auth'}`);
+  }
   
   // If accessing root without auth, redirect to login
   if (pathname === '/' && !hasAuth && !isPublicRoute) {

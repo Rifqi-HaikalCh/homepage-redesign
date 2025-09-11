@@ -57,6 +57,24 @@ export const getUserRole = async (userId: string) => {
 };
 
 export const signUp = async (email: string, password: string, role: 'admin' | 'client' = 'client') => {
+  // Development fallback when Supabase is not configured
+  if (supabaseAnonKey === 'placeholder-key' || supabaseAnonKey === 'your_supabase_anon_key_here') {
+    console.warn('🚧 Development mode: Supabase not configured, using mock registration');
+    
+    if (email && password) {
+      const mockUser = {
+        id: 'mock-user-' + Date.now(),
+        email: email,
+        user_metadata: { role }
+      };
+      
+      return { user: mockUser, role };
+    } else {
+      throw new Error('Email dan password harus diisi');
+    }
+  }
+
+  // Real Supabase registration
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,
@@ -79,6 +97,35 @@ export const signUp = async (email: string, password: string, role: 'admin' | 'c
 };
 
 export const signIn = async (email: string, password: string) => {
+  // Development fallback when Supabase is not configured
+  if (supabaseAnonKey === 'placeholder-key' || supabaseAnonKey === 'your_supabase_anon_key_here') {
+    console.warn('🚧 Development mode: Supabase not configured, using mock login');
+    
+    // Mock successful login for development
+    if (email && password) {
+      const mockUser = {
+        id: 'mock-user-' + Date.now(),
+        email: email,
+        user_metadata: { role: 'client' }
+      };
+      
+      const mockSession = {
+        access_token: 'mock-token',
+        refresh_token: 'mock-refresh',
+        user: mockUser
+      };
+      
+      return { 
+        session: mockSession, 
+        user: mockUser, 
+        role: 'client' as const 
+      };
+    } else {
+      throw new Error('Email atau password tidak valid');
+    }
+  }
+
+  // Real Supabase authentication
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,

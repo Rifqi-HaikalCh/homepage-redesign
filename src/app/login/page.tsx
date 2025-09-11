@@ -79,12 +79,25 @@ export default function LoginPage() {
                 <p className="text-gray-600 dark:text-gray-400">
                   Selamat datang kembali! Silakan masuk untuk melanjutkan.
                 </p>
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <p className="text-blue-600 dark:text-blue-400 text-xs">
+                      🚧 <strong>Development Mode:</strong> Masukkan email dan password apa saja untuk testing.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Error Message */}
               {error && (
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-6">
                   <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+                  {error.includes('Server configuration error') && (
+                    <div className="mt-2 text-xs text-red-500 dark:text-red-300">
+                      <p>💡 <strong>Development Note:</strong></p>
+                      <p>Supabase belum dikonfigurasi. Untuk testing, coba masukkan email dan password apa saja.</p>
+                    </div>
+                  )}
                 </div>
               )}
 
