@@ -20,6 +20,8 @@ interface User {
   email: string;
   role: string;
   created_at: string;
+  fullName?: string;
+  username?: string;
 }
 
 interface Package {
@@ -130,8 +132,8 @@ export default function AdminDashboard() {
         email: user.email,
         password: '',
         role: user.role as 'admin' | 'client' | 'influencer',
-        fullName: user.fullName || '',
-        username: user.username || '',
+        fullName: (user as any).fullName || '',
+        username: (user as any).username || '',
         influencerData: {
           name: '',
           content_type: '',
