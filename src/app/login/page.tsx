@@ -20,7 +20,7 @@ export default function LoginPage() {
   const [countdown, setCountdown] = useState(0);
   const [isRedirecting, setIsRedirecting] = useState(false);
   
-  const { user, role, signIn, setGuestMode } = useAuth();
+  const { user, role, signIn, setGuestMode, setUser, setRole } = useAuth();
   const router = useRouter();
 
   // Auto redirect when user is authenticated
@@ -245,6 +245,92 @@ export default function LoginPage() {
                   Masuk sebagai Tamu
                 </Button>
               </div>
+
+              {/* Test Login Buttons for Development */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 text-center">
+                    🧪 Test Accounts (Development Only)
+                  </p>
+                  <div className="space-y-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/test-login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: 'admin@test.com', role: 'admin' })
+                          });
+                          const data = await response.json();
+                          if (response.ok) {
+                            setUser(data.user);
+                            setRole(data.role);
+                            router.push('/admin');
+                          }
+                        } catch (error) {
+                          console.error('Test login failed:', error);
+                        }
+                      }}
+                      className="w-full text-xs"
+                      size="sm"
+                    >
+                      👑 Test Admin
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/test-login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: 'client@test.com', role: 'client' })
+                          });
+                          const data = await response.json();
+                          if (response.ok) {
+                            setUser(data.user);
+                            setRole(data.role);
+                            router.push('/profile');
+                          }
+                        } catch (error) {
+                          console.error('Test login failed:', error);
+                        }
+                      }}
+                      className="w-full text-xs"
+                      size="sm"
+                    >
+                      👤 Test Client
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={async () => {
+                        try {
+                          const response = await fetch('/api/test-login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: 'influencer@test.com', role: 'influencer' })
+                          });
+                          const data = await response.json();
+                          if (response.ok) {
+                            setUser(data.user);
+                            setRole(data.role);
+                            router.push('/profile');
+                          }
+                        } catch (error) {
+                          console.error('Test login failed:', error);
+                        }
+                      }}
+                      className="w-full text-xs"
+                      size="sm"
+                    >
+                      ⭐ Test Influencer
+                    </Button>
+                  </div>
+                </div>
+              )}
 
               {/* Register Link */}
               <div className="mt-6 text-center">

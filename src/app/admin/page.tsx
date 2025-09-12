@@ -6,8 +6,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Package, Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { Users, Package, Plus, Edit, Trash2, Eye, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 // Types
 interface User {
@@ -18,16 +19,18 @@ interface User {
 }
 
 interface Package {
-  id: string;
-  name: string;
+  id: number;
+  title: string;
   description: string;
-  price: number;
-  features: string[];
+  price: string;
+  icon: string;
+  category: string;
   created_at: string;
+  updated_at: string;
 }
 
 export default function AdminDashboard() {
-  const { user, role, loading } = useAuth();
+  const { user, role, loading, signOut } = useAuth();
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [packages, setPackages] = useState<Package[]>([]);
@@ -38,12 +41,8 @@ export default function AdminDashboard() {
   const [editingPackage, setEditingPackage] = useState<Package | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{type: 'user' | 'package', id: string} | null>(null);
 
-  // Redirect non-admin users
-  useEffect(() => {
-    if (!loading && (!user || role !== 'admin')) {
-      router.push('/');
-    }
-  }, [user, role, loading, router]);
+  // Show access denied for non-admin users instead of redirecting
+  const showAccessDenied = !loading && (!user || role !== 'admin');
 
   // Load data
   useEffect(() => {
@@ -55,13 +54,13 @@ export default function AdminDashboard() {
 
   const loadUsers = async () => {
     try {
-      // Mock data for now - replace with actual API call
-      const mockUsers: User[] = [
-        { id: '1', email: 'admin@example.com', role: 'admin', created_at: '2024-01-01' },
-        { id: '2', email: 'client@example.com', role: 'client', created_at: '2024-01-02' },
-        { id: '3', email: 'influencer@example.com', role: 'influencer', created_at: '2024-01-03' },
-      ];
-      setUsers(mockUsers);
+      const response = await fetch('/api/admin/users');
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      } else {
+        console.error('Failed to fetch users');
+      }
     } catch (error) {
       console.error('Error loading users:', error);
     } finally {
@@ -71,26 +70,13 @@ export default function AdminDashboard() {
 
   const loadPackages = async () => {
     try {
-      // Mock data for now - replace with actual API call
-      const mockPackages: Package[] = [
-        {
-          id: '1',
-          name: 'Basic Package',
-          description: 'Basic social media management',
-          price: 500000,
-          features: ['1 Platform', 'Weekly Posts', 'Basic Analytics'],
-          created_at: '2024-01-01'
-        },
-        {
-          id: '2',
-          name: 'Premium Package',
-          description: 'Comprehensive social media strategy',
-          price: 1500000,
-          features: ['3 Platforms', 'Daily Posts', 'Advanced Analytics', 'Influencer Matching'],
-          created_at: '2024-01-02'
-        }
-      ];
-      setPackages(mockPackages);
+      const response = await fetch('/api/admin/packages');
+      if (response.ok) {
+        const data = await response.json();
+        setPackages(data);
+      } else {
+        console.error('Failed to fetch packages');
+      }
     } catch (error) {
       console.error('Error loading packages:', error);
     }
@@ -114,6 +100,15 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.push('/');
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
+
   if (loading || isLoadingData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-purple-950 dark:to-blue-950">
@@ -125,13 +120,69 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!user || role !== 'admin') {
-    return null;
+  // Show access denied page for non-admin users
+  if (showAccessDenied) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-purple-950 dark:to-blue-950 flex items-center justify-center p-6">
+        <div className="text-center">
+          <div className="w-20 h-20 bg-red-100 dark:bg-red-900/20 rounded-full mx-auto mb-6 flex items-center justify-center">
+            <span className="text-4xl">🚫</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Access Denied
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md">
+            You need admin privileges to access this page. Please contact an administrator or login with an admin account.
+          </p>
+          <div className="space-y-4">
+            <Link href="/login">
+              <Button className="bg-[#7124A8] hover:bg-[#5a1d87] text-white px-6 py-3">
+                Login as Admin
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button variant="outline" className="px-6 py-3">
+                Back to Homepage
+              </Button>
+            </Link>
+          </div>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-6">
+            Current role: {role || 'Not logged in'}
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-purple-950 dark:to-blue-950 p-6">
-      <div className="container mx-auto max-w-7xl">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-purple-950 dark:to-blue-950">
+      {/* Admin Header */}
+      <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-b border-white/30 dark:border-gray-700/30 sticky top-0 z-50">
+        <div className="container mx-auto max-w-7xl px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logout Button - Left */}
+            <Button
+              onClick={handleSignOut}
+              variant="outline"
+              className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-900/20"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
+            
+            {/* Logo - Right */}
+            <div className="flex items-center">
+              <img 
+                src="/dapur-buzzer-logo.png" 
+                alt="Dapur Buzzer Logo" 
+                className="h-10 w-auto object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="container mx-auto max-w-7xl p-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -255,7 +306,10 @@ export default function AdminDashboard() {
                     <Card key={pkg.id} className="border border-gray-200 dark:border-gray-700">
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">{pkg.name}</CardTitle>
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl">{pkg.icon}</span>
+                            <CardTitle className="text-lg">{pkg.title}</CardTitle>
+                          </div>
                           <div className="flex items-center gap-1">
                             <Button
                               size="sm"
@@ -270,27 +324,22 @@ export default function AdminDashboard() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => setDeleteConfirm({type: 'package', id: pkg.id})}
+                              onClick={() => setDeleteConfirm({type: 'package', id: pkg.id.toString()})}
                               className="text-red-600 hover:text-red-700"
                             >
                               <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
                         </div>
-                        <p className="text-2xl font-bold text-[#7124A8]">
-                          Rp {pkg.price.toLocaleString()}
-                        </p>
+                        <div className="space-y-2">
+                          <p className="text-2xl font-bold text-[#7124A8]">{pkg.price}</p>
+                          <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 rounded-full">
+                            {pkg.category}
+                          </span>
+                        </div>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-gray-600 dark:text-gray-400 mb-3">{pkg.description}</p>
-                        <ul className="space-y-1">
-                          {pkg.features.map((feature, index) => (
-                            <li key={index} className="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                              <span className="w-1 h-1 bg-[#7124A8] rounded-full"></span>
-                              {feature}
-                            </li>
-                          ))}
-                        </ul>
+                        <p className="text-gray-600 dark:text-gray-400">{pkg.description}</p>
                       </CardContent>
                     </Card>
                   ))}

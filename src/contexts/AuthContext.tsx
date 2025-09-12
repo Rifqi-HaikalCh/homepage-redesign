@@ -13,6 +13,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   setGuestMode: () => void;
+  setUser: (user: User | null) => void;
+  setRole: (role: 'admin' | 'client' | 'influencer' | 'guest') => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,9 +37,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setRole(userRole || 'guest');
       } else {
         // Check if user has chosen guest mode previously
-        const guestMode = localStorage.getItem('guest-mode');
-        if (guestMode === 'true') {
-          setRole('guest');
+        if (typeof window !== 'undefined') {
+          const guestMode = localStorage.getItem('guest-mode');
+          if (guestMode === 'true') {
+            setRole('guest');
+          }
         }
       }
       
@@ -104,7 +108,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(data.user);
       setSession(data.session || null);
       setRole(data.role || 'client');
-      localStorage.removeItem('guest-mode');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('guest-mode');
+      }
     }
 
     return data;
@@ -129,7 +135,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setSession(null);
     setRole('guest');
-    localStorage.setItem('guest-mode', 'true');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('guest-mode', 'true');
+    }
   };
 
   const value = {
@@ -141,6 +149,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
     signOut,
     setGuestMode,
+    setUser,
+    setRole,
   };
 
   return (

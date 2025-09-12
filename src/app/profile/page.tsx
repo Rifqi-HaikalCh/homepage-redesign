@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Edit, LogOut, Instagram, User, UserPlus } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import SecondaryHeader from '@/components/secondary-header';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -91,10 +92,32 @@ const GuestLoginPrompt = () => (
 );
 
 export default function ProfilePage() {
-  const { user, role } = useAuth();
+  const { user, role, loading, signOut } = useAuth();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.push('/');
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
   
-  // Show guest login prompt if user is a guest
-  if (role === 'guest') {
+  // Show loading state while auth is being determined
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-purple-950 dark:to-blue-950">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7124A8] mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Show guest login prompt if user is a guest or not authenticated
+  if (role === 'guest' || !user) {
     return <GuestLoginPrompt />;
   }
 
@@ -294,14 +317,13 @@ export default function ProfilePage() {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Link href="/login">
-              <Button
-                variant="destructive"
-                className="rounded-full h-14 w-14 shadow-lg flex items-center justify-center"
-              >
-                <LogOut className="w-6 h-6" />
-              </Button>
-            </Link>
+            <Button
+              onClick={handleSignOut}
+              variant="destructive"
+              className="rounded-full h-14 w-14 shadow-lg flex items-center justify-center"
+            >
+              <LogOut className="w-6 h-6" />
+            </Button>
           </motion.div>
         </div>
       </div>

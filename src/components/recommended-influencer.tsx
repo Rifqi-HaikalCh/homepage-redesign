@@ -115,7 +115,7 @@ export default function RecommendedInfluencer() {
     );
   }
   
-  if (influencersData.length === 0) {
+  if (influencersData.length === 0 || !activeInfluencer) {
     return (
       <section className="py-16 bg-gray-50 dark:bg-gray-800">
         <div className="container mx-auto px-6">
@@ -194,14 +194,14 @@ export default function RecommendedInfluencer() {
                 >
                   <div className="w-full h-full rounded-2xl overflow-hidden border-4 border-white dark:border-gray-700 shadow-xl relative group">
                     <img
-                      src={influencer.avatar}
-                      alt={influencer.name}
+                      src={influencer?.avatar}
+                      alt={influencer?.name}
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-                      <h4 className="font-semibold text-sm mb-1">{influencer.name}</h4>
-                      <p className="text-xs opacity-90">{influencer.content_type}</p>
+                      <h4 className="font-semibold text-sm mb-1">{influencer?.name}</h4>
+                      <p className="text-xs opacity-90">{influencer?.content_type}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -220,31 +220,31 @@ export default function RecommendedInfluencer() {
                 <Card className="w-full bg-white dark:bg-gray-900 shadow-2xl border border-gray-200/50 dark:border-gray-700/30 rounded-2xl">
                    <CardContent className="p-6">
                     <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-                      {activeInfluencer.name}
+                      {activeInfluencer?.name}
                     </h3>
                     <p className="text-[#7124A8] font-semibold text-md mb-6">
-                      {activeInfluencer.content_type}
+                      {activeInfluencer?.content_type}
                     </p>
                     <div className="space-y-4 mb-8 text-sm">
                       <div className="flex items-center text-gray-600 dark:text-gray-300">
                         <Instagram className="w-4 h-4 mr-3 text-[#7124A8]" />
-                        <span className="font-medium">{activeInfluencer.instagram}</span>
+                        <span className="font-medium">{activeInfluencer?.instagram}</span>
                       </div>
                       <div className="flex items-center text-gray-600 dark:text-gray-300">
                         <Users className="w-4 h-4 mr-3 text-[#7124A8]" />
-                        <span>{activeInfluencer.followers} Followers</span>
+                        <span>{activeInfluencer?.followers} Followers</span>
                       </div>
                       <div className="flex items-center text-gray-600 dark:text-gray-300">
                         <MapPin className="w-4 h-4 mr-3 text-[#7124A8]" />
-                        <span>{activeInfluencer.city}</span>
+                        <span>{activeInfluencer?.city}</span>
                       </div>
                       <div className="flex items-center text-gray-600 dark:text-gray-300">
                         <TrendingUp className="w-4 h-4 mr-3 text-[#7124A8]" />
-                        <span>{activeInfluencer.engagement_rate} Engagement Rate</span>
+                        <span>{activeInfluencer?.engagement_rate} Engagement Rate</span>
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">
-                       <Link href={`/influencer/${activeInfluencer.id}`} className="w-full">
+                       <Link href={`/influencer/${activeInfluencer?.id || 1}`} className="w-full">
                          <Button className="w-full bg-[#7124A8] hover:bg-[#5a1d87] text-white">
                             View Profile
                           </Button>
