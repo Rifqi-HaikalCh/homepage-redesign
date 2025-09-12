@@ -132,8 +132,8 @@ export default function AdminDashboard() {
         email: user.email,
         password: '',
         role: user.role as 'admin' | 'client' | 'influencer',
-        fullName: (user as any).fullName || '',
-        username: (user as any).username || '',
+        fullName: user.fullName || '',
+        username: user.username || '',
         influencerData: {
           name: '',
           content_type: '',
