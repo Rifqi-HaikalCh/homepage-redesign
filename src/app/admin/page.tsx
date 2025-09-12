@@ -580,8 +580,8 @@ export default function AdminDashboard() {
                 <Label htmlFor="role">Role</Label>
                 <Select
                   value={userForm.role}
-                  onValueChange={(value: 'admin' | 'client' | 'influencer') => 
-                    setUserForm({...userForm, role: value})
+                  onValueChange={(value) => 
+                    setUserForm({...userForm, role: value as 'admin' | 'client' | 'influencer'})
                   }
                 >
                   <SelectItem value="client">Client</SelectItem>
