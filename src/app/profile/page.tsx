@@ -179,15 +179,15 @@ const EditProfileModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="max-w-md w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <Card className="max-w-2xl w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl my-8 max-h-[90vh] overflow-y-auto">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Edit className="w-5 h-5" />
             Edit Profile
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           {/* Avatar Upload */}
           <div className="text-center">
             <div className="relative w-24 h-24 mx-auto mb-4">
@@ -217,65 +217,117 @@ const EditProfileModal = ({
             </div>
           </div>
 
-          {/* Form Fields */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Nama</label>
-            <Input
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="Masukkan nama"
-            />
+          {/* Form Fields - Grid Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Nama</label>
+              <Input
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Masukkan nama"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Kota Asal</label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  value={formData.city}
+                  onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                  placeholder="Masukkan kota"
+                  className="pl-10"
+                />
+              </div>
+            </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-1">Content Type</label>
-            <Input
+            <select
               value={formData.content_type}
               onChange={(e) => setFormData(prev => ({ ...prev, content_type: e.target.value }))}
-              placeholder="Masukkan jenis konten"
-            />
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#7124A8]/50"
+            >
+              <option value="">Pilih jenis konten</option>
+              <option value="Beauty & Skincare">Beauty & Skincare</option>
+              <option value="Lifestyle & Fashion">Lifestyle & Fashion</option>
+              <option value="Travel & Food">Travel & Food</option>
+              <option value="Tech & Gaming">Tech & Gaming</option>
+              <option value="Fitness & Health">Fitness & Health</option>
+              <option value="Art & Creative">Art & Creative</option>
+              <option value="Business & Finance">Business & Finance</option>
+              <option value="Education">Education</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Music">Music</option>
+            </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Kota Asal</label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                value={formData.city}
-                onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                placeholder="Masukkan kota"
-                className="pl-10"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Instagram Handle</label>
-            <div className="relative">
-              <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#E4405F]" />
-              <Input
-                value={formData.instagram_handle}
-                onChange={(e) => setFormData(prev => ({ ...prev, instagram_handle: e.target.value }))}
-                placeholder="username"
-                className="pl-10"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">TikTok Handle</label>
-            <div className="relative">
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-black dark:bg-white rounded-sm flex items-center justify-center">
-                <svg className="w-2 h-2 text-white dark:text-black" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-2.43.03-4.83-.95-6.43-2.98-1.55-1.99-2.3-4.49-2.2-6.87.09-2.38 1.01-4.74 2.48-6.42 1.45-1.66 3.49-2.69 5.59-2.71.01 1.54-.01 3.08.01 4.61-.13 1.17-.72 2.3-1.57 3.12-1.32 1.25-3.33 1.76-4.96 1.13.04-2.05-.01-4.11.02-6.16.22-1.63 1.15-3.2 2.3-4.25 1.16-1.06 2.74-1.58 4.27-1.71v-4.04c.01-.02.02-.02.02-.02z"/>
-                </svg>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Instagram Handle</label>
+              <div className="relative">
+                <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#E4405F]" />
+                <Input
+                  value={formData.instagram_handle}
+                  onChange={(e) => setFormData(prev => ({ ...prev, instagram_handle: e.target.value }))}
+                  placeholder="username"
+                  className="pl-10"
+                />
               </div>
-              <Input
-                value={formData.tiktok_handle || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, tiktok_handle: e.target.value }))}
-                placeholder="@username"
-                className="pl-10"
-              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">TikTok Handle</label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-black dark:bg-white rounded-sm flex items-center justify-center">
+                  <svg className="w-2 h-2 text-white dark:text-black" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-2.43.03-4.83-.95-6.43-2.98-1.55-1.99-2.3-4.49-2.2-6.87.09-2.38 1.01-4.74 2.48-6.42 1.45-1.66 3.49-2.69 5.59-2.71.01 1.54-.01 3.08.01 4.61-.13 1.17-.72 2.3-1.57 3.12-1.32 1.25-3.33 1.76-4.96 1.13.04-2.05-.01-4.11.02-6.16.22-1.63 1.15-3.2 2.3-4.25 1.16-1.06 2.74-1.58 4.27-1.71v-4.04c.01-.02.02-.02.02-.02z"/>
+                  </svg>
+                </div>
+                <Input
+                  value={formData.tiktok_handle || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, tiktok_handle: e.target.value }))}
+                  placeholder="@username"
+                  className="pl-10"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Services Section */}
+          <div>
+            <label className="block text-sm font-medium mb-2">Services</label>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                'Photo Content',
+                'Video Content',
+                'Story Posts',
+                'Reels/TikTok',
+                'Live Stream',
+                'Product Review',
+                'Event Coverage',
+                'Brand Ambassador'
+              ].map((service) => (
+                <label key={service} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={(formData.services || []).includes(service)}
+                    onChange={(e) => {
+                      const newServices = [...(formData.services || [])];
+                      if (e.target.checked) {
+                        newServices.push(service);
+                      } else {
+                        const index = newServices.indexOf(service);
+                        if (index > -1) newServices.splice(index, 1);
+                      }
+                      setFormData(prev => ({ ...prev, services: newServices }));
+                    }}
+                    className="rounded border-gray-300 dark:border-gray-600 text-[#7124A8] focus:ring-[#7124A8]/50"
+                  />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{service}</span>
+                </label>
+              ))}
             </div>
           </div>
 
