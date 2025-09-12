@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Package, Plus, Edit, Trash2, Eye, LogOut } from 'lucide-react';
+import { Users, Package, Plus, Edit, Trash2, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
 
   const handleDeletePackage = async (id: string) => {
     try {
-      setPackages(packages.filter(p => p.id !== id));
+      setPackages(packages.filter(p => p.id.toString() !== id));
       setDeleteConfirm(null);
     } catch (error) {
       console.error('Error deleting package:', error);
