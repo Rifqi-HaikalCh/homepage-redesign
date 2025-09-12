@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     const packageData = await request.json();
     
     // Validate required fields
-    const { title, description, price } = packageData;
+    const { title, description, price, icon, category } = packageData;
     
     if (!title || !description || !price) {
       return NextResponse.json(
@@ -64,7 +64,9 @@ export async function POST(request: Request) {
       .insert([{
         title,
         description,
-        price
+        price,
+        icon: icon || '📦',
+        category: category || 'micro'
       }])
       .select()
       .single();

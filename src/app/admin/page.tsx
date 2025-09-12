@@ -49,7 +49,18 @@ export default function AdminDashboard() {
   const [userForm, setUserForm] = useState({
     email: '',
     password: '',
-    role: 'client' as 'admin' | 'client' | 'influencer'
+    role: 'client' as 'admin' | 'client' | 'influencer',
+    fullName: '',
+    username: '',
+    // Influencer specific fields
+    influencerData: {
+      name: '',
+      content_type: '',
+      city: '',
+      instagram_handle: '',
+      tiktok_handle: '',
+      services: [] as string[]
+    }
   });
   
   const [packageForm, setPackageForm] = useState({
@@ -118,14 +129,34 @@ export default function AdminDashboard() {
       setUserForm({
         email: user.email,
         password: '',
-        role: user.role as 'admin' | 'client' | 'influencer'
+        role: user.role as 'admin' | 'client' | 'influencer',
+        fullName: user.fullName || '',
+        username: user.username || '',
+        influencerData: {
+          name: '',
+          content_type: '',
+          city: '',
+          instagram_handle: '',
+          tiktok_handle: '',
+          services: []
+        }
       });
     } else {
       setEditingUser(null);
       setUserForm({
         email: '',
         password: '',
-        role: 'client'
+        role: 'client',
+        fullName: '',
+        username: '',
+        influencerData: {
+          name: '',
+          content_type: '',
+          city: '',
+          instagram_handle: '',
+          tiktok_handle: '',
+          services: []
+        }
       });
     }
     setShowUserModal(true);
@@ -156,15 +187,41 @@ export default function AdminDashboard() {
 
   const handleUserSubmit = async () => {
     try {
-      const url = editingUser ? `/api/users?id=${editingUser.id}` : '/api/users';
-      const method = editingUser ? 'PUT' : 'POST';
+      let url, method, requestBody;
+
+      if (editingUser) {
+        // Update existing user
+        url = `/api/users?id=${editingUser.id}`;
+        method = 'PUT';
+        requestBody = userForm;
+      } else {
+        // Create new user
+        if (userForm.role === 'influencer') {
+          // Use register API for influencer with all required fields
+          url = '/api/auth/register';
+          method = 'POST';
+          requestBody = {
+            email: userForm.email,
+            password: userForm.password,
+            role: userForm.role,
+            fullName: userForm.fullName,
+            username: userForm.username,
+            influencerData: userForm.influencerData
+          };
+        } else {
+          // Use users API for admin/client
+          url = '/api/users';
+          method = 'POST';
+          requestBody = userForm;
+        }
+      }
       
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userForm),
+        body: JSON.stringify(requestBody),
       });
 
       if (response.ok) {
@@ -178,6 +235,22 @@ export default function AdminDashboard() {
         }
         setShowUserModal(false);
         setEditingUser(null);
+        // Reset form
+        setUserForm({
+          email: '',
+          password: '',
+          role: 'client',
+          fullName: '',
+          username: '',
+          influencerData: {
+            name: '',
+            content_type: '',
+            city: '',
+            instagram_handle: '',
+            tiktok_handle: '',
+            services: []
+          }
+        });
       } else {
         throw new Error('Failed to save user');
       }
@@ -548,8 +621,8 @@ export default function AdminDashboard() {
 
       {/* User Modal */}
       {showUserModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="max-w-md w-full">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <Card className="max-w-2xl w-full my-8 max-h-[90vh] overflow-y-auto">
             <CardHeader>
               <CardTitle>{editingUser ? 'Edit User' : 'Add User'}</CardTitle>
             </CardHeader>
@@ -575,6 +648,28 @@ export default function AdminDashboard() {
                   onChange={(e) => setUserForm({...userForm, password: e.target.value})}
                 />
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    placeholder="Enter full name"
+                    value={userForm.fullName}
+                    onChange={(e) => setUserForm({...userForm, fullName: e.target.value})}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    placeholder="Enter username"
+                    value={userForm.username}
+                    onChange={(e) => setUserForm({...userForm, username: e.target.value})}
+                  />
+                </div>
+              </div>
               
               <div className="space-y-2">
                 <Label htmlFor="role">Role</Label>
@@ -589,6 +684,133 @@ export default function AdminDashboard() {
                   <SelectItem value="admin">Admin</SelectItem>
                 </Select>
               </div>
+
+              {/* Conditional Influencer Fields */}
+              {userForm.role === 'influencer' && (
+                <>
+                  <div className="border-t pt-4">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Influencer Profile</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="influencerName">Display Name</Label>
+                        <Input
+                          id="influencerName"
+                          placeholder="Influencer display name"
+                          value={userForm.influencerData.name}
+                          onChange={(e) => setUserForm({
+                            ...userForm,
+                            influencerData: {...userForm.influencerData, name: e.target.value}
+                          })}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="city">City</Label>
+                        <Input
+                          id="city"
+                          placeholder="City"
+                          value={userForm.influencerData.city}
+                          onChange={(e) => setUserForm({
+                            ...userForm,
+                            influencerData: {...userForm.influencerData, city: e.target.value}
+                          })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 mb-4">
+                      <Label htmlFor="contentType">Content Type</Label>
+                      <select
+                        value={userForm.influencerData.content_type}
+                        onChange={(e) => setUserForm({
+                          ...userForm,
+                          influencerData: {...userForm.influencerData, content_type: e.target.value}
+                        })}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#7124A8]/50"
+                      >
+                        <option value="">Select content type</option>
+                        <option value="Beauty & Skincare">Beauty & Skincare</option>
+                        <option value="Lifestyle & Fashion">Lifestyle & Fashion</option>
+                        <option value="Travel & Food">Travel & Food</option>
+                        <option value="Tech & Gaming">Tech & Gaming</option>
+                        <option value="Fitness & Health">Fitness & Health</option>
+                        <option value="Art & Creative">Art & Creative</option>
+                        <option value="Business & Finance">Business & Finance</option>
+                        <option value="Education">Education</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Music">Music</option>
+                      </select>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="instagramHandle">Instagram Handle</Label>
+                        <Input
+                          id="instagramHandle"
+                          placeholder="@username"
+                          value={userForm.influencerData.instagram_handle}
+                          onChange={(e) => setUserForm({
+                            ...userForm,
+                            influencerData: {...userForm.influencerData, instagram_handle: e.target.value}
+                          })}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="tiktokHandle">TikTok Handle (Optional)</Label>
+                        <Input
+                          id="tiktokHandle"
+                          placeholder="@username"
+                          value={userForm.influencerData.tiktok_handle}
+                          onChange={(e) => setUserForm({
+                            ...userForm,
+                            influencerData: {...userForm.influencerData, tiktok_handle: e.target.value}
+                          })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Services</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          'Photo Content',
+                          'Video Content', 
+                          'Story Posts',
+                          'Reels/TikTok',
+                          'Live Stream',
+                          'Product Review',
+                          'Event Coverage',
+                          'Brand Ambassador'
+                        ].map((service) => (
+                          <label key={service} className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              checked={userForm.influencerData.services.includes(service)}
+                              onChange={(e) => {
+                                const newServices = [...userForm.influencerData.services];
+                                if (e.target.checked) {
+                                  newServices.push(service);
+                                } else {
+                                  const index = newServices.indexOf(service);
+                                  if (index > -1) newServices.splice(index, 1);
+                                }
+                                setUserForm({
+                                  ...userForm,
+                                  influencerData: {...userForm.influencerData, services: newServices}
+                                });
+                              }}
+                              className="rounded border-gray-300 dark:border-gray-600 text-[#7124A8] focus:ring-[#7124A8]/50"
+                            />
+                            <span className="text-sm text-gray-700 dark:text-gray-300">{service}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
               
               <div className="flex justify-end gap-3 pt-4">
                 <Button
@@ -596,6 +818,21 @@ export default function AdminDashboard() {
                   onClick={() => {
                     setShowUserModal(false);
                     setEditingUser(null);
+                    setUserForm({
+                      email: '',
+                      password: '',
+                      role: 'client',
+                      fullName: '',
+                      username: '',
+                      influencerData: {
+                        name: '',
+                        content_type: '',
+                        city: '',
+                        instagram_handle: '',
+                        tiktok_handle: '',
+                        services: []
+                      }
+                    });
                   }}
                 >
                   Cancel
