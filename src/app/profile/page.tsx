@@ -3,7 +3,7 @@
 import { motion, Variants } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit, LogOut, Instagram, User, UserPlus, Upload, Camera, MapPin } from 'lucide-react';
+import { Edit, LogOut, Instagram, User, UserPlus, Camera, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -250,7 +250,14 @@ const EditProfileModal = ({
                 value={formData.tiktok?.handle || ''}
                 onChange={(e) => setFormData(prev => ({ 
                   ...prev, 
-                  tiktok: { ...prev.tiktok, handle: e.target.value } as any
+                  tiktok: { 
+                    ...(prev.tiktok || {}), 
+                    handle: e.target.value,
+                    followers: prev.tiktok?.followers || '',
+                    engagement_rate: prev.tiktok?.engagement_rate || '',
+                    avg_likes: prev.tiktok?.avg_likes || '',
+                    avg_views: prev.tiktok?.avg_views || ''
+                  }
                 }))}
                 placeholder="@username"
                 className="pl-10"
@@ -274,7 +281,7 @@ const EditProfileModal = ({
 };
 
 // Client Profile Component (Simple Layout)
-const ClientProfile = ({ user, onSignOut }: { user: any, onSignOut: () => void }) => {
+const ClientProfile = ({ user, onSignOut }: { user: { email?: string }, onSignOut: () => void }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 dark:from-gray-950 dark:via-purple-950 dark:to-blue-950 transition-all duration-500">
       <div className="fixed inset-0 bg-gradient-to-br from-white/30 via-transparent to-purple-100/20 dark:from-gray-900/50 dark:via-transparent dark:to-purple-900/10 pointer-events-none" />

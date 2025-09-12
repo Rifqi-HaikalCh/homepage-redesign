@@ -28,7 +28,7 @@ interface InfluencerProfile {
 }
 
 // Mock data generator untuk Instagram
-const generateInstagramMockData = (instagramHandle: string) => {
+const generateInstagramMockData = (_instagramHandle: string) => {
   const baseFollowers = Math.floor(Math.random() * 500000) + 10000; // 10K - 510K followers
   const engagementRate = (Math.random() * 8 + 2).toFixed(1); // 2% - 10%
   const avgLikes = Math.floor(baseFollowers * (parseFloat(engagementRate) / 100));
