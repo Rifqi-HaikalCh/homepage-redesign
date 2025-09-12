@@ -160,7 +160,16 @@ export default function AdminDashboard() {
       <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-b border-white/30 dark:border-gray-700/30 sticky top-0 z-50">
         <div className="container mx-auto max-w-7xl px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* Logout Button - Left */}
+            {/* Logo - Left */}
+            <div className="flex items-center">
+              <img 
+                src="/dapur-buzzer-logo.png" 
+                alt="Dapur Buzzer Logo" 
+                className="h-10 w-auto object-contain"
+              />
+            </div>
+            
+            {/* Logout Button - Right */}
             <Button
               onClick={handleSignOut}
               variant="outline"
@@ -169,15 +178,6 @@ export default function AdminDashboard() {
               <LogOut className="w-4 h-4" />
               Logout
             </Button>
-            
-            {/* Logo - Right */}
-            <div className="flex items-center">
-              <img 
-                src="/dapur-buzzer-logo.png" 
-                alt="Dapur Buzzer Logo" 
-                className="h-10 w-auto object-contain"
-              />
-            </div>
           </div>
         </div>
       </div>
