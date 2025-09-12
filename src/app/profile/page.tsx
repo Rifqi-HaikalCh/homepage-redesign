@@ -91,7 +91,7 @@ const GuestLoginPrompt = () => (
 );
 
 export default function ProfilePage() {
-  const { role } = useAuth();
+  const { user, role } = useAuth();
   
   // Show guest login prompt if user is a guest
   if (role === 'guest') {
@@ -144,10 +144,12 @@ export default function ProfilePage() {
                   />
                 </div>
                 <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-1 font-sans">
-                  {userData.name}
+                  {user?.email || userData.name}
                 </h1>
                 <p className="text-[#7124A8] font-medium text-sm mb-6 font-sans">
-                  {userData.contentType}
+                  {role === 'admin' && '👑 Admin'}
+                  {role === 'client' && '👤 Client'}
+                  {role === 'influencer' && '⭐ Influencer'}
                 </p>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button className="w-full bg-[#7124A8] hover:bg-[#5a1d87] text-white rounded-xl py-3 font-semibold">

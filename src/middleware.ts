@@ -10,25 +10,32 @@ export function middleware(request: NextRequest) {
                   request.cookies.has('sb-localhost-auth-token') ||
                   request.cookies.has('guest-mode'); // Allow guest mode
   
-  // Public routes that don't require authentication
-  const publicRoutes = ['/login', '/register', '/forgot-password', '/api'];
+  // Public routes that everyone can access (homepage, login, register, etc)
+  const publicRoutes = ['/', '/login', '/register', '/forgot-password', '/api'];
+  
+  // Protected routes that need authentication
+  const protectedRoutes = ['/profile'];
+  
+  // Admin-only routes
+  const adminRoutes = ['/admin'];
   
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+  const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
   
-  // Development mode: Skip auth redirect for easier testing
+  // Development mode logging
   if (process.env.NODE_ENV === 'development') {
-    // Allow access but suggest authentication
     console.log(`🚧 Development mode: Accessing ${pathname} ${hasAuth ? 'with auth' : 'without auth'}`);
   }
   
-  // If accessing root without auth, redirect to login
-  if (pathname === '/' && !hasAuth && !isPublicRoute) {
+  // Only protect /profile and /admin routes - homepage is now public for all
+  if (isProtectedRoute && !hasAuth) {
     const loginUrl = new URL('/login', request.url);
     return NextResponse.redirect(loginUrl);
   }
   
-  // If accessing protected routes without auth, redirect to login
-  if (!hasAuth && !isPublicRoute && pathname !== '/') {
+  // Admin routes need special handling (will be done server-side)
+  if (isAdminRoute && !hasAuth) {
     const loginUrl = new URL('/login', request.url);
     return NextResponse.redirect(loginUrl);
   }

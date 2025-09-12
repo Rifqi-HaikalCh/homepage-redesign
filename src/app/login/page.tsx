@@ -20,16 +20,21 @@ export default function LoginPage() {
   const [countdown, setCountdown] = useState(0);
   const [isRedirecting, setIsRedirecting] = useState(false);
   
-  const { user, signIn, setGuestMode } = useAuth();
+  const { user, role, signIn, setGuestMode } = useAuth();
   const router = useRouter();
 
   // Auto redirect when user is authenticated
   useEffect(() => {
     if (user) {
       setIsRedirecting(true);
-      router.push('/');
+      // Redirect admin to dashboard, others to homepage
+      if (role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     }
-  }, [user, router]);
+  }, [user, role, router]);
 
   // Countdown timer untuk rate limiting
   useEffect(() => {
