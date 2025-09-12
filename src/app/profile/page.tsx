@@ -11,49 +11,64 @@ import { useState, useEffect, useRef } from 'react';
 import SecondaryHeader from '@/components/secondary-header';
 import { useAuth } from '@/contexts/AuthContext';
 
-// Interface untuk profile data
+// Interface untuk profile data - Updated to match correct structure
 interface ProfileData {
   id?: number;
   name: string;
-  content_type?: string;
+  content_type: string;
   city: string;
   avatar: string;
-  instagram: string;
-  instagram_data?: {
-    followers: string;
-    engagement_rate: string;
-    avg_likes: string;
-    avg_comments: string;
-  };
-  tiktok?: {
-    handle: string;
-    followers: string;
-    engagement_rate: string;
-    avg_likes: string;
-    avg_views: string;
-  };
+  
+  // Instagram data
+  instagram_handle: string;
+  instagram_followers: string;
+  instagram_engagement_rate: string;
+  instagram_avg_likes: string;
+  instagram_avg_comments: string;
+  
+  // TikTok data
+  tiktok_handle?: string;
+  tiktok_followers?: string;
+  tiktok_engagement_rate?: string;
+  tiktok_avg_likes?: string;
+  tiktok_avg_views?: string;
+  
+  // Services and Portfolio
+  services?: string[];
+  portfolio?: Array<{
+    id: string;
+    title: string;
+    image_url: string;
+    description?: string;
+  }>;
 }
 
-// Default data
+// Default data - Updated to match correct structure
 const defaultUserData: ProfileData = {
   name: 'Default User',
-  content_type: 'Content Creator',
-  avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=center',
+  content_type: 'Beauty & Fashion',
+  avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b494?w=400&h=400&fit=crop&crop=center',
   city: 'Jakarta',
-  instagram: 'defaultuser',
-  instagram_data: {
-    followers: '15.4K',
-    engagement_rate: '5.4%',
-    avg_likes: '1.2K',
-    avg_comments: '32'
-  },
-  tiktok: {
-    handle: '@defaultuser',
-    followers: '5.2K',
-    engagement_rate: '8.1%',
-    avg_likes: '500',
-    avg_views: '10.5K'
-  }
+  
+  // Instagram data
+  instagram_handle: 'defaultuser',
+  instagram_followers: '15.4K',
+  instagram_engagement_rate: '3.5%',
+  instagram_avg_likes: '1200',
+  instagram_avg_comments: '32',
+  
+  // TikTok data
+  tiktok_handle: '@defaultuser',
+  tiktok_followers: '50.2K',
+  tiktok_engagement_rate: '0.7%',
+  tiktok_avg_likes: '500',
+  tiktok_avg_views: '9.4K',
+  
+  // Services
+  services: ['Endorse', 'Foto Katalog'],
+  
+  // Portfolio (empty by default)
+  portfolio: []
 };
 
 // Guest Login Prompt Component
@@ -213,6 +228,15 @@ const EditProfileModal = ({
           </div>
 
           <div>
+            <label className="block text-sm font-medium mb-1">Content Type</label>
+            <Input
+              value={formData.content_type}
+              onChange={(e) => setFormData(prev => ({ ...prev, content_type: e.target.value }))}
+              placeholder="Masukkan jenis konten"
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium mb-1">Kota Asal</label>
             <div className="relative">
               <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -230,8 +254,8 @@ const EditProfileModal = ({
             <div className="relative">
               <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#E4405F]" />
               <Input
-                value={formData.instagram}
-                onChange={(e) => setFormData(prev => ({ ...prev, instagram: e.target.value }))}
+                value={formData.instagram_handle}
+                onChange={(e) => setFormData(prev => ({ ...prev, instagram_handle: e.target.value }))}
                 placeholder="username"
                 className="pl-10"
               />
@@ -247,18 +271,8 @@ const EditProfileModal = ({
                 </svg>
               </div>
               <Input
-                value={formData.tiktok?.handle || ''}
-                onChange={(e) => setFormData(prev => ({ 
-                  ...prev, 
-                  tiktok: { 
-                    ...(prev.tiktok || {}), 
-                    handle: e.target.value,
-                    followers: prev.tiktok?.followers || '',
-                    engagement_rate: prev.tiktok?.engagement_rate || '',
-                    avg_likes: prev.tiktok?.avg_likes || '',
-                    avg_views: prev.tiktok?.avg_views || ''
-                  }
-                }))}
+                value={formData.tiktok_handle || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, tiktok_handle: e.target.value }))}
                 placeholder="@username"
                 className="pl-10"
               />
@@ -365,11 +379,7 @@ export default function ProfilePage() {
           const response = await fetch(`/api/influencers/profile?user_id=${user.id}`);
           if (response.ok) {
             const data = await response.json();
-            setProfileData({
-              ...data,
-              instagram_data: data.instagram_data,
-              tiktok: data.tiktok
-            });
+            setProfileData(data);
           }
         } catch (error) {
           console.error('Error loading profile:', error);
@@ -501,7 +511,7 @@ export default function ProfilePage() {
 
           {/* Kolom Kanan - Detail Statistik & Portofolio */}
           <motion.div className="lg:col-span-3 space-y-6" variants={itemVariants}>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Kartu Instagram */}
               <Card className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl shadow-2xl border border-white/30 dark:border-gray-700/30 rounded-3xl">
                 <CardContent className="p-6">
@@ -514,27 +524,27 @@ export default function ProfilePage() {
                   <div className="space-y-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-[#7124A8] font-sans">
-                        @{profileData.instagram}
+                        @{profileData.instagram_handle}
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Followers</div>
-                        <div className="text-xl font-bold text-gray-800 dark:text-white">{profileData.instagram_data?.followers || 'N/A'}</div>
+                        <div className="text-xl font-bold text-gray-800 dark:text-white">{profileData.instagram_followers}</div>
                       </div>
                       <div>
                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Engagement Rate</div>
-                        <div className="text-xl font-bold text-green-600">{profileData.instagram_data?.engagement_rate || 'N/A'}</div>
+                        <div className="text-xl font-bold text-green-600">{profileData.instagram_engagement_rate}</div>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                        <div>
                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Average Like</div>
-                        <div className="text-lg font-bold text-gray-800 dark:text-white">{profileData.instagram_data?.avg_likes || 'N/A'}</div>
+                        <div className="text-lg font-bold text-gray-800 dark:text-white">{profileData.instagram_avg_likes}</div>
                       </div>
                        <div>
                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Average Comment</div>
-                        <div className="text-lg font-bold text-gray-800 dark:text-white">{profileData.instagram_data?.avg_comments || 'N/A'}</div>
+                        <div className="text-lg font-bold text-gray-800 dark:text-white">{profileData.instagram_avg_comments}</div>
                       </div>
                     </div>
                   </div>
@@ -555,29 +565,61 @@ export default function ProfilePage() {
                   <div className="space-y-4">
                      <div className="text-center">
                       <div className="text-2xl font-bold text-[#7124A8] font-sans">
-                        {profileData.tiktok?.handle || '@notset'}
+                        {profileData.tiktok_handle || '@notset'}
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                        <div>
                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Followers</div>
-                        <div className="text-xl font-bold text-gray-800 dark:text-white">{profileData.tiktok?.followers || 'N/A'}</div>
+                        <div className="text-xl font-bold text-gray-800 dark:text-white">{profileData.tiktok_followers || 'N/A'}</div>
                       </div>
                        <div>
                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Engagement Rate</div>
-                        <div className="text-xl font-bold text-green-600">{profileData.tiktok?.engagement_rate || 'N/A'}</div>
+                        <div className="text-xl font-bold text-green-600">{profileData.tiktok_engagement_rate || 'N/A'}</div>
                       </div>
                     </div>
                      <div className="grid grid-cols-2 gap-4">
                        <div>
                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Average Like</div>
-                        <div className="text-lg font-bold text-gray-800 dark:text-white">{profileData.tiktok?.avg_likes || 'N/A'}</div>
+                        <div className="text-lg font-bold text-gray-800 dark:text-white">{profileData.tiktok_avg_likes || 'N/A'}</div>
                       </div>
                        <div>
                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Average View</div>
-                        <div className="text-lg font-bold text-gray-800 dark:text-white">{profileData.tiktok?.avg_views || 'N/A'}</div>
+                        <div className="text-lg font-bold text-gray-800 dark:text-white">{profileData.tiktok_avg_views || 'N/A'}</div>
                       </div>
                     </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Kartu Services */}
+              <Card className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl shadow-2xl border border-white/30 dark:border-gray-700/30 rounded-3xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="w-5 h-5 bg-[#7124A8] rounded-sm mr-2 flex items-center justify-center">
+                      <span className="text-white text-xs">⚡</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-white font-sans">
+                      Services
+                    </h3>
+                  </div>
+                  <div className="space-y-3">
+                    {profileData.services && profileData.services.length > 0 ? (
+                      profileData.services.map((service, index) => (
+                        <div
+                          key={index}
+                          className="px-3 py-2 bg-[#7124A8]/10 text-[#7124A8] rounded-lg text-sm font-medium text-center"
+                        >
+                          {service}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="text-gray-400 dark:text-gray-500 text-sm">
+                          No services added yet
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

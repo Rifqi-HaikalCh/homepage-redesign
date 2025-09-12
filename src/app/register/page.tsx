@@ -18,7 +18,7 @@ export default function RegisterPage() {
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [countdown, setCountdown] = useState(0);
   
-  // Form data
+  // Form data - Updated to match correct structure
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -27,9 +27,11 @@ export default function RegisterPage() {
     role: 'client' as 'admin' | 'client' | 'influencer',
     // Influencer specific fields
     contentType: '',
-    instagram: '',
+    instagramHandle: '',
+    tiktokHandle: '',
     city: '',
-    avatar: ''
+    avatar: '',
+    services: [] as string[]
   });
 
   const { signUp } = useAuth();
@@ -51,7 +53,7 @@ export default function RegisterPage() {
     }
   }, [countdown, isRateLimited]);
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -74,8 +76,10 @@ export default function RegisterPage() {
           influencerData: {
             name: formData.fullName,
             content_type: formData.contentType,
-            instagram: formData.instagram,
             city: formData.city,
+            instagram_handle: formData.instagramHandle,
+            tiktok_handle: formData.tiktokHandle,
+            services: formData.services,
             avatar: formData.avatar || 'https://images.unsplash.com/photo-1494790108755-2616b612b494?w=400&h=400&fit=crop&crop=center'
           }
         })
@@ -347,11 +351,25 @@ export default function RegisterPage() {
                     <div className="relative">
                       <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#E4405F]" />
                       <Input 
-                        placeholder="Instagram Handle" 
-                        value={formData.instagram}
-                        onChange={(e) => handleInputChange('instagram', e.target.value)}
+                        placeholder="Instagram Handle (tanpa @)" 
+                        value={formData.instagramHandle}
+                        onChange={(e) => handleInputChange('instagramHandle', e.target.value)}
                         className="pl-10 h-12 rounded-lg bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm focus:bg-white/80 dark:focus:bg-gray-800/80" 
                         required
+                      />
+                    </div>
+
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-black dark:bg-white rounded-sm flex items-center justify-center">
+                        <svg className="w-2 h-2 text-white dark:text-black" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-2.43.03-4.83-.95-6.43-2.98-1.55-1.99-2.3-4.49-2.2-6.87.09-2.38 1.01-4.74 2.48-6.42 1.45-1.66 3.49-2.69 5.59-2.71.01 1.54-.01 3.08.01 4.61-.13 1.17-.72 2.3-1.57 3.12-1.32 1.25-3.33 1.76-4.96 1.13.04-2.05-.01-4.11.02-6.16.22-1.63 1.15-3.2 2.3-4.25 1.16-1.06 2.74-1.58 4.27-1.71v-4.04c.01-.02.02-.02.02-.02z"/>
+                        </svg>
+                      </div>
+                      <Input 
+                        placeholder="TikTok Handle (@username)" 
+                        value={formData.tiktokHandle}
+                        onChange={(e) => handleInputChange('tiktokHandle', e.target.value)}
+                        className="pl-10 h-12 rounded-lg bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm focus:bg-white/80 dark:focus:bg-gray-800/80" 
                       />
                     </div>
 
@@ -364,6 +382,30 @@ export default function RegisterPage() {
                         className="pl-10 h-12 rounded-lg bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm focus:bg-white/80 dark:focus:bg-gray-800/80" 
                         required
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Services (Pilih yang sesuai)
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {['Endorse', 'Foto Katalog', 'Video Review', 'Live Streaming', 'Content Creation', 'Brand Ambassador'].map((service) => (
+                          <label key={service} className="flex items-center space-x-2 text-sm">
+                            <input
+                              type="checkbox"
+                              checked={formData.services.includes(service)}
+                              onChange={(e) => {
+                                const newServices = e.target.checked
+                                  ? [...formData.services, service]
+                                  : formData.services.filter(s => s !== service);
+                                handleInputChange('services', newServices);
+                              }}
+                              className="rounded border-gray-300 text-[#7124A8] focus:ring-[#7124A8]"
+                            />
+                            <span className="text-gray-700 dark:text-gray-300">{service}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
 
                     <div className="flex gap-4">
