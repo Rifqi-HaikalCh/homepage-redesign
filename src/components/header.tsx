@@ -7,11 +7,13 @@ import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/theme-provider';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
   const { user, role, signOut, loading } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,6 +31,7 @@ export default function Header() {
   const handleSignOut = async () => {
     try {
       await signOut();
+      router.push('/login');
     } catch (error) {
       console.error('Sign out error:', error);
     }

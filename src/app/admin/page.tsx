@@ -6,6 +6,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Users, Package, Plus, Edit, Trash2, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -40,6 +44,27 @@ export default function AdminDashboard() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [editingPackage, setEditingPackage] = useState<Package | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{type: 'user' | 'package', id: string} | null>(null);
+  
+  // Form states
+  const [userForm, setUserForm] = useState({
+    email: '',
+    password: '',
+    role: 'client' as 'admin' | 'client' | 'influencer'
+  });
+  
+  const [packageForm, setPackageForm] = useState({
+    title: '',
+    description: '',
+    price: '',
+    icon: '📦',
+    category: 'micro' as 'micro' | 'nano' | 'premium'
+  });
+
+  // Available icons for packages
+  const packageIcons = [
+    '📦', '🚀', '⭐', '💎', '🎯', '📱', '💰', '🔥', 
+    '✨', '🎉', '🏆', '💡', '🎪', '🌟', '🎨', '🔔'
+  ];
 
   // Show access denied for non-admin users instead of redirecting
   const showAccessDenied = !loading && (!user || role !== 'admin');
@@ -86,21 +111,148 @@ export default function AdminDashboard() {
     }
   };
 
+  // Form handlers
+  const openUserModal = (user?: User) => {
+    if (user) {
+      setEditingUser(user);
+      setUserForm({
+        email: user.email,
+        password: '',
+        role: user.role as 'admin' | 'client' | 'influencer'
+      });
+    } else {
+      setEditingUser(null);
+      setUserForm({
+        email: '',
+        password: '',
+        role: 'client'
+      });
+    }
+    setShowUserModal(true);
+  };
+
+  const openPackageModal = (pkg?: Package) => {
+    if (pkg) {
+      setEditingPackage(pkg);
+      setPackageForm({
+        title: pkg.title,
+        description: pkg.description,
+        price: pkg.price,
+        icon: pkg.icon,
+        category: pkg.category as 'micro' | 'nano' | 'premium'
+      });
+    } else {
+      setEditingPackage(null);
+      setPackageForm({
+        title: '',
+        description: '',
+        price: '',
+        icon: '📦',
+        category: 'micro'
+      });
+    }
+    setShowPackageModal(true);
+  };
+
+  const handleUserSubmit = async () => {
+    try {
+      const url = editingUser ? `/api/users?id=${editingUser.id}` : '/api/users';
+      const method = editingUser ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userForm),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (editingUser) {
+          // Update existing user
+          setUsers(users.map(u => u.id === editingUser.id ? {...u, ...userForm} : u));
+        } else {
+          // Add new user - reload the users list to get the new user with ID
+          loadUsers();
+        }
+        setShowUserModal(false);
+        setEditingUser(null);
+      } else {
+        throw new Error('Failed to save user');
+      }
+    } catch (error) {
+      console.error('Error saving user:', error);
+      alert('Failed to save user. Please try again.');
+    }
+  };
+
+  const handlePackageSubmit = async () => {
+    try {
+      const url = editingPackage ? `/api/packages?id=${editingPackage.id}` : '/api/packages';
+      const method = editingPackage ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(packageForm),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (editingPackage) {
+          // Update existing package
+          setPackages(packages.map(p => p.id === editingPackage.id ? {...p, ...packageForm} : p));
+        } else {
+          // Add new package - reload the packages list to get the new package with ID
+          loadPackages();
+        }
+        setShowPackageModal(false);
+        setEditingPackage(null);
+      } else {
+        throw new Error('Failed to save package');
+      }
+    } catch (error) {
+      console.error('Error saving package:', error);
+      alert('Failed to save package. Please try again.');
+    }
+  };
+
   const handleDeleteUser = async (id: string) => {
     try {
-      setUsers(users.filter(u => u.id !== id));
+      const response = await fetch(`/api/users?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setUsers(users.filter(u => u.id !== id));
+      } else {
+        throw new Error('Failed to delete user');
+      }
       setDeleteConfirm(null);
     } catch (error) {
       console.error('Error deleting user:', error);
+      alert('Failed to delete user. Please try again.');
     }
   };
 
   const handleDeletePackage = async (id: string) => {
     try {
-      setPackages(packages.filter(p => p.id.toString() !== id));
+      const response = await fetch(`/api/packages?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setPackages(packages.filter(p => p.id.toString() !== id));
+      } else {
+        throw new Error('Failed to delete package');
+      }
       setDeleteConfirm(null);
     } catch (error) {
       console.error('Error deleting package:', error);
+      alert('Failed to delete package. Please try again.');
     }
   };
 
@@ -220,10 +372,7 @@ export default function AdminDashboard() {
                   User Management
                 </CardTitle>
                 <Button
-                  onClick={() => {
-                    setEditingUser(null);
-                    setShowUserModal(true);
-                  }}
+                  onClick={() => openUserModal()}
                   className="bg-[#7124A8] hover:bg-[#5a1d87]"
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -267,10 +416,7 @@ export default function AdminDashboard() {
                                 <Button
                                   size="sm"
                                   variant="outline"
-                                  onClick={() => {
-                                    setEditingUser(user);
-                                    setShowUserModal(true);
-                                  }}
+                                  onClick={() => openUserModal(user)}
                                 >
                                   <Edit className="w-3 h-3" />
                                 </Button>
@@ -302,10 +448,7 @@ export default function AdminDashboard() {
                   Package Management
                 </CardTitle>
                 <Button
-                  onClick={() => {
-                    setEditingPackage(null);
-                    setShowPackageModal(true);
-                  }}
+                  onClick={() => openPackageModal()}
                   className="bg-[#7124A8] hover:bg-[#5a1d87]"
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -333,10 +476,7 @@ export default function AdminDashboard() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => {
-                                setEditingPackage(pkg);
-                                setShowPackageModal(true);
-                              }}
+                              onClick={() => openPackageModal(pkg)}
                             >
                               <Edit className="w-3 h-3" />
                             </Button>
@@ -406,26 +546,70 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* User Modal - Simplified for now */}
+      {/* User Modal */}
       {showUserModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="max-w-md w-full">
             <CardHeader>
               <CardTitle>{editingUser ? 'Edit User' : 'Add User'}</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                User management modal - implement form here
-              </p>
-              <div className="flex justify-end gap-3">
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="user@example.com"
+                  value={userForm.email}
+                  onChange={(e) => setUserForm({...userForm, email: e.target.value})}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password">Password {editingUser && '(leave blank to keep current)'}</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter password"
+                  value={userForm.password}
+                  onChange={(e) => setUserForm({...userForm, password: e.target.value})}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="role">Role</Label>
+                <Select
+                  value={userForm.role}
+                  onValueChange={(value: 'admin' | 'client' | 'influencer') => 
+                    setUserForm({...userForm, role: value})
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="client">Client</SelectItem>
+                    <SelectItem value="influencer">Influencer</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex justify-end gap-3 pt-4">
                 <Button
                   variant="outline"
-                  onClick={() => setShowUserModal(false)}
+                  onClick={() => {
+                    setShowUserModal(false);
+                    setEditingUser(null);
+                  }}
                 >
                   Cancel
                 </Button>
-                <Button className="bg-[#7124A8] hover:bg-[#5a1d87]">
-                  Save
+                <Button 
+                  className="bg-[#7124A8] hover:bg-[#5a1d87]"
+                  onClick={handleUserSubmit}
+                >
+                  {editingUser ? 'Update' : 'Create'} User
                 </Button>
               </div>
             </CardContent>
@@ -433,26 +617,97 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Package Modal - Simplified for now */}
+      {/* Package Modal */}
       {showPackageModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="max-w-md w-full">
+          <Card className="max-w-lg w-full">
             <CardHeader>
               <CardTitle>{editingPackage ? 'Edit Package' : 'Add Package'}</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Package management modal - implement form here
-              </p>
-              <div className="flex justify-end gap-3">
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Package Title</Label>
+                <Input
+                  id="title"
+                  placeholder="Enter package title"
+                  value={packageForm.title}
+                  onChange={(e) => setPackageForm({...packageForm, title: e.target.value})}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Enter package description"
+                  value={packageForm.description}
+                  onChange={(e) => setPackageForm({...packageForm, description: e.target.value})}
+                  rows={3}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="price">Price</Label>
+                <Input
+                  id="price"
+                  placeholder="e.g. Rp 1.500.000"
+                  value={packageForm.price}
+                  onChange={(e) => setPackageForm({...packageForm, price: e.target.value})}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="icon">Icon</Label>
+                <div className="grid grid-cols-8 gap-2 p-3 border rounded-lg">
+                  {packageIcons.map((icon) => (
+                    <button
+                      key={icon}
+                      type="button"
+                      className={`text-2xl p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                        packageForm.icon === icon ? 'bg-[#7124A8]/20 border-2 border-[#7124A8]' : 'border border-gray-200 dark:border-gray-700'
+                      }`}
+                      onClick={() => setPackageForm({...packageForm, icon})}
+                    >
+                      {icon}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  value={packageForm.category}
+                  onValueChange={(value: 'micro' | 'nano' | 'premium') => 
+                    setPackageForm({...packageForm, category: value})
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="micro">Micro Influencer</SelectItem>
+                    <SelectItem value="nano">Nano Influencer</SelectItem>
+                    <SelectItem value="premium">Premium Package</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex justify-end gap-3 pt-4">
                 <Button
                   variant="outline"
-                  onClick={() => setShowPackageModal(false)}
+                  onClick={() => {
+                    setShowPackageModal(false);
+                    setEditingPackage(null);
+                  }}
                 >
                   Cancel
                 </Button>
-                <Button className="bg-[#7124A8] hover:bg-[#5a1d87]">
-                  Save
+                <Button 
+                  className="bg-[#7124A8] hover:bg-[#5a1d87]"
+                  onClick={handlePackageSubmit}
+                >
+                  {editingPackage ? 'Update' : 'Create'} Package
                 </Button>
               </div>
             </CardContent>

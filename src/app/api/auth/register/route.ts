@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
 // Mock data generator untuk Instagram - Updated format
 const generateInstagramMockData = (instagramHandle: string) => {
@@ -31,6 +32,11 @@ const generateTikTokMockData = (tiktokHandle: string) => {
   };
 };
 
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 // POST - Register user dengan optional influencer data
 export async function POST(request: NextRequest) {
   try {
@@ -52,22 +58,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate user ID mock (dalam implementasi nyata ini akan datang dari Supabase)
-    const userId = `user_${Math.random().toString(36).substr(2, 9)}`;
-
-    // Mock user creation - replace dengan Supabase auth.signUp
-    const newUser = {
-      id: userId,
+    // 1. Create user in Supabase Auth
+    const { data: authUser, error: authError } = await supabase.auth.signUp({
       email,
-      user_metadata: {
-        full_name: fullName,
-        username,
-        role
-      },
-      created_at: new Date().toISOString()
-    };
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          username,
+          role
+        }
+      }
+    });
 
-    // Jika role influencer, buat record di influencers table
+    if (authError || !authUser.user) {
+      console.error('Auth error:', authError);
+      return NextResponse.json(
+        { error: authError?.message || 'Failed to create user' },
+        { status: 400 }
+      );
+    }
+
+    const userId = authUser.user.id;
+
+    // 2. Insert role into users_roles table
+    const { error: roleError } = await supabase
+      .from('users_roles')
+      .insert({
+        user_id: userId,
+        role: role
+      });
+
+    if (roleError) {
+      console.error('Role insertion error:', roleError);
+      // Continue despite role error for now
+    }
+
+    // 3. Jika role influencer, buat record di influencers table
     if (role === 'influencer' && influencerData) {
       // Generate mock Instagram data
       const instagramData = generateInstagramMockData(influencerData.instagram_handle);
@@ -77,9 +104,8 @@ export async function POST(request: NextRequest) {
         ? generateTikTokMockData(influencerData.tiktok_handle)
         : null;
       
-      // Mock influencer record creation - replace dengan actual Supabase query
+      // Insert influencer record into database
       const influencerRecord = {
-        id: Math.floor(Math.random() * 1000),
         name: influencerData.name,
         content_type: influencerData.content_type,
         city: influencerData.city,
@@ -106,17 +132,29 @@ export async function POST(request: NextRequest) {
         portfolio: [],
         
         // Metadata
-        user_id: userId,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        user_id: userId
       };
 
-      console.log('Created influencer record:', influencerRecord);
+      const { error: influencerError } = await supabase
+        .from('influencers')
+        .insert(influencerRecord);
+
+      if (influencerError) {
+        console.error('Influencer insertion error:', influencerError);
+        return NextResponse.json(
+          { error: 'Failed to create influencer profile' },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json({
       message: 'User registered successfully',
-      user: newUser,
+      user: {
+        id: userId,
+        email: authUser.user.email,
+        role
+      },
       role,
       ...(role === 'influencer' && { profileCreated: true })
     });
