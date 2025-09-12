@@ -673,8 +673,8 @@ export default function AdminDashboard() {
                 <Label htmlFor="category">Category</Label>
                 <Select
                   value={packageForm.category}
-                  onValueChange={(value: 'micro' | 'nano' | 'premium') => 
-                    setPackageForm({...packageForm, category: value})
+                  onValueChange={(value) => 
+                    setPackageForm({...packageForm, category: value as 'micro' | 'nano' | 'premium'})
                   }
                 >
                   <SelectItem value="micro">Micro Influencer</SelectItem>
