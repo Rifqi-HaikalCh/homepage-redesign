@@ -5,11 +5,11 @@ import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Mail, Lock, User, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, ArrowLeft, Instagram, MapPin, Camera } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
-type Step = 1 | 2 | 3;
+type Step = 1 | 2 | 3 | 4;
 
 export default function RegisterPage() {
   const [step, setStep] = useState<Step>(1);
@@ -24,13 +24,18 @@ export default function RegisterPage() {
     password: '',
     fullName: '',
     username: '',
-    role: 'client' as 'admin' | 'client' | 'influencer'
+    role: 'client' as 'admin' | 'client' | 'influencer',
+    // Influencer specific fields
+    contentType: '',
+    instagram: '',
+    city: '',
+    avatar: ''
   });
 
   const { signUp } = useAuth();
   const router = useRouter();
 
-  const nextStep = () => setStep(prev => prev < 3 ? (prev + 1) as Step : prev);
+  const nextStep = () => setStep(prev => prev < 4 ? (prev + 1) as Step : prev);
   const prevStep = () => setStep(prev => prev > 1 ? (prev - 1) as Step : prev);
 
   // Countdown timer untuk rate limiting
@@ -57,11 +62,41 @@ export default function RegisterPage() {
     setError('');
     
     try {
-      await signUp(formData.email, formData.password, formData.role);
+      // Create the registration payload
+      const registrationData = {
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+        fullName: formData.fullName,
+        username: formData.username,
+        // Include influencer data if role is influencer
+        ...(formData.role === 'influencer' && {
+          influencerData: {
+            name: formData.fullName,
+            content_type: formData.contentType,
+            instagram: formData.instagram,
+            city: formData.city,
+            avatar: formData.avatar || 'https://images.unsplash.com/photo-1494790108755-2616b612b494?w=400&h=400&fit=crop&crop=center'
+          }
+        })
+      };
+
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(registrationData),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Registration failed');
+      }
+
       router.push('/login?message=Registration successful, please login');
     } catch (error: unknown) {
       if (error instanceof Error && error.message.includes('Terlalu banyak percobaan')) {
-        // Extract retry time dari error message
         const seconds = error.message.match(/(\d+) detik/)?.[1];
         if (seconds) {
           setCountdown(parseInt(seconds));
@@ -109,12 +144,22 @@ export default function RegisterPage() {
 
   const handleNext = () => {
     setDirection(1);
-    nextStep();
+    // Skip influencer step if not an influencer
+    if (step === 2 && formData.role !== 'influencer') {
+      setStep(4); // Go directly to final step
+    } else {
+      nextStep();
+    }
   };
   
   const handlePrev = () => {
     setDirection(-1);
-    prevStep();
+    // Skip influencer step when going back if not an influencer
+    if (step === 4 && formData.role !== 'influencer') {
+      setStep(2); // Go directly to step 2
+    } else {
+      prevStep();
+    }
   };
 
   return (
@@ -150,7 +195,7 @@ export default function RegisterPage() {
 
             {/* Indikator Stepper */}
             <div className="flex justify-center gap-2 mb-8">
-              {[1, 2, 3].map(s => (
+              {(formData.role === 'influencer' ? [1, 2, 3, 4] : [1, 2, 4]).map((s, index) => (
                 <motion.div
                   key={s}
                   className="h-2 rounded-full bg-purple-200 dark:bg-purple-900"
@@ -265,9 +310,79 @@ export default function RegisterPage() {
                     </div>
                   </motion.div>
                 )}
-                 {step === 3 && (
+                {step === 3 && formData.role === 'influencer' && (
                   <motion.div
                     key={3}
+                    custom={direction}
+                    variants={stepVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="space-y-4 absolute w-full overflow-y-auto max-h-80"
+                  >
+                    <h2 className="font-semibold text-lg text-center text-gray-800 dark:text-gray-200">Influencer Profile</h2>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Content Type
+                      </label>
+                      <select
+                        value={formData.contentType}
+                        onChange={(e) => handleInputChange('contentType', e.target.value)}
+                        className="w-full p-3 h-12 rounded-lg border border-white/30 dark:border-gray-600/30 bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 backdrop-blur-sm"
+                        required
+                      >
+                        <option value="">Pilih Content Type</option>
+                        <option value="Lifestyle & Beauty">Lifestyle & Beauty</option>
+                        <option value="Tech & Gaming">Tech & Gaming</option>
+                        <option value="Food & Culinary">Food & Culinary</option>
+                        <option value="Travel & Adventure">Travel & Adventure</option>
+                        <option value="Fashion & Style">Fashion & Style</option>
+                        <option value="Health & Fitness">Health & Fitness</option>
+                        <option value="Business & Finance">Business & Finance</option>
+                        <option value="Entertainment">Entertainment</option>
+                      </select>
+                    </div>
+
+                    <div className="relative">
+                      <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#E4405F]" />
+                      <Input 
+                        placeholder="Instagram Handle" 
+                        value={formData.instagram}
+                        onChange={(e) => handleInputChange('instagram', e.target.value)}
+                        className="pl-10 h-12 rounded-lg bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm focus:bg-white/80 dark:focus:bg-gray-800/80" 
+                        required
+                      />
+                    </div>
+
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <Input 
+                        placeholder="Kota Asal" 
+                        value={formData.city}
+                        onChange={(e) => handleInputChange('city', e.target.value)}
+                        className="pl-10 h-12 rounded-lg bg-white/50 dark:bg-gray-800/50 border-white/30 dark:border-gray-600/30 backdrop-blur-sm focus:bg-white/80 dark:focus:bg-gray-800/80" 
+                        required
+                      />
+                    </div>
+
+                    <div className="flex gap-4">
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-1/2">
+                         <Button onClick={handlePrev} variant="outline" className="w-full h-12 rounded-lg">
+                          <ArrowLeft className="w-4 h-4 mr-2" /> Back
+                        </Button>
+                      </motion.div>
+                      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-1/2">
+                         <Button onClick={handleNext} className="w-full h-12 bg-[#7124A8] hover:bg-[#5a1d87] text-white font-bold rounded-lg text-base">
+                          Next <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                )}
+                 {step === 4 && (
+                  <motion.div
+                    key={4}
                     custom={direction}
                     variants={stepVariants}
                     initial="hidden"
