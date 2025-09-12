@@ -54,15 +54,17 @@ export default function AdminDashboard() {
 
   const loadUsers = async () => {
     try {
-      const response = await fetch('/api/admin/users');
+      const response = await fetch('/api/users');
       if (response.ok) {
         const data = await response.json();
         setUsers(data);
       } else {
-        console.error('Failed to fetch users');
+        console.log('No users found, showing empty state');
+        setUsers([]);
       }
     } catch (error) {
       console.error('Error loading users:', error);
+      setUsers([]);
     } finally {
       setIsLoadingData(false);
     }
@@ -70,15 +72,17 @@ export default function AdminDashboard() {
 
   const loadPackages = async () => {
     try {
-      const response = await fetch('/api/admin/packages');
+      const response = await fetch('/api/packages');
       if (response.ok) {
         const data = await response.json();
         setPackages(data);
       } else {
-        console.error('Failed to fetch packages');
+        console.log('No packages found, showing empty state');
+        setPackages([]);
       }
     } catch (error) {
       console.error('Error loading packages:', error);
+      setPackages([]);
     }
   };
 
@@ -227,57 +231,65 @@ export default function AdminDashboard() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200 dark:border-gray-700">
-                        <th className="text-left p-4">Email</th>
-                        <th className="text-left p-4">Role</th>
-                        <th className="text-left p-4">Created</th>
-                        <th className="text-left p-4">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users.map((user) => (
-                        <tr key={user.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                          <td className="p-4">{user.email}</td>
-                          <td className="p-4">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              user.role === 'admin' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' :
-                              user.role === 'influencer' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400' :
-                              'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
-                            }`}>
-                              {user.role}
-                            </span>
-                          </td>
-                          <td className="p-4">{new Date(user.created_at).toLocaleDateString()}</td>
-                          <td className="p-4">
-                            <div className="flex items-center gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => {
-                                  setEditingUser(user);
-                                  setShowUserModal(true);
-                                }}
-                              >
-                                <Edit className="w-3 h-3" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setDeleteConfirm({type: 'user', id: user.id})}
-                                className="text-red-600 hover:text-red-700"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          </td>
+                {users.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">👥</div>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Users Found</h3>
+                    <p className="text-gray-600 dark:text-gray-400">Users will appear here once they are loaded from the database.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200 dark:border-gray-700">
+                          <th className="text-left p-4">Email</th>
+                          <th className="text-left p-4">Role</th>
+                          <th className="text-left p-4">Created</th>
+                          <th className="text-left p-4">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {users.map((user) => (
+                          <tr key={user.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                            <td className="p-4">{user.email}</td>
+                            <td className="p-4">
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                user.role === 'admin' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' :
+                                user.role === 'influencer' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400' :
+                                'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+                              }`}>
+                                {user.role}
+                              </span>
+                            </td>
+                            <td className="p-4">{new Date(user.created_at).toLocaleDateString()}</td>
+                            <td className="p-4">
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setEditingUser(user);
+                                    setShowUserModal(true);
+                                  }}
+                                >
+                                  <Edit className="w-3 h-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => setDeleteConfirm({type: 'user', id: user.id})}
+                                  className="text-red-600 hover:text-red-700"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -301,8 +313,15 @@ export default function AdminDashboard() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {packages.map((pkg) => (
+                {packages.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">📦</div>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Packages Found</h3>
+                    <p className="text-gray-600 dark:text-gray-400">Packages will appear here once they are loaded from the database.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {packages.map((pkg) => (
                     <Card key={pkg.id} className="border border-gray-200 dark:border-gray-700">
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
@@ -342,8 +361,9 @@ export default function AdminDashboard() {
                         <p className="text-gray-600 dark:text-gray-400">{pkg.description}</p>
                       </CardContent>
                     </Card>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

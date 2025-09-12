@@ -43,29 +43,29 @@ interface ProfileData {
   }>;
 }
 
-// Default data - Updated to match correct structure
+// Empty default data - will be populated from database
 const defaultUserData: ProfileData = {
-  name: 'Default User',
-  content_type: 'Beauty & Fashion',
+  name: '',
+  content_type: '',
   avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b494?w=400&h=400&fit=crop&crop=center',
-  city: 'Jakarta',
+  city: '',
   
   // Instagram data
-  instagram_handle: 'defaultuser',
-  instagram_followers: '15.4K',
-  instagram_engagement_rate: '3.5%',
-  instagram_avg_likes: '1200',
-  instagram_avg_comments: '32',
+  instagram_handle: '',
+  instagram_followers: '',
+  instagram_engagement_rate: '',
+  instagram_avg_likes: '',
+  instagram_avg_comments: '',
   
   // TikTok data
-  tiktok_handle: '@defaultuser',
-  tiktok_followers: '50.2K',
-  tiktok_engagement_rate: '0.7%',
-  tiktok_avg_likes: '500',
-  tiktok_avg_views: '9.4K',
+  tiktok_handle: '',
+  tiktok_followers: '',
+  tiktok_engagement_rate: '',
+  tiktok_avg_likes: '',
+  tiktok_avg_views: '',
   
   // Services
-  services: ['Endorse', 'Foto Katalog'],
+  services: [],
   
   // Portfolio (empty by default)
   portfolio: []
@@ -380,9 +380,13 @@ export default function ProfilePage() {
           if (response.ok) {
             const data = await response.json();
             setProfileData(data);
+          } else {
+            // Profile not found, keep default empty data
+            console.log('Profile not found, showing empty state');
           }
         } catch (error) {
           console.error('Error loading profile:', error);
+          // Keep default empty data on error
         } finally {
           setIsLoadingProfile(false);
         }
@@ -487,14 +491,14 @@ export default function ProfilePage() {
                   />
                 </div>
                 <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-1 font-sans">
-                  {profileData.name}
+                  {profileData.name || 'No Name Set'}
                 </h1>
                 <p className="text-[#7124A8] font-medium text-sm mb-2 font-sans">
-                  {profileData.content_type}
+                  {profileData.content_type || 'No Content Type Set'}
                 </p>
                 <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 flex items-center justify-center gap-1">
                   <MapPin className="w-3 h-3" />
-                  {profileData.city}
+                  {profileData.city || 'No City Set'}
                 </p>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button 
@@ -524,27 +528,27 @@ export default function ProfilePage() {
                   <div className="space-y-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-[#7124A8] font-sans">
-                        @{profileData.instagram_handle}
+                        @{profileData.instagram_handle || 'notset'}
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Followers</div>
-                        <div className="text-xl font-bold text-gray-800 dark:text-white">{profileData.instagram_followers}</div>
+                        <div className="text-xl font-bold text-gray-800 dark:text-white">{profileData.instagram_followers || 'N/A'}</div>
                       </div>
                       <div>
                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Engagement Rate</div>
-                        <div className="text-xl font-bold text-green-600">{profileData.instagram_engagement_rate}</div>
+                        <div className="text-xl font-bold text-green-600">{profileData.instagram_engagement_rate || 'N/A'}</div>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                        <div>
                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Average Like</div>
-                        <div className="text-lg font-bold text-gray-800 dark:text-white">{profileData.instagram_avg_likes}</div>
+                        <div className="text-lg font-bold text-gray-800 dark:text-white">{profileData.instagram_avg_likes || 'N/A'}</div>
                       </div>
                        <div>
                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Average Comment</div>
-                        <div className="text-lg font-bold text-gray-800 dark:text-white">{profileData.instagram_avg_comments}</div>
+                        <div className="text-lg font-bold text-gray-800 dark:text-white">{profileData.instagram_avg_comments || 'N/A'}</div>
                       </div>
                     </div>
                   </div>

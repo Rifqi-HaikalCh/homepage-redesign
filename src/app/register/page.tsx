@@ -146,7 +146,31 @@ export default function RegisterPage() {
 
   const [direction, setDirection] = useState(1);
 
+  // Form validation functions
+  const isStep1Valid = () => {
+    return formData.email.trim() !== '' && formData.password.length >= 6;
+  };
+
+  const isStep2Valid = () => {
+    return formData.fullName.trim() !== '' && formData.username.trim() !== '' && formData.role !== '';
+  };
+
+  const isStep3Valid = () => {
+    if (formData.role !== 'influencer') return true;
+    return (
+      formData.contentType.trim() !== '' &&
+      formData.instagramHandle.trim() !== '' &&
+      formData.city.trim() !== '' &&
+      formData.services.length > 0
+    );
+  };
+
   const handleNext = () => {
+    // Validate current step before proceeding
+    if (step === 1 && !isStep1Valid()) return;
+    if (step === 2 && !isStep2Valid()) return;
+    if (step === 3 && !isStep3Valid()) return;
+    
     setDirection(1);
     // Skip influencer step if not an influencer
     if (step === 2 && formData.role !== 'influencer') {
@@ -249,7 +273,15 @@ export default function RegisterPage() {
                       />
                     </div>
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                       <Button onClick={handleNext} className="w-full h-12 bg-[#7124A8] hover:bg-[#5a1d87] text-white font-bold rounded-lg text-base">
+                       <Button 
+                         onClick={handleNext} 
+                         disabled={!isStep1Valid()}
+                         className={`w-full h-12 font-bold rounded-lg text-base ${
+                           isStep1Valid() 
+                             ? 'bg-[#7124A8] hover:bg-[#5a1d87] text-white' 
+                             : 'bg-gray-300 cursor-not-allowed text-gray-500'
+                         }`}
+                       >
                         Next <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </motion.div>
@@ -307,7 +339,15 @@ export default function RegisterPage() {
                         </Button>
                       </motion.div>
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-1/2">
-                         <Button onClick={handleNext} className="w-full h-12 bg-[#7124A8] hover:bg-[#5a1d87] text-white font-bold rounded-lg text-base">
+                         <Button 
+                           onClick={handleNext} 
+                           disabled={!isStep2Valid()}
+                           className={`w-full h-12 font-bold rounded-lg text-base ${
+                             isStep2Valid() 
+                               ? 'bg-[#7124A8] hover:bg-[#5a1d87] text-white' 
+                               : 'bg-gray-300 cursor-not-allowed text-gray-500'
+                           }`}
+                         >
                           Next <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
                       </motion.div>
@@ -415,7 +455,15 @@ export default function RegisterPage() {
                         </Button>
                       </motion.div>
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-1/2">
-                         <Button onClick={handleNext} className="w-full h-12 bg-[#7124A8] hover:bg-[#5a1d87] text-white font-bold rounded-lg text-base">
+                         <Button 
+                           onClick={handleNext} 
+                           disabled={!isStep3Valid()}
+                           className={`w-full h-12 font-bold rounded-lg text-base ${
+                             isStep3Valid() 
+                               ? 'bg-[#7124A8] hover:bg-[#5a1d87] text-white' 
+                               : 'bg-gray-300 cursor-not-allowed text-gray-500'
+                           }`}
+                         >
                           Next <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
                       </motion.div>

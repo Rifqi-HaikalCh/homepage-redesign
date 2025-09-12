@@ -1,54 +1,50 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 
-const packages = [
-  {
-    id: 1,
-    title: 'Paket Endorsement 10 Micro Influencer',
-    description: 'Kampanye endorsement dengan 10 micro influencer pilihan',
-    price: 'Rp 2.500.000',
-    icon: '🎯'
-  },
-  {
-    id: 2,
-    title: 'Paket Paid Promote 10 Micro Influencer',
-    description: 'Promosi berbayar melalui 10 micro influencer terverifikasi',
-    price: 'Rp 1.500.000',
-    icon: '📢'
-  },
-  {
-    id: 3,
-    title: 'Paket Produk Review 10 Micro Influencer',
-    description: 'Review produk mendalam oleh 10 micro influencer',
-    price: 'Rp 2.000.000',
-    icon: '⭐'
-  },
-  {
-    id: 4,
-    title: 'Paket Bundle TikTok + Instagram Story 10 Micro Influencer',
-    description: 'Konten multi-platform TikTok dan Instagram Story',
-    price: 'Rp 3.500.000',
-    icon: '📱'
-  },
-  {
-    id: 5,
-    title: 'Paket Kampanye Viral 100 Micro Influencer',
-    description: 'Kampanye viral massal dengan 100 micro influencer',
-    price: 'Rp 25.000.000',
-    icon: '🚀'
-  }
-];
+interface Package {
+  id: number;
+  title: string;
+  description: string;
+  price: string;
+  icon: string;
+  category: string;
+}
 
 export default function RecommendationCards() {
+  const [packages, setPackages] = useState<Package[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const cardsToShow = 4;
   const maxIndex = Math.max(0, packages.length - cardsToShow);
+
+  // Fetch packages from API
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const response = await fetch('/api/packages?category=micro');
+        if (response.ok) {
+          const data = await response.json();
+          setPackages(data);
+        } else {
+          console.log('No packages found, showing empty state');
+          setPackages([]);
+        }
+      } catch (error) {
+        console.error('Error fetching packages:', error);
+        setPackages([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPackages();
+  }, []);
 
   const nextSlide = () => {
     setCurrentIndex(prev => Math.min(prev + 1, maxIndex));
@@ -86,6 +82,47 @@ export default function RecommendationCards() {
       }
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <section className="py-16 bg-gray-50 dark:bg-gray-800">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Package Micro Influencer</h2>
+            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Paket kolaborasi dengan micro influencer terpilih untuk meningkatkan brand awareness dan engagement produk Anda
+            </p>
+          </div>
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7124A8] mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400 ml-4">Loading packages...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Empty state
+  if (packages.length === 0) {
+    return (
+      <section className="py-16 bg-gray-50 dark:bg-gray-800">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Package Micro Influencer</h2>
+            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Paket kolaborasi dengan micro influencer terpilih untuk meningkatkan brand awareness dan engagement produk Anda
+            </p>
+          </div>
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">📦</div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Packages Available</h3>
+            <p className="text-gray-600 dark:text-gray-400">Packages will appear here once they are added to the database.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-gray-50 dark:bg-gray-800">
