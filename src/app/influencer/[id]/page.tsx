@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Instagram, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Instagram, ChevronLeft, ChevronRight, Music, MapPin, Users, Heart, MessageCircle, Eye, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useParams } from 'next/navigation';
@@ -12,11 +12,28 @@ interface Influencer {
   id: number;
   name: string;
   content_type: string;
-  instagram: string;
-  followers: string;
   city: string;
   avatar: string;
-  engagement_rate: string;
+  instagram_handle: string;
+  instagram_followers: string;
+  instagram_engagement_rate: string;
+  instagram_avg_likes: string;
+  instagram_avg_comments: string;
+  tiktok_handle?: string;
+  tiktok_followers?: string;
+  tiktok_engagement_rate?: string;
+  tiktok_avg_likes?: string;
+  tiktok_avg_views?: string;
+  services: string[] | null;
+  portfolio: Array<{
+    id: string;
+    title: string;
+    image_url: string;
+    description?: string;
+  }> | null;
+  user_id?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export default function InfluencerDetail() {
@@ -285,9 +302,10 @@ export default function InfluencerDetail() {
                     <p className="text-purple-600 dark:text-purple-400 font-medium text-sm mb-6">
                       {selectedInfluencer.content_type}
                     </p>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">
-                      📍 {selectedInfluencer.city}
-                    </p>
+                    <div className="flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm mb-6">
+                      <MapPin className="w-4 h-4 mr-1" />
+                      {selectedInfluencer.city}
+                    </div>
                     <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl py-3">
                       Contact Influencer
                     </Button>
@@ -308,49 +326,118 @@ export default function InfluencerDetail() {
                         </h3>
                       </div>
                       <div className="space-y-6">
-                        <div className="text-center">
-                          <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                            {selectedInfluencer.instagram}
+                        <div className="text-center mb-6">
+                          <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                            @{selectedInfluencer.instagram_handle}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                          <div className="text-center">
+                            <div className="flex items-center justify-center mb-1">
+                              <Users className="w-4 h-4 text-gray-500 mr-1" />
+                              <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Followers</div>
+                            </div>
+                            <div className="text-xl font-bold text-gray-800 dark:text-white">{selectedInfluencer.instagram_followers}</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="flex items-center justify-center mb-1">
+                              <Zap className="w-4 h-4 text-gray-500 mr-1" />
+                              <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Engagement</div>
+                            </div>
+                            <div className="text-xl font-bold text-green-600">{selectedInfluencer.instagram_engagement_rate}</div>
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="text-center">
-                            <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Followers</div>
-                            <div className="text-2xl font-bold text-gray-800 dark:text-white">{selectedInfluencer.followers}</div>
+                            <div className="flex items-center justify-center mb-1">
+                              <Heart className="w-4 h-4 text-gray-500 mr-1" />
+                              <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Avg Likes</div>
+                            </div>
+                            <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">{selectedInfluencer.instagram_avg_likes}</div>
                           </div>
                           <div className="text-center">
-                            <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Engagement Rate</div>
-                            <div className="text-2xl font-bold text-green-600">{selectedInfluencer.engagement_rate}</div>
+                            <div className="flex items-center justify-center mb-1">
+                              <MessageCircle className="w-4 h-4 text-gray-500 mr-1" />
+                              <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Avg Comments</div>
+                            </div>
+                            <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">{selectedInfluencer.instagram_avg_comments}</div>
                           </div>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
-                  {/* Collaboration Types */}
+                  {/* TikTok Stats or Services */}
                   <Card className="bg-white dark:bg-gray-800 shadow-2xl border border-gray-200/50 dark:border-gray-700/30 rounded-3xl">
                     <CardContent className="p-8">
-                      <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-6">
-                        Collaboration Types
-                      </h3>
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600 dark:text-gray-400">Sponsored Posts</span>
-                          <span className="text-green-600 font-semibold">Available</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600 dark:text-gray-400">Product Reviews</span>
-                          <span className="text-green-600 font-semibold">Available</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600 dark:text-gray-400">Brand Ambassador</span>
-                          <span className="text-green-600 font-semibold">Available</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600 dark:text-gray-400">Event Coverage</span>
-                          <span className="text-yellow-600 font-semibold">On Request</span>
-                        </div>
-                      </div>
+                      {selectedInfluencer.tiktok_handle ? (
+                        <>
+                          <div className="flex items-center mb-6">
+                            <Music className="w-6 h-6 text-black mr-3" />
+                            <h3 className="text-xl font-bold text-gray-800 dark:text-white">
+                              TikTok Stats
+                            </h3>
+                          </div>
+                          <div className="text-center mb-6">
+                            <div className="text-lg font-bold text-black dark:text-white">
+                              @{selectedInfluencer.tiktok_handle}
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div className="text-center">
+                              <div className="flex items-center justify-center mb-1">
+                                <Users className="w-4 h-4 text-gray-500 mr-1" />
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Followers</div>
+                              </div>
+                              <div className="text-xl font-bold text-gray-800 dark:text-white">{selectedInfluencer.tiktok_followers || 'N/A'}</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="flex items-center justify-center mb-1">
+                                <Zap className="w-4 h-4 text-gray-500 mr-1" />
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Engagement</div>
+                              </div>
+                              <div className="text-xl font-bold text-green-600">{selectedInfluencer.tiktok_engagement_rate || 'N/A'}</div>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="text-center">
+                              <div className="flex items-center justify-center mb-1">
+                                <Heart className="w-4 h-4 text-gray-500 mr-1" />
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Avg Likes</div>
+                              </div>
+                              <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">{selectedInfluencer.tiktok_avg_likes || 'N/A'}</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="flex items-center justify-center mb-1">
+                                <Eye className="w-4 h-4 text-gray-500 mr-1" />
+                                <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Avg Views</div>
+                              </div>
+                              <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">{selectedInfluencer.tiktok_avg_views || 'N/A'}</div>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-6">
+                            Services Available
+                          </h3>
+                          <div className="space-y-3">
+                            {selectedInfluencer.services && selectedInfluencer.services.length > 0 ? (
+                              selectedInfluencer.services.map((service, index) => (
+                                <div key={index} className="flex justify-between items-center py-2">
+                                  <span className="text-gray-600 dark:text-gray-400">{service}</span>
+                                  <span className="text-green-600 font-semibold">Available</span>
+                                </div>
+                              ))
+                            ) : (
+                              <div className="text-center text-gray-500 dark:text-gray-400">
+                                <p>No specific services listed</p>
+                                <p className="text-sm mt-2">Contact for available collaboration options</p>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </CardContent>
                   </Card>
                 </div>

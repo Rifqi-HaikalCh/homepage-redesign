@@ -12,11 +12,28 @@ interface Influencer {
   id: number;
   name: string;
   content_type: string;
-  instagram: string;
-  followers: string;
   city: string;
   avatar: string;
-  engagement_rate: string;
+  instagram_handle: string;
+  instagram_followers: string;
+  instagram_engagement_rate: string;
+  instagram_avg_likes: string;
+  instagram_avg_comments: string;
+  tiktok_handle?: string;
+  tiktok_followers?: string;
+  tiktok_engagement_rate?: string;
+  tiktok_avg_likes?: string;
+  tiktok_avg_views?: string;
+  services?: string[];
+  portfolio?: Array<{
+    id: string;
+    title: string;
+    image_url: string;
+    description?: string;
+  }>;
+  user_id?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export default function RecommendedInfluencer() {
@@ -31,23 +48,63 @@ export default function RecommendedInfluencer() {
       id: 1,
       name: "Sarah Johnson",
       content_type: "Lifestyle & Fashion",
-      instagram: "@sarahjohnson",
-      followers: "85.2K",
+      instagram_handle: "sarahjohnson",
+      instagram_followers: "85.2K",
+      instagram_engagement_rate: "6.8%",
+      instagram_avg_likes: "5.8K",
+      instagram_avg_comments: "234",
       city: "Jakarta",
       avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=400&h=400&fit=crop",
-      engagement_rate: "6.8%"
+      created_at: "",
+      updated_at: ""
     },
     {
       id: 2,
       name: "Michael Chen",
       content_type: "Tech & Gaming",
-      instagram: "@michaelchen",
-      followers: "120.5K",
+      instagram_handle: "michaelchen",
+      instagram_followers: "120.5K",
+      instagram_engagement_rate: "5.4%",
+      instagram_avg_likes: "6.5K",
+      instagram_avg_comments: "189",
       city: "Bandung",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-      engagement_rate: "5.4%"
+      created_at: "",
+      updated_at: ""
+    },
+    {
+      id: 3,
+      name: "Jessica Lee",
+      content_type: "Food & Travel",
+      instagram_handle: "jessicalee",
+      instagram_followers: "95.8K",
+      instagram_engagement_rate: "7.2%",
+      instagram_avg_likes: "6.9K",
+      instagram_avg_comments: "312",
+      city: "Bali",
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
+      created_at: "",
+      updated_at: ""
     }
   ];
+
+  // Utility function to convert follower string to number for sorting
+  const parseFollowerCount = (followerStr: string): number => {
+    if (!followerStr) return 0;
+    
+    const numStr = followerStr.toLowerCase().replace(/[^0-9.kmb]/g, '');
+    const num = parseFloat(numStr);
+    
+    if (followerStr.toLowerCase().includes('m')) {
+      return num * 1000000;
+    } else if (followerStr.toLowerCase().includes('k')) {
+      return num * 1000;
+    } else if (followerStr.toLowerCase().includes('b')) {
+      return num * 1000000000;
+    }
+    
+    return num || 0;
+  };
 
   // Fetch influencers from API with fallback
   useEffect(() => {
@@ -57,7 +114,11 @@ export default function RecommendedInfluencer() {
         if (response.ok) {
           const data = await response.json();
           if (data && data.length > 0) {
-            setInfluencersData(data.slice(0, 6));
+            // Sort by followers (highest first) and get top 3
+            const sortedData = data.sort((a: Influencer, b: Influencer) => 
+              parseFollowerCount(b.instagram_followers) - parseFollowerCount(a.instagram_followers)
+            );
+            setInfluencersData(sortedData.slice(0, 3));
           } else {
             // Use sample data if no data in database
             setInfluencersData(sampleInfluencers);
@@ -228,11 +289,11 @@ export default function RecommendedInfluencer() {
                     <div className="space-y-4 mb-8 text-sm">
                       <div className="flex items-center text-gray-600 dark:text-gray-300">
                         <Instagram className="w-4 h-4 mr-3 text-[#7124A8]" />
-                        <span className="font-medium">{activeInfluencer?.instagram}</span>
+                        <span className="font-medium">@{activeInfluencer?.instagram_handle}</span>
                       </div>
                       <div className="flex items-center text-gray-600 dark:text-gray-300">
                         <Users className="w-4 h-4 mr-3 text-[#7124A8]" />
-                        <span>{activeInfluencer?.followers} Followers</span>
+                        <span>{activeInfluencer?.instagram_followers} Followers</span>
                       </div>
                       <div className="flex items-center text-gray-600 dark:text-gray-300">
                         <MapPin className="w-4 h-4 mr-3 text-[#7124A8]" />
@@ -240,7 +301,7 @@ export default function RecommendedInfluencer() {
                       </div>
                       <div className="flex items-center text-gray-600 dark:text-gray-300">
                         <TrendingUp className="w-4 h-4 mr-3 text-[#7124A8]" />
-                        <span>{activeInfluencer?.engagement_rate} Engagement Rate</span>
+                        <span>{activeInfluencer?.instagram_engagement_rate} Engagement Rate</span>
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">
