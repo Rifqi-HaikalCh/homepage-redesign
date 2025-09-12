@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectItem } from '@/components/ui/select';
 import { Users, Package, Plus, Edit, Trash2, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -584,14 +584,9 @@ export default function AdminDashboard() {
                     setUserForm({...userForm, role: value})
                   }
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="client">Client</SelectItem>
-                    <SelectItem value="influencer">Influencer</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
+                  <SelectItem value="client">Client</SelectItem>
+                  <SelectItem value="influencer">Influencer</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
                 </Select>
               </div>
               
@@ -682,14 +677,9 @@ export default function AdminDashboard() {
                     setPackageForm({...packageForm, category: value})
                   }
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="micro">Micro Influencer</SelectItem>
-                    <SelectItem value="nano">Nano Influencer</SelectItem>
-                    <SelectItem value="premium">Premium Package</SelectItem>
-                  </SelectContent>
+                  <SelectItem value="micro">Micro Influencer</SelectItem>
+                  <SelectItem value="nano">Nano Influencer</SelectItem>
+                  <SelectItem value="premium">Premium Package</SelectItem>
                 </Select>
               </div>
               
