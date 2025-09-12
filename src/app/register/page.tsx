@@ -152,7 +152,7 @@ export default function RegisterPage() {
   };
 
   const isStep2Valid = () => {
-    return formData.fullName.trim() !== '' && formData.username.trim() !== '' && formData.role !== '';
+    return formData.fullName.trim() !== '' && formData.username.trim() !== '' && formData.role.length > 0;
   };
 
   const isStep3Valid = () => {
