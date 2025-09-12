@@ -585,39 +585,20 @@ export default function ProfilePage() {
 
             <Card className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl shadow-2xl border border-white/30 dark:border-gray-700/30 rounded-3xl">
               <CardContent className="p-6">
-                <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-6 font-sans">Portofolio</h3>
-                {userData.portfolioItems === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-xl mx-auto mb-4 flex items-center justify-center">
-                      <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                        <span className="text-gray-400 dark:text-gray-500 text-lg">📁</span>
-                      </div>
+                <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-6 font-sans">Portfolio</h3>
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                      <span className="text-gray-400 dark:text-gray-500 text-lg">📁</span>
                     </div>
-                    <h4 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Portfolio Belum Diupload
-                    </h4>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">
-                      Mulai upload karya terbaik Anda untuk menarik klien potensial
-                    </p>
                   </div>
-                ) : (
-                  <div className="grid md:grid-cols-3 gap-4">
-                    {Array.from({ length: userData.portfolioItems }).map((_, index) => (
-                      <motion.div
-                        key={index}
-                        className="aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center cursor-pointer"
-                        whileHover={{ scale: 1.05, backgroundColor: '#f3e8ff' }}
-                      >
-                        <div className="text-center">
-                          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                            <span className="text-gray-400 dark:text-gray-500 text-sm font-sans">#{index + 1}</span>
-                          </div>
-                          <span className="text-xs text-gray-500 dark:text-gray-400 font-sans">Project {index + 1}</span>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
+                  <h4 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Portfolio Coming Soon
+                  </h4>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
+                    Portfolio management feature will be available in the next update
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
