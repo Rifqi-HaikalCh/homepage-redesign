@@ -79,6 +79,7 @@ export const signUp = async (email: string, password: string, role: 'admin' | 'c
 };
 
 export const signIn = async (email: string, password: string) => {
+  // Hanya lakukan proses sign in, jangan ambil role di sini.
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -88,10 +89,11 @@ export const signIn = async (email: string, password: string) => {
     throw new Error(error.message);
   }
 
-  // Get user role
-  const role = await getUserRole(data.user.id);
+  // Hapus panggilan getUserRole dari sini.
+  // const role = await getUserRole(data.user.id); // <--- HAPUS ATAU KOMENTARI BARIS INI
 
-  return { session: data.session, user: data.user, role };
+  // Kembalikan hanya data session dan user. AuthProvider akan mengurus sisanya.
+  return { session: data.session, user: data.user };
 };
 
 export const signOut = async () => {
