@@ -5,6 +5,7 @@ import { ReactNode } from 'react';
 // Komponen navigasi mobile yang reusable
 import MobileBottomNavigation from './MobileBottomNavigation';
 import MobileHeader from './MobileHeader';
+import MobileFooter from './MobileFooter'; // <-- 1. Impor komponen footer
 
 // Interface untuk props - comprehensive tapi tetap flexible
 interface MobileLayoutProps {
@@ -19,7 +20,7 @@ interface MobileLayoutProps {
   showMenu?: boolean; // Hamburger menu
   showSearch?: boolean; // Icon search
   showNotification?: boolean; // Bell notification dengan badge
-  showLogo?: boolean; // Logo brand di center header
+  showLogo?: boolean; // Logo brand di center
   
   // Event handlers - optional untuk flexibility
   onMenuClick?: () => void;
@@ -30,8 +31,7 @@ interface MobileLayoutProps {
 /**
  * Layout wrapper untuk semua halaman mobile
  * Menghandle header, content area, dan bottom navigation
- * 
- * Pattern ini memudahkan konsistensi UI across pages
+ * * Pattern ini memudahkan konsistensi UI across pages
  * dan memungkinkan customization per halaman
  */
 const MobileLayout = ({
@@ -69,6 +69,7 @@ const MobileLayout = ({
       {/* Scrollable area dengan proper spacing */}
       <main className={`flex-1 overflow-y-auto ${contentPadding}`}>
         {children}
+        <MobileFooter /> {/* <-- 2. Tambahkan komponen footer di sini */}
       </main>
 
       {/* ================== BOTTOM NAVIGATION ================== */}

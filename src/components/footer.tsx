@@ -50,7 +50,6 @@ export default function Footer() {
                   className="h-10 mr-3"
                   style={{ width: "auto" }}
                 />
-                <h3 className="text-2xl font-bold text-[#7124A8]">Dapur Buzzer</h3>
               </div>
               <p className="text-gray-400 mb-6 leading-relaxed">
                 Dapur Buzzer Indonesia - Platform Agensi Digital yang menghubungkan antara brand dan influencer.

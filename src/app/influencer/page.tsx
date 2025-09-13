@@ -19,13 +19,11 @@ interface Influencer {
   id: number;
   name: string;
   content_type: string;
-  instagram: string;
-  followers: string;
+  instagram: string; // NOTE: This maps to instagram_handle in the card
+  followers: string; // NOTE: This maps to instagram_followers in the card
   city: string;
   avatar: string;
   engagement_rate: string;
-  instagram_handle: string;
-  instagram_followers: string;
 }
 
 
@@ -209,6 +207,16 @@ const DesktopInfluencerListPage = () => {
       }
     }
   };
+  
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 transition-all duration-500">
@@ -353,74 +361,66 @@ const DesktopInfluencerListPage = () => {
           ) : (
             <motion.div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+              variants={containerVariants}
               initial="hidden"
-              animate="visible"
-              variants={{
-                visible: {
-                  transition: {
-                    staggerChildren: 0.1
-                  }
-                }
-              }}
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
             >
               {filteredInfluencers.map((influencer) => (
-              <motion.div
-                key={influencer.id}
-                variants={cardVariants}
-                whileHover={{ 
-                  y: -8,
-                  transition: { duration: 0.3 }
-                }}
-                className="group"
-              >
-                <Link href={`/influencer/${influencer.id}`}>
-                  <div className="relative h-96 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer">
-                    <img
-                      src={influencer.avatar || 'https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=680&h=1020&fit=crop&crop=center'}
-                      alt={influencer.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      style={{ aspectRatio: '680/1020' }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-                    <div className="absolute top-0 left-0 right-0 p-4 bg-black/20 backdrop-blur-sm rounded-t-3xl">
-                      <h3 className="text-lg font-bold text-white text-center drop-shadow-lg">
-                        {influencer.name}
-                      </h3>
-                      <p className="text-white/90 text-xs text-center font-medium drop-shadow-md">
-                        {influencer.content_type}
-                      </p>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-3 border border-white/40">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <Instagram className="w-4 h-4 text-white" />
-                            <div>
-                              <p className="text-white text-xs font-medium">
-                                {influencer.instagram_handle || '@username'}
-                              </p>
-                              <p className="text-white/80 text-xs">
-                                {influencer.instagram_followers || '0'}
-                              </p>
+                <motion.div
+                  key={influencer.id}
+                  variants={cardVariants}
+                  whileHover={{ 
+                    y: -8,
+                    transition: { duration: 0.3 }
+                  }}
+                  className="group"
+                >
+                  <Link href={`/influencer/${influencer.id}`}>
+                    <div className="relative h-96 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer">
+                      <img
+                        src={influencer.avatar || 'https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=680&h=1020&fit=crop&crop=center'}
+                        alt={influencer.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        style={{ aspectRatio: '680/1020' }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                      <div className="absolute top-0 left-0 right-0 p-4 bg-black/20 backdrop-blur-sm rounded-t-3xl">
+                        <h3 className="text-lg font-bold text-white text-center drop-shadow-lg">
+                          {influencer.name}
+                        </h3>
+                        <p className="text-white/90 text-xs text-center font-medium drop-shadow-md">
+                          {influencer.content_type}
+                        </p>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 p-4">
+                        <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-3 border border-white/40">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <Instagram className="w-4 h-4 text-white" />
+                              <div>
+                                <p className="text-white text-xs font-medium">
+                                  {influencer.instagram || '@username'}
+                                </p>
+                                <p className="text-white/80 text-xs">
+                                  {influencer.followers || '0'}
+                                </p>
+                              </div>
                             </div>
+                            <Button 
+                              className="bg-white hover:bg-gray-50 text-gray-900 text-xs px-3 py-1 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                              size="sm"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              View Detail
+                            </Button>
                           </div>
-                          <Button 
-                            className="bg-white hover:bg-gray-50 text-gray-900 text-xs px-3 py-1 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-0"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              e.preventDefault();
-                            }}
-                          >
-                            View Detail
-                          </Button>
                         </div>
                       </div>
+                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/0 via-purple-400/0 to-pink-400/0 group-hover:from-blue-400/10 group-hover:via-purple-400/5 group-hover:to-pink-400/10 transition-all duration-500 pointer-events-none" />
                     </div>
-                    <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/0 via-purple-400/0 to-pink-400/0 group-hover:from-blue-400/10 group-hover:via-purple-400/5 group-hover:to-pink-400/10 transition-all duration-500 pointer-events-none" />
-                  </div>
-                </Link>
-              </motion.div>
+                  </Link>
+                </motion.div>
               ))}
             </motion.div>
           )}
