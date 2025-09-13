@@ -3,6 +3,7 @@
 import { ArrowLeft, Menu, Bell, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 interface MobileHeaderProps {
   title?: string;
@@ -10,6 +11,7 @@ interface MobileHeaderProps {
   showMenu?: boolean;
   showSearch?: boolean;
   showNotification?: boolean;
+  showLogo?: boolean;
   onMenuClick?: () => void;
   onSearchClick?: () => void;
   onNotificationClick?: () => void;
@@ -22,6 +24,7 @@ const MobileHeader = ({
   showMenu = false,
   showSearch = false,
   showNotification = false,
+  showLogo = false,
   onMenuClick,
   onSearchClick,
   onNotificationClick,
@@ -65,11 +68,21 @@ const MobileHeader = ({
           </div>
 
           {/* Center Section */}
-          {title && (
-            <h1 className="text-lg font-semibold text-gray-900 truncate mx-4">
-              {title}
-            </h1>
-          )}
+          <div className="flex-1 flex justify-center mx-4">
+            {showLogo ? (
+              <Image
+                src="/dapur-buzzer-logo.png"
+                alt="Dapur Buzzer"
+                width={120}
+                height={32}
+                className="h-8 w-auto"
+              />
+            ) : title ? (
+              <h1 className="text-lg font-semibold text-gray-900 truncate">
+                {title}
+              </h1>
+            ) : null}
+          </div>
 
           {/* Right Section */}
           <div className="flex items-center space-x-2">

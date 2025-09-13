@@ -12,6 +12,7 @@ interface MobileLayoutProps {
   showMenu?: boolean;
   showSearch?: boolean;
   showNotification?: boolean;
+  showLogo?: boolean;
   onMenuClick?: () => void;
   onSearchClick?: () => void;
   onNotificationClick?: () => void;
@@ -25,6 +26,7 @@ const MobileLayout = ({
   showMenu = false,
   showSearch = false,
   showNotification = false,
+  showLogo = false,
   onMenuClick,
   onSearchClick,
   onNotificationClick,
@@ -38,6 +40,7 @@ const MobileLayout = ({
         showMenu={showMenu}
         showSearch={showSearch}
         showNotification={showNotification}
+        showLogo={showLogo}
         onMenuClick={onMenuClick}
         onSearchClick={onSearchClick}
         onNotificationClick={onNotificationClick}

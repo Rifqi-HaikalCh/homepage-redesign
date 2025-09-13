@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Star, MapPin, TrendingUp, Users, Check } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import MobileLayout from './MobileLayout';
 
 interface Influencer {
@@ -31,64 +32,76 @@ interface PackageItem {
 
 const MobileHomePage = () => {
   const [influencers, setInfluencers] = useState<Influencer[]>([]);
-  const [packages, setPackages] = useState<PackageItem[]>([]);
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingPackages, setIsLoadingPackages] = useState(true);
 
-  // Hero slides data
+  // Hero slides data - using desktop slide images
   const heroSlides = [
     {
       id: 1,
       title: "Find Perfect\nInfluencers",
       subtitle: "Connect with top creators for your brand",
-      image: "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=600&h=800&fit=crop&crop=center",
+      image: "/Slide 1.png",
       cta: "Explore Now"
     },
     {
       id: 2,
       title: "Grow Your\nBusiness",
       subtitle: "Reach millions through authentic partnerships",
-      image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=800&fit=crop&crop=center",
+      image: "/Slide 2.png",
       cta: "Get Started"
     },
     {
       id: 3,
       title: "Premium\nPackages",
       subtitle: "Professional services tailored for you",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=800&fit=crop&crop=center",
+      image: "/Slide 3.png",
       cta: "View Packages"
+    },
+    {
+      id: 4,
+      title: "Quality\nContent",
+      subtitle: "Professional content creation services",
+      image: "/Slide 4.png",
+      cta: "Learn More"
+    },
+    {
+      id: 5,
+      title: "Success\nStories",
+      subtitle: "Join thousands of satisfied clients",
+      image: "/Slide 5.png",
+      cta: "View Stories"
     }
   ];
 
-  // Mock packages data
-  const mockPackages: PackageItem[] = [
+  // Simple packages data - no API call needed
+  const packages: PackageItem[] = [
     {
       id: 1,
       title: "Starter Package",
-      description: "Perfect for small businesses starting their influencer marketing journey",
+      description: "Perfect for small businesses",
       price: "$99",
       icon: "🚀",
       category: "Basic",
-      features: ["5 Influencer Connections", "Basic Analytics", "Email Support"]
+      features: ["5 Connections", "Basic Analytics"]
     },
     {
       id: 2,
       title: "Professional Package",
-      description: "Advanced tools for growing businesses and marketing agencies",
+      description: "Advanced tools for agencies",
       price: "$299",
       icon: "⭐",
       category: "Professional",
-      features: ["20 Influencer Connections", "Advanced Analytics", "Priority Support"]
+      features: ["20 Connections", "Advanced Analytics"]
     },
     {
       id: 3,
       title: "Enterprise Package",
-      description: "Full-scale solution for large enterprises and marketing teams",
+      description: "Full-scale solution",
       price: "$599",
       icon: "👑",
       category: "Enterprise",
-      features: ["Unlimited Connections", "Full Analytics Suite", "24/7 Support"]
+      features: ["Unlimited Connections", "Full Analytics"]
     }
   ];
 
@@ -111,24 +124,6 @@ const MobileHomePage = () => {
     fetchInfluencers();
   }, []);
 
-  // Fetch packages
-  useEffect(() => {
-    const fetchPackages = async () => {
-      try {
-        setIsLoadingPackages(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setPackages(mockPackages);
-      } catch (error) {
-        console.error('Error fetching packages:', error);
-        setPackages(mockPackages);
-      } finally {
-        setIsLoadingPackages(false);
-      }
-    };
-
-    fetchPackages();
-  }, [mockPackages]);
 
   // Auto-rotate hero slides
   useEffect(() => {
@@ -142,7 +137,7 @@ const MobileHomePage = () => {
   const currentSlide = heroSlides[currentHeroIndex];
 
   return (
-    <MobileLayout showMenu showNotification>
+    <MobileLayout showMenu showNotification showLogo>
       <div className="space-y-6">
         {/* Hero Section */}
         <section className="relative h-[60vh] overflow-hidden">
@@ -212,28 +207,51 @@ const MobileHomePage = () => {
           </div>
         </section>
 
-        {/* Quick Actions */}
+        {/* Content Selection */}
         <section className="px-4">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Pilih Konten</h2>
           <div className="grid grid-cols-2 gap-3">
-            <Link href="/influencer" className="group">
+            <Link href="/content/lifestyle" className="group">
               <motion.div
                 whileTap={{ scale: 0.98 }}
                 className="bg-gradient-to-br from-[#7124a8] to-[#7124a8] p-4 rounded-2xl text-white shadow-lg"
               >
-                <Users className="w-6 h-6 mb-2" />
-                <h3 className="font-semibold text-sm">Find Influencers</h3>
-                <p className="text-white/80 text-xs">Discover creators</p>
+                <Star className="w-6 h-6 mb-2" />
+                <h3 className="font-semibold text-sm">Lifestyle</h3>
+                <p className="text-white/80 text-xs">Fashion, Beauty, Travel</p>
               </motion.div>
             </Link>
             
-            <Link href="/packages" className="group">
+            <Link href="/content/technology" className="group">
               <motion.div
                 whileTap={{ scale: 0.98 }}
                 className="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-2xl text-white shadow-lg"
               >
+                <Users className="w-6 h-6 mb-2" />
+                <h3 className="font-semibold text-sm">Technology</h3>
+                <p className="text-blue-100 text-xs">Tech Reviews, Gadgets</p>
+              </motion.div>
+            </Link>
+            
+            <Link href="/content/food" className="group">
+              <motion.div
+                whileTap={{ scale: 0.98 }}
+                className="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-2xl text-white shadow-lg"
+              >
                 <Star className="w-6 h-6 mb-2" />
-                <h3 className="font-semibold text-sm">Premium Plans</h3>
-                <p className="text-blue-100 text-xs">Special offers</p>
+                <h3 className="font-semibold text-sm">Food & Culinary</h3>
+                <p className="text-green-100 text-xs">Recipes, Restaurants</p>
+              </motion.div>
+            </Link>
+            
+            <Link href="/content/business" className="group">
+              <motion.div
+                whileTap={{ scale: 0.98 }}
+                className="bg-gradient-to-br from-orange-500 to-orange-600 p-4 rounded-2xl text-white shadow-lg"
+              >
+                <TrendingUp className="w-6 h-6 mb-2" />
+                <h3 className="font-semibold text-sm">Business</h3>
+                <p className="text-orange-100 text-xs">Finance, Startup</p>
               </motion.div>
             </Link>
           </div>
@@ -264,7 +282,7 @@ const MobileHomePage = () => {
               ))}
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               {influencers.map((influencer, index) => (
                 <motion.div
                   key={influencer.id}
@@ -275,42 +293,42 @@ const MobileHomePage = () => {
                   <Link href={`/influencer/${influencer.id}`}>
                     <motion.div
                       whileTap={{ scale: 0.98 }}
-                      className="flex items-center space-x-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 active:bg-gray-50 transition-colors"
+                      className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 active:bg-gray-50 transition-colors h-full"
                     >
-                      <div className="relative">
-                        <img
-                          src={influencer.avatar}
-                          alt={influencer.name}
-                          className="w-12 h-12 rounded-full object-cover"
-                        />
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-sm truncate">
+                      <div className="text-center">
+                        <div className="relative mb-3">
+                          <Image
+                            src={influencer.avatar}
+                            alt={influencer.name}
+                            width={64}
+                            height={64}
+                            className="w-16 h-16 rounded-full object-cover mx-auto"
+                          />
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
+                        </div>
+                        
+                        <h3 className="font-semibold text-gray-900 text-sm mb-1 truncate">
                           {influencer.name}
                         </h3>
-                        <p className="text-[#7124a8] text-xs font-medium mb-1">
+                        
+                        <p className="text-[#7124a8] text-xs font-medium mb-2">
                           {influencer.content_type}
                         </p>
-                        <div className="flex items-center space-x-3 text-xs text-gray-500">
-                          <span className="flex items-center">
+                        
+                        <div className="space-y-1 text-xs text-gray-500">
+                          <div className="flex items-center justify-center">
                             <MapPin className="w-3 h-3 mr-1" />
-                            {influencer.city}
-                          </span>
-                          <span className="flex items-center">
+                            <span className="truncate">{influencer.city}</span>
+                          </div>
+                          <div className="flex items-center justify-center">
                             <Users className="w-3 h-3 mr-1" />
-                            {influencer.instagram_followers}
-                          </span>
+                            <span>{influencer.instagram_followers}</span>
+                          </div>
+                          <div className="flex items-center justify-center text-green-600 font-medium">
+                            <TrendingUp className="w-3 h-3 mr-1" />
+                            <span>{influencer.instagram_engagement_rate}</span>
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div className="text-right">
-                        <div className="flex items-center text-green-600 text-xs font-medium mb-1">
-                          <TrendingUp className="w-3 h-3 mr-1" />
-                          {influencer.instagram_engagement_rate}
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-gray-400" />
                       </div>
                     </motion.div>
                   </Link>
@@ -330,7 +348,7 @@ const MobileHomePage = () => {
             </Link>
           </div>
 
-          {isLoadingPackages ? (
+          {false ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="animate-pulse">
