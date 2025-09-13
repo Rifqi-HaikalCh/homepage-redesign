@@ -50,7 +50,7 @@ const MobileBottomNavigation = () => {
                 {item.isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 bg-purple-100 rounded-xl"
+                    className="absolute inset-0 bg-[#7124a8]/20 rounded-xl"
                     initial={false}
                     animate={{ opacity: 1 }}
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
@@ -60,14 +60,14 @@ const MobileBottomNavigation = () => {
                   <IconComponent 
                     className={`w-5 h-5 mb-1 ${
                       item.isActive 
-                        ? 'text-purple-600' 
+                        ? 'text-[#7124a8]' 
                         : 'text-gray-500'
                     }`} 
                   />
                   <span 
                     className={`text-xs font-medium ${
                       item.isActive 
-                        ? 'text-purple-600' 
+                        ? 'text-[#7124a8]' 
                         : 'text-gray-500'
                     }`}
                   >

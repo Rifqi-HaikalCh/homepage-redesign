@@ -90,7 +90,7 @@ const MobilePackagesPage = () => {
       case 'Basic':
         return 'from-blue-500 to-blue-600';
       case 'Professional':
-        return 'from-purple-500 to-purple-600';
+        return 'from-[#7124a8] to-[#7124a8]';
       case 'Enterprise':
         return 'from-yellow-500 to-yellow-600';
       case 'Services':
@@ -119,7 +119,7 @@ const MobilePackagesPage = () => {
     <MobileLayout headerTitle="Packages">
       <div className="space-y-6">
         {/* Hero Section */}
-        <section className="px-4 py-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+        <section className="px-4 py-6 bg-gradient-to-r from-[#7124a8] to-[#7124a8] text-white">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -128,7 +128,7 @@ const MobilePackagesPage = () => {
             <h1 className="text-2xl font-bold mb-2">
               Choose Your Perfect Plan
             </h1>
-            <p className="text-purple-100">
+            <p className="text-white/80">
               Scale your influencer marketing with our premium packages
             </p>
           </motion.div>
@@ -143,7 +143,7 @@ const MobilePackagesPage = () => {
                 onClick={() => setSelectedCategory(category)}
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                   selectedCategory === category
-                    ? 'bg-purple-600 text-white'
+                    ? 'bg-[#7124a8] text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -181,12 +181,12 @@ const MobilePackagesPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   className={`bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden ${
-                    pkg.category === 'Professional' ? 'ring-2 ring-purple-500' : ''
+                    pkg.category === 'Professional' ? 'ring-2 ring-[#7124a8]' : ''
                   }`}
                 >
                   {/* Popular Badge */}
                   {pkg.category === 'Professional' && (
-                    <div className="bg-purple-600 text-white text-center py-2 text-sm font-medium">
+                    <div className="bg-[#7124a8] text-white text-center py-2 text-sm font-medium">
                       🔥 Most Popular
                     </div>
                   )}
@@ -245,7 +245,7 @@ const MobilePackagesPage = () => {
                       whileTap={{ scale: 0.98 }}
                       className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center transition-colors ${
                         pkg.category === 'Professional'
-                          ? 'bg-purple-600 text-white hover:bg-purple-700'
+                          ? 'bg-[#7124a8] text-white hover:bg-[#7124a8]/90'
                           : 'bg-gray-900 text-white hover:bg-gray-800'
                       }`}
                     >

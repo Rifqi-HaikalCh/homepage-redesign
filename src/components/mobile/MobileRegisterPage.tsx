@@ -69,7 +69,7 @@ const MobileRegisterPage = () => {
       title: 'Influencer',
       description: 'I want to offer my services as a creator',
       icon: '⭐',
-      color: 'from-purple-500 to-purple-600'
+      color: 'from-[#7124a8] to-[#7124a8]'
     }
   ];
 
@@ -83,7 +83,7 @@ const MobileRegisterPage = () => {
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm ${
                   step <= currentStep
-                    ? 'bg-purple-600 text-white'
+                    ? 'bg-[#7124a8] text-white'
                     : 'bg-gray-200 text-gray-500'
                 }`}
               >
@@ -92,7 +92,7 @@ const MobileRegisterPage = () => {
               {step < 2 && (
                 <div
                   className={`flex-1 h-1 mx-4 rounded-full ${
-                    step < currentStep ? 'bg-purple-600' : 'bg-gray-200'
+                    step < currentStep ? 'bg-[#7124a8]' : 'bg-gray-200'
                   }`}
                 />
               )}
@@ -141,7 +141,7 @@ const MobileRegisterPage = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email"
-                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-colors"
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#7124a8] focus:border-transparent outline-none transition-colors"
                       required
                     />
                     <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -159,7 +159,7 @@ const MobileRegisterPage = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Create a password"
-                      className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-colors"
+                      className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#7124a8] focus:border-transparent outline-none transition-colors"
                       required
                     />
                     <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -188,7 +188,7 @@ const MobileRegisterPage = () => {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm your password"
-                      className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-colors"
+                      className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#7124a8] focus:border-transparent outline-none transition-colors"
                       required
                     />
                     <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -210,7 +210,7 @@ const MobileRegisterPage = () => {
                   type="button"
                   onClick={handleNext}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-4 rounded-xl flex items-center justify-center shadow-lg"
+                  className="w-full bg-gradient-to-r from-[#7124a8] to-[#7124a8] text-white font-semibold py-4 rounded-xl flex items-center justify-center shadow-lg"
                 >
                   <span>Continue</span>
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -222,7 +222,7 @@ const MobileRegisterPage = () => {
                   Already have an account?{' '}
                   <Link
                     href="/login"
-                    className="text-purple-600 font-semibold hover:text-purple-700"
+                    className="text-[#7124a8] font-semibold hover:text-[#7124a8]/80"
                   >
                     Sign In
                   </Link>
@@ -268,7 +268,7 @@ const MobileRegisterPage = () => {
                     whileTap={{ scale: 0.98 }}
                     className={`w-full p-6 rounded-2xl border-2 transition-all text-left ${
                       role === option.id
-                        ? 'border-purple-500 bg-purple-50'
+                        ? 'border-[#7124a8] bg-[#7124a8]/10'
                         : 'border-gray-200 bg-white hover:border-gray-300'
                     }`}
                   >
@@ -286,7 +286,7 @@ const MobileRegisterPage = () => {
                       </div>
                       <div className={`w-5 h-5 rounded-full border-2 ${
                         role === option.id
-                          ? 'border-purple-500 bg-purple-500'
+                          ? 'border-[#7124a8] bg-[#7124a8]'
                           : 'border-gray-300'
                       }`}>
                         {role === option.id && (
@@ -314,7 +314,7 @@ const MobileRegisterPage = () => {
                   onClick={handleSubmit}
                   disabled={isLoading}
                   whileTap={{ scale: 0.98 }}
-                  className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-4 rounded-xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                  className="flex-1 bg-gradient-to-r from-[#7124a8] to-[#7124a8] text-white font-semibold py-4 rounded-xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                 >
                   {isLoading ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

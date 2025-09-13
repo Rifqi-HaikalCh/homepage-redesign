@@ -75,7 +75,7 @@ const MobileInfluencerDetailPage = () => {
     return (
       <MobileLayout showBack headerTitle="Loading...">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7124a8]"></div>
         </div>
       </MobileLayout>
     );
@@ -105,7 +105,7 @@ const MobileInfluencerDetailPage = () => {
       <div className="space-y-0">
         {/* Hero Section */}
         <section className="relative">
-          <div className="aspect-[4/3] bg-gradient-to-br from-purple-400 to-blue-500 relative overflow-hidden">
+          <div className="aspect-[4/3] bg-gradient-to-br from-[#7124a8] to-[#7124a8] relative overflow-hidden">
             <img
               src={influencer.avatar}
               alt={influencer.name}
@@ -143,7 +143,7 @@ const MobileInfluencerDetailPage = () => {
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.1 }}
-                className="text-purple-200 font-medium mb-2"
+                className="text-white/80 font-medium mb-2"
               >
                 {influencer.content_type}
               </motion.p>
@@ -204,7 +204,7 @@ const MobileInfluencerDetailPage = () => {
                   onClick={() => setActiveTab(tab.id as 'stats' | 'services' | 'portfolio')}
                   className={`flex-1 flex items-center justify-center py-3 px-4 rounded-xl font-medium text-sm transition-all duration-300 relative ${
                     activeTab === tab.id
-                      ? 'bg-white text-purple-600 shadow-sm'
+                      ? 'bg-white text-[#7124a8] shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
@@ -356,14 +356,14 @@ const MobileInfluencerDetailPage = () => {
 
         {/* Contact CTA */}
         <section className="p-4 bg-gray-50">
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white">
+          <div className="bg-gradient-to-r from-[#7124a8] to-[#7124a8] rounded-2xl p-6 text-white">
             <h3 className="text-lg font-bold mb-2">Ready to collaborate?</h3>
-            <p className="text-purple-100 mb-4 text-sm">
+            <p className="text-white/80 mb-4 text-sm">
               Get in touch with {influencer.name} to discuss your project
             </p>
             <motion.button
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-white text-purple-600 font-semibold py-3 rounded-xl flex items-center justify-center"
+              className="w-full bg-white text-[#7124a8] font-semibold py-3 rounded-xl flex items-center justify-center"
             >
               Contact Influencer
               <ChevronRight className="w-4 h-4 ml-2" />

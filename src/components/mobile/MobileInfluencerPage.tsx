@@ -181,7 +181,7 @@ const MobileInfluencerPage = () => {
             </h2>
             <button
               onClick={() => setShowFilter(!showFilter)}
-              className="flex items-center space-x-2 px-3 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium"
+              className="flex items-center space-x-2 px-3 py-2 bg-[#7124a8]/20 text-[#7124a8] rounded-full text-sm font-medium"
             >
               <Filter className="w-4 h-4" />
               <span>Filter</span>
@@ -210,7 +210,7 @@ const MobileInfluencerPage = () => {
                           onClick={() => setSelectedCategory(category)}
                           className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                             selectedCategory === category
-                              ? 'bg-purple-600 text-white'
+                              ? 'bg-[#7124a8] text-white'
                               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                           }`}
                         >
@@ -230,7 +230,7 @@ const MobileInfluencerPage = () => {
                         onClick={() => setSelectedCity('All')}
                         className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                           selectedCity === 'All'
-                            ? 'bg-purple-600 text-white'
+                            ? 'bg-[#7124a8] text-white'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >
@@ -242,7 +242,7 @@ const MobileInfluencerPage = () => {
                           onClick={() => setSelectedCity(city)}
                           className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                             selectedCity === city
-                              ? 'bg-purple-600 text-white'
+                              ? 'bg-[#7124a8] text-white'
                               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                           }`}
                         >
@@ -255,7 +255,7 @@ const MobileInfluencerPage = () => {
                   {/* Clear Filters */}
                   <button
                     onClick={clearFilters}
-                    className="w-full py-2 text-sm text-purple-600 font-medium"
+                    className="w-full py-2 text-sm text-[#7124a8] font-medium"
                   >
                     Clear All Filters
                   </button>
@@ -313,7 +313,7 @@ const MobileInfluencerPage = () => {
                         <h3 className="font-semibold text-gray-900 text-base mb-1 truncate">
                           {influencer.name}
                         </h3>
-                        <p className="text-purple-600 text-sm font-medium mb-2">
+                        <p className="text-[#7124a8] text-sm font-medium mb-2">
                           {influencer.content_type}
                         </p>
                         

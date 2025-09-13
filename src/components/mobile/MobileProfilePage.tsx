@@ -83,7 +83,7 @@ const MobileProfilePage = () => {
     return (
       <MobileLayout headerTitle="Profile">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7124a8]"></div>
         </div>
       </MobileLayout>
     );
@@ -99,8 +99,8 @@ const MobileProfilePage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center max-w-sm"
           >
-            <div className="w-20 h-20 bg-purple-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-              <User className="w-10 h-10 text-purple-600" />
+            <div className="w-20 h-20 bg-[#7124a8]/20 rounded-full mx-auto mb-6 flex items-center justify-center">
+              <User className="w-10 h-10 text-[#7124a8]" />
             </div>
             
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
@@ -115,7 +115,7 @@ const MobileProfilePage = () => {
               <Link href="/login" className="block">
                 <motion.button
                   whileTap={{ scale: 0.98 }}
-                  className="w-full bg-purple-600 text-white font-semibold py-3 rounded-xl flex items-center justify-center"
+                  className="w-full bg-[#7124a8] text-white font-semibold py-3 rounded-xl flex items-center justify-center"
                 >
                   <User className="w-5 h-5 mr-2" />
                   Sign In
@@ -125,7 +125,7 @@ const MobileProfilePage = () => {
               <Link href="/register" className="block">
                 <motion.button
                   whileTap={{ scale: 0.98 }}
-                  className="w-full border border-purple-600 text-purple-600 font-semibold py-3 rounded-xl flex items-center justify-center"
+                  className="w-full border border-[#7124a8] text-[#7124a8] font-semibold py-3 rounded-xl flex items-center justify-center"
                 >
                   <UserPlus className="w-5 h-5 mr-2" />
                   Create Account
@@ -149,12 +149,12 @@ const MobileProfilePage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-2xl p-6 shadow-sm text-center"
           >
-            <div className="w-20 h-20 bg-purple-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <User className="w-10 h-10 text-purple-600" />
+            <div className="w-20 h-20 bg-[#7124a8]/20 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <User className="w-10 h-10 text-[#7124a8]" />
             </div>
             
             <h1 className="text-xl font-bold text-gray-900 mb-1">Client Profile</h1>
-            <p className="text-purple-600 text-sm font-medium">{user?.email}</p>
+            <p className="text-[#7124a8] text-sm font-medium">{user?.email}</p>
           </motion.div>
 
           {/* Profile Stats */}
@@ -172,7 +172,7 @@ const MobileProfilePage = () => {
               </div>
               <div className="flex items-center justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600">Role</span>
-                <span className="font-medium text-purple-600 flex items-center">
+                <span className="font-medium text-[#7124a8] flex items-center">
                   <Shield className="w-4 h-4 mr-1" />
                   Client
                 </span>
@@ -210,7 +210,7 @@ const MobileProfilePage = () => {
     <MobileLayout headerTitle="Profile">
       <div className="space-y-0">
         {/* Profile Hero */}
-        <section className="relative bg-gradient-to-br from-purple-600 to-blue-600 text-white">
+        <section className="relative bg-gradient-to-br from-[#7124a8] to-[#7124a8] text-white">
           <div className="p-6 text-center">
             <div className="relative inline-block mb-4">
               <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white/20">
@@ -228,7 +228,7 @@ const MobileProfilePage = () => {
             <h1 className="text-2xl font-bold mb-1">
               {profileData?.name || 'Complete Your Profile'}
             </h1>
-            <p className="text-purple-100 font-medium mb-1">
+            <p className="text-white/80 font-medium mb-1">
               {profileData?.content_type || 'Set your content type'}
             </p>
             <p className="text-white/80 text-sm flex items-center justify-center">
@@ -281,7 +281,7 @@ const MobileProfilePage = () => {
             
             <div className="p-4 space-y-4">
               {/* Instagram */}
-              <div className="flex items-center space-x-4 p-3 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl">
+              <div className="flex items-center space-x-4 p-3 bg-gradient-to-r from-[#7124a8]/10 to-[#7124a8]/20 rounded-xl">
                 <Instagram className="w-6 h-6 text-pink-500" />
                 <div className="flex-1">
                   <div className="font-medium text-gray-900">Instagram</div>

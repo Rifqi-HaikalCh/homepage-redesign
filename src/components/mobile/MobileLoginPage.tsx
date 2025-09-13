@@ -43,7 +43,7 @@ const MobileLoginPage = () => {
         >
           {/* Header */}
           <div className="text-center">
-            <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl mx-auto mb-6 flex items-center justify-center">
+            <div className="w-20 h-20 bg-gradient-to-r from-[#7124a8] to-[#7124a8] rounded-2xl mx-auto mb-6 flex items-center justify-center">
               <div className="text-white text-2xl font-bold">I</div>
             </div>
             
@@ -78,7 +78,7 @@ const MobileLoginPage = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-colors"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#7124a8] focus:border-transparent outline-none transition-colors"
                   required
                 />
                 <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -96,7 +96,7 @@ const MobileLoginPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-colors"
+                  className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#7124a8] focus:border-transparent outline-none transition-colors"
                   required
                 />
                 <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -118,7 +118,7 @@ const MobileLoginPage = () => {
             <div className="text-right">
               <Link
                 href="/forgot-password"
-                className="text-purple-600 text-sm font-medium hover:text-purple-700"
+                className="text-[#7124a8] text-sm font-medium hover:text-[#7124a8]/80"
               >
                 Forgot Password?
               </Link>
@@ -129,7 +129,7 @@ const MobileLoginPage = () => {
               type="submit"
               disabled={isLoading}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-4 rounded-xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              className="w-full bg-gradient-to-r from-[#7124a8] to-[#7124a8] text-white font-semibold py-4 rounded-xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -182,7 +182,7 @@ const MobileLoginPage = () => {
               Don&apos;t have an account?{' '}
               <Link
                 href="/register"
-                className="text-purple-600 font-semibold hover:text-purple-700"
+                className="text-[#7124a8] font-semibold hover:text-[#7124a8]/80"
               >
                 Sign Up
               </Link>
