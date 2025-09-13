@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image'; // Import komponen Image
 
 const ExpandingCardsPackages = () => {
   const [activePanel, setActivePanel] = useState(0);
@@ -43,10 +44,8 @@ const ExpandingCardsPackages = () => {
 
   const handlePanelClick = (index: number) => {
     if (activePanel === index) {
-      // Double click or click on active panel - navigate to packages page
       router.push('/packages');
     } else {
-      // Single click on inactive panel - make it active
       setActivePanel(index);
     }
   };
@@ -83,15 +82,22 @@ const ExpandingCardsPackages = () => {
                 transition-all duration-700 ease-in-out rounded-[50px] overflow-hidden
                 ${activePanel === index ? 'flex-[5]' : 'flex-[0.5]'}
               `}
-              style={{
-                backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.7)), url(${pkg.image})`,
-              }}
               onClick={() => handlePanelClick(index)}
             >
+              {/* Ganti backgroundImage dengan komponen Image */}
+              <Image
+                src={pkg.image}
+                alt={pkg.title}
+                layout="fill"
+                objectFit="cover"
+                className="z-0"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
+              
               {/* Content */}
               <div
                 className={`
-                  absolute bottom-5 left-5 transition-opacity duration-300
+                  absolute bottom-5 left-5 transition-opacity duration-300 z-20
                   ${activePanel === index
                     ? 'opacity-100 transition-delay-[0.4s]'
                     : 'opacity-0'
@@ -109,7 +115,7 @@ const ExpandingCardsPackages = () => {
               {/* Panel Number for inactive panels */}
               <div
                 className={`
-                  absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                  absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20
                   transition-opacity duration-300
                   ${activePanel === index ? 'opacity-0' : 'opacity-100'}
                 `}
@@ -118,9 +124,6 @@ const ExpandingCardsPackages = () => {
                   {pkg.id}
                 </div>
               </div>
-
-              {/* Overlay for better text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
             </div>
           ))}
         </div>

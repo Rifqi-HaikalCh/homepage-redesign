@@ -24,6 +24,8 @@ interface Influencer {
   city: string;
   avatar: string;
   engagement_rate: string;
+  instagram_handle: string;
+  instagram_followers: string;
 }
 
 
@@ -371,11 +373,10 @@ const DesktopInfluencerListPage = () => {
                 }}
                 className="group"
               >
-                {/* --- KODE KARTU YANG DIPERBARUI --- */}
                 <Link href={`/influencer/${influencer.id}`}>
                   <div className="relative h-96 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer">
                     <img
-                      src={influencer.avatar}
+                      src={influencer.avatar || 'https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=680&h=1020&fit=crop&crop=center'}
                       alt={influencer.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       style={{ aspectRatio: '680/1020' }}
@@ -391,22 +392,20 @@ const DesktopInfluencerListPage = () => {
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 p-4">
                       <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-3 border border-white/40">
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
                             <Instagram className="w-4 h-4 text-white" />
                             <div>
                               <p className="text-white text-xs font-medium">
-                                {influencer.instagram}
+                                {influencer.instagram_handle || '@username'}
                               </p>
                               <p className="text-white/80 text-xs">
-                                {influencer.followers}
+                                {influencer.instagram_followers || '0'}
                               </p>
                             </div>
                           </div>
-                        </div>
-                        <div className="flex gap-2">
                           <Button 
-                            className="bg-white hover:bg-gray-50 text-gray-900 text-xs px-2 py-1 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-0 flex-1"
+                            className="bg-white hover:bg-gray-50 text-gray-900 text-xs px-3 py-1 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-0"
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -415,32 +414,6 @@ const DesktopInfluencerListPage = () => {
                           >
                             View Detail
                           </Button>
-                          {role === 'admin' && (
-                            <>
-                              <Button 
-                                className="bg-blue-500 hover:bg-blue-600 text-white text-xs p-1 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border-0"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  e.preventDefault();
-                                  handleEditInfluencer(influencer);
-                                }}
-                              >
-                                <Edit className="w-3 h-3" />
-                              </Button>
-                              <Button 
-                                className="bg-red-500 hover:bg-red-600 text-white text-xs p-1 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border-0"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  e.preventDefault();
-                                  handleDeleteInfluencer(influencer);
-                                }}
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </Button>
-                            </>
-                          )}
                         </div>
                       </div>
                     </div>

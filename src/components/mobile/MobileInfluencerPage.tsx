@@ -10,6 +10,7 @@ import { Search, Filter, MapPin, Users, TrendingUp, Instagram, X } from 'lucide-
 import Link from 'next/link';
 // Layout wrapper khusus mobile
 import MobileLayout from './MobileLayout';
+import { Button } from '@/components/ui/button';
 
 // ======================== TYPE DEFINITIONS ========================
 // Interface untuk data influencer dari API
@@ -21,7 +22,6 @@ interface Influencer {
   avatar: string; // URL foto profil
   instagram_handle: string; // Username Instagram tanpa @
   instagram_followers: string; // Format: "10.5K", "1.2M", dll
-  instagram_engagement_rate: string; // Format: "3.2%", "5.8%", dll
   created_at: string;
   updated_at: string;
 }
@@ -51,8 +51,7 @@ const ANIMATION_CONFIG = {
 
 /**
  * Halaman utama untuk eksplorasi influencer
- * 
- * Features:
+ * * Features:
  * - Real-time search dengan instant results
  * - Multi-filter system (kategori + lokasi)
  * - Sorting berdasarkan jumlah followers
@@ -356,7 +355,7 @@ const MobileInfluencerPage = () => {
               ))}
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4">
               {filteredInfluencers
                 .sort((a, b) => parseFollowerCount(b.instagram_followers) - parseFollowerCount(a.instagram_followers))
                 .map((influencer, index) => (
@@ -368,56 +367,51 @@ const MobileInfluencerPage = () => {
                     delay: index * ANIMATION_CONFIG.STAGGER_DELAY, 
                     duration: ANIMATION_CONFIG.CARD_TRANSITION 
                   }}
+                  className="group"
                 >
                   <Link href={`/influencer/${influencer.id}`}>
-                    <motion.div
-                      whileTap={{ scale: 0.98 }}
-                      className="flex items-center space-x-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100"
-                    >
-                      <div className="relative">
-                        <img
-                          src={influencer.avatar}
-                          alt={influencer.name}
-                          className="w-16 h-16 rounded-2xl object-cover"
-                        />
-                        <div className="absolute -top-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center">
-                          <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-base mb-1 truncate">
+                    <div className="relative h-96 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer">
+                      <img
+                        src={influencer.avatar || 'https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=680&h=1020&fit=crop&crop=center'}
+                        alt={influencer.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        style={{ aspectRatio: '680/1020' }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                      <div className="absolute top-0 left-0 right-0 p-4 bg-black/20 backdrop-blur-sm rounded-t-3xl">
+                        <h3 className="text-lg font-bold text-white text-center drop-shadow-lg">
                           {influencer.name}
                         </h3>
-                        <p className="text-[#7124a8] text-sm font-medium mb-2">
+                        <p className="text-white/90 text-xs text-center font-medium drop-shadow-md">
                           {influencer.content_type}
                         </p>
-                        
-                        <div className="space-y-1">
-                          <div className="flex items-center space-x-4 text-xs text-gray-500">
-                            <span className="flex items-center">
-                              <MapPin className="w-3 h-3 mr-1" />
-                              {influencer.city}
-                            </span>
-                            <span className="flex items-center">
-                              <Instagram className="w-3 h-3 mr-1" />
-                              @{influencer.instagram_handle}
-                            </span>
-                          </div>
-                          
-                          <div className="flex items-center space-x-4 text-xs">
-                            <span className="flex items-center text-blue-600 font-medium">
-                              <Users className="w-3 h-3 mr-1" />
-                              {influencer.instagram_followers}
-                            </span>
-                            <span className="flex items-center text-green-600 font-medium">
-                              <TrendingUp className="w-3 h-3 mr-1" />
-                              {influencer.instagram_engagement_rate}
-                            </span>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 p-4">
+                        <div className="bg-white/30 backdrop-blur-sm rounded-2xl p-3 border border-white/40">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <Instagram className="w-4 h-4 text-white" />
+                              <div>
+                                <p className="text-white text-xs font-medium">
+                                  {influencer.instagram_handle || '@username'}
+                                </p>
+                                <p className="text-white/80 text-xs">
+                                  {influencer.instagram_followers || '0'}
+                                </p>
+                              </div>
+                            </div>
+                            <Button 
+                              className="bg-white hover:bg-gray-50 text-gray-900 text-xs px-3 py-1 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                              size="sm"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              View Detail
+                            </Button>
                           </div>
                         </div>
                       </div>
-                    </motion.div>
+                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-400/0 via-purple-400/0 to-pink-400/0 group-hover:from-blue-400/10 group-hover:via-purple-400/5 group-hover:to-pink-400/10 transition-all duration-500 pointer-events-none" />
+                    </div>
                   </Link>
                 </motion.div>
               ))}
