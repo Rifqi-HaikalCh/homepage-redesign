@@ -14,6 +14,7 @@ export default function Header() {
   const { theme, setTheme } = useTheme();
   const { user, role, signOut, loading } = useAuth();
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +27,12 @@ export default function Header() {
 
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchQuery.trim() !== '') {
+      router.push(`/influencer?q=${encodeURIComponent(searchQuery)}`);
+    }
   };
 
   const handleSignOut = async () => {
@@ -62,7 +69,10 @@ export default function Header() {
               <Search className="absolute left-3 w-4 h-4 text-gray-400 dark:text-gray-500 z-10" />
               <Input
                 className="pl-10 pr-16 py-2 w-full rounded-full border border-white/30 dark:border-gray-600/50 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm focus:bg-white/80 dark:focus:bg-gray-800/80 focus:border-[#7124A8]/50 transition-all duration-300 text-gray-900 dark:text-gray-100 shadow-sm"
-                placeholder="Cari produk & transaksi"
+                placeholder="Cari influencer..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
               />
               <div className="absolute right-3 z-10">
                 <kbd className="px-2 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded">

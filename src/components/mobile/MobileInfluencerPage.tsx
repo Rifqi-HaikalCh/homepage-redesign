@@ -1,52 +1,96 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+// React hooks untuk state management dan side effects
+import { useState, useEffect, useCallback } from 'react';
+// Animasi yang smooth untuk mobile interactions
 import { motion, AnimatePresence } from 'framer-motion';
+// Icon set yang konsisten untuk UI elements
 import { Search, Filter, MapPin, Users, TrendingUp, Instagram, X } from 'lucide-react';
+// Next.js navigation untuk client-side routing
 import Link from 'next/link';
+// Layout wrapper khusus mobile
 import MobileLayout from './MobileLayout';
 
+// ======================== TYPE DEFINITIONS ========================
+// Interface untuk data influencer dari API
 interface Influencer {
   id: number;
   name: string;
-  content_type: string;
-  city: string;
-  avatar: string;
-  instagram_handle: string;
-  instagram_followers: string;
-  instagram_engagement_rate: string;
+  content_type: string; // Kategori konten yang dibuat
+  city: string; // Lokasi influencer
+  avatar: string; // URL foto profil
+  instagram_handle: string; // Username Instagram tanpa @
+  instagram_followers: string; // Format: "10.5K", "1.2M", dll
+  instagram_engagement_rate: string; // Format: "3.2%", "5.8%", dll
   created_at: string;
   updated_at: string;
 }
 
+// ======================== CONSTANTS ========================
+// Kategori konten untuk filtering - mudah maintain dan extend
+const CONTENT_CATEGORIES = [
+  'All', 
+  'Lifestyle & Fashion', 
+  'Tech & Gaming', 
+  'Food & Travel', 
+  'Beauty & Health', 
+  'Sports & Fitness', 
+  'Music & Entertainment'
+] as const;
+
+// Konfigurasi animasi untuk consistent feel
+const ANIMATION_CONFIG = {
+  STAGGER_DELAY: 0.05, // Delay antar item saat render
+  CARD_TRANSITION: 0.3, // Durasi animasi card
+  FILTER_ANIMATION: { 
+    type: "spring", 
+    bounce: 0.2, 
+    duration: 0.4 
+  }
+} as const;
+
+/**
+ * Halaman utama untuk eksplorasi influencer
+ * 
+ * Features:
+ * - Real-time search dengan instant results
+ * - Multi-filter system (kategori + lokasi)
+ * - Sorting berdasarkan jumlah followers
+ * - Mobile-optimized dengan smooth animations
+ * - Loading states untuk better UX
+ */
 const MobileInfluencerPage = () => {
+  // ======================== STATE MANAGEMENT ========================
+  // Data states
   const [influencers, setInfluencers] = useState<Influencer[]>([]);
   const [filteredInfluencers, setFilteredInfluencers] = useState<Influencer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // UI states
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
+  
+  // Filter states
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedCity, setSelectedCity] = useState('All');
 
-  // Categories for filtering
-  const categories = [
-    'All', 'Lifestyle & Fashion', 'Tech & Gaming', 'Food & Travel', 
-    'Beauty & Health', 'Sports & Fitness', 'Music & Entertainment'
-  ];
-
-  // Fetch influencers
+  // ======================== DATA FETCHING ========================
+  // Effect untuk load initial data dari API
   useEffect(() => {
-    const fetchInfluencers = async () => {
+    const fetchInfluencers = async (): Promise<void> => {
       try {
         const response = await fetch('/api/influencers');
         if (response.ok) {
-          const data = await response.json();
+          const data: Influencer[] = await response.json();
           setInfluencers(data);
-          setFilteredInfluencers(data);
+          setFilteredInfluencers(data); // Initial state sama dengan semua data
+        } else {
+          console.error('Failed to fetch influencers:', response.status);
         }
       } catch (error) {
         console.error('Error fetching influencers:', error);
+        // TODO: Bisa ditambahkan error state untuk user feedback
       } finally {
         setIsLoading(false);
       }
@@ -55,57 +99,86 @@ const MobileInfluencerPage = () => {
     fetchInfluencers();
   }, []);
 
-  // Filter influencers
-  useEffect(() => {
-    let filtered = influencers;
+  // ======================== DERIVED DATA ========================
+  // Extract unique cities untuk city filter options
+  const availableCities = [...new Set(influencers.map(inf => inf.city))];
 
-    // Filter by search query
-    if (searchQuery) {
-      filtered = filtered.filter(
-        influencer =>
-          influencer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          influencer.content_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          influencer.city.toLowerCase().includes(searchQuery.toLowerCase())
+  // ======================== HELPER FUNCTIONS ========================
+  /**
+   * Parse string follower count ke number untuk sorting
+   * Mendukung format: "10.5K", "1.2M", "500", "2.1B"
+   */
+  const parseFollowerCount = (followerStr: string): number => {
+    if (!followerStr) return 0;
+    
+    const normalizedStr = followerStr.toLowerCase().replace(/[^0-9.kmb]/g, '');
+    const baseNumber = parseFloat(normalizedStr);
+    
+    // Konversi berdasarkan suffix
+    if (followerStr.toLowerCase().includes('b')) {
+      return baseNumber * 1_000_000_000; // Billion
+    } else if (followerStr.toLowerCase().includes('m')) {
+      return baseNumber * 1_000_000; // Million
+    } else if (followerStr.toLowerCase().includes('k')) {
+      return baseNumber * 1_000; // Thousand
+    }
+    
+    return baseNumber || 0;
+  };
+
+  /**
+   * Advanced filtering dengan multiple criteria
+   * Menggunakan fuzzy search untuk better user experience
+   */
+  const applyFilters = useCallback((data: Influencer[]): Influencer[] => {
+    let filtered = [...data];
+
+    // Search query filter - case insensitive, multiple fields
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(influencer => {
+        const nameMatch = influencer.name.toLowerCase().includes(query);
+        const contentMatch = influencer.content_type.toLowerCase().includes(query);
+        const cityMatch = influencer.city.toLowerCase().includes(query);
+        const handleMatch = influencer.instagram_handle.toLowerCase().includes(query);
+        
+        return nameMatch || contentMatch || cityMatch || handleMatch;
+      });
+    }
+
+    // Category filter
+    if (selectedCategory !== 'All') {
+      filtered = filtered.filter(influencer => 
+        influencer.content_type === selectedCategory
       );
     }
 
-    // Filter by category
-    if (selectedCategory !== 'All') {
-      filtered = filtered.filter(influencer => influencer.content_type === selectedCategory);
-    }
-
-    // Filter by city
+    // City filter
     if (selectedCity !== 'All') {
-      filtered = filtered.filter(influencer => influencer.city === selectedCity);
+      filtered = filtered.filter(influencer => 
+        influencer.city === selectedCity
+      );
     }
 
-    setFilteredInfluencers(filtered);
-  }, [influencers, searchQuery, selectedCategory, selectedCity]);
+    return filtered;
+  }, [searchQuery, selectedCategory, selectedCity]);
 
-  const cities = [...new Set(influencers.map(inf => inf.city))];
-
-  const parseFollowerCount = (followerStr: string): number => {
-    if (!followerStr) return 0;
-    const numStr = followerStr.toLowerCase().replace(/[^0-9.kmb]/g, '');
-    const num = parseFloat(numStr);
-    
-    if (followerStr.toLowerCase().includes('m')) {
-      return num * 1000000;
-    } else if (followerStr.toLowerCase().includes('k')) {
-      return num * 1000;
-    } else if (followerStr.toLowerCase().includes('b')) {
-      return num * 1000000000;
-    }
-    
-    return num || 0;
-  };
-
-  const clearFilters = () => {
+  /**
+   * Reset semua filter ke state initial
+   */
+  const clearAllFilters = (): void => {
     setSelectedCategory('All');
     setSelectedCity('All');
     setSearchQuery('');
     setShowFilter(false);
   };
+
+  // ======================== EFFECTS ========================
+  // Effect untuk apply filters setiap ada perubahan
+  useEffect(() => {
+    const filtered = applyFilters(influencers);
+    setFilteredInfluencers(filtered);
+  }, [influencers, searchQuery, selectedCategory, selectedCity]);
 
   return (
     <MobileLayout
@@ -204,7 +277,7 @@ const MobileInfluencerPage = () => {
                       Category
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {categories.map((category) => (
+                      {CONTENT_CATEGORIES.map((category) => (
                         <button
                           key={category}
                           onClick={() => setSelectedCategory(category)}
@@ -236,7 +309,7 @@ const MobileInfluencerPage = () => {
                       >
                         All
                       </button>
-                      {cities.map((city) => (
+                      {availableCities.map((city) => (
                         <button
                           key={city}
                           onClick={() => setSelectedCity(city)}
@@ -254,8 +327,8 @@ const MobileInfluencerPage = () => {
 
                   {/* Clear Filters */}
                   <button
-                    onClick={clearFilters}
-                    className="w-full py-2 text-sm text-[#7124a8] font-medium"
+                    onClick={clearAllFilters}
+                    className="w-full py-2 text-sm text-[#7124a8] font-medium hover:bg-[#7124a8]/5 rounded-lg transition-colors"
                   >
                     Clear All Filters
                   </button>
@@ -291,7 +364,10 @@ const MobileInfluencerPage = () => {
                   key={influencer.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05, duration: 0.3 }}
+                  transition={{ 
+                    delay: index * ANIMATION_CONFIG.STAGGER_DELAY, 
+                    duration: ANIMATION_CONFIG.CARD_TRANSITION 
+                  }}
                 >
                   <Link href={`/influencer/${influencer.id}`}>
                     <motion.div

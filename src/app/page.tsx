@@ -7,9 +7,8 @@ import MobileHomePage from '@/components/mobile/MobileHomePage';
 // Desktop components
 import Header from '@/components/header';
 import HeroCarousel from '@/components/hero-carousel';
-import ContentCarousel from '@/components/content-carousel';
+import ContentSelectionWithFiltering from '@/components/ContentSelectionWithFiltering';
 import RecommendedInfluencer from '@/components/recommended-influencer';
-import OtherInfluencers from '@/components/other-influencers';
 import RecommendationCards from '@/components/recommendation-cards';
 import TestimonialStack from '@/components/testimonial-stack';
 import Footer from '@/components/footer';
@@ -45,9 +44,12 @@ const DesktopHomePage = () => {
         
         <main>
           <HeroCarousel />
-          <ContentCarousel />
+          <ContentSelectionWithFiltering 
+            variant="desktop" 
+            showInfluencerResults={true}
+            maxInfluencersToShow={8}
+          />
           <RecommendedInfluencer />
-          <OtherInfluencers />
           <RecommendationCards />
           <TestimonialStack />
         </main>

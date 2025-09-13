@@ -1,42 +1,126 @@
 'use client';
 
+// Import dependencies - React hooks untuk state management
 import { useState, useEffect } from 'react';
+// Framer Motion untuk animasi yang smooth dan modern
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, Star, MapPin, TrendingUp, Users, Check } from 'lucide-react';
+// Icons dari Lucide - pilihan yang lebih ringan dibanding FontAwesome
+import { ChevronRight, Check, Search, Instagram } from 'lucide-react';
 import Link from 'next/link';
+// Next.js Image untuk optimisasi gambar otomatis
 import Image from 'next/image';
 import MobileLayout from './MobileLayout';
+// Import komponen baru untuk seleksi konten
+import ContentSelectionCards from '@/components/ContentSelectionCards';
 
+// ======================== CONSTANTS ========================
+// Konfigurasi untuk komponen - mudah diubah tanpa touching logic
+const SLIDE_AUTO_DURATION = 4000; // Durasi auto-rotate slide (4 detik)
+const MAX_FEATURED_INFLUENCERS = 4; // Jumlah influencer yang ditampilkan di homepage
+const SEARCH_PLACEHOLDER = 'Cari nama atau konten influencer...';
+
+// ======================== INTERFACES ========================
+// Interface untuk data influencer - struktur yang konsisten dengan API
 interface Influencer {
   id: number;
   name: string;
-  content_type: string;
+  content_type: string; // Jenis konten yang dibuat (lifestyle, tech, dll)
   city: string;
-  avatar: string;
-  instagram_handle: string;
-  instagram_followers: string;
-  instagram_engagement_rate: string;
+  avatar: string; // URL foto profil
+  instagram_handle: string; // Handle Instagram tanpa @
+  instagram_followers: string; // Formatted followers count (misal: "10K", "1.2M")
+  instagram_engagement_rate: string; // Persentase engagement
   created_at: string;
   updated_at: string;
 }
 
+// Interface untuk paket layanan - lebih sederhana untuk tampilan mobile
 interface PackageItem {
   id: number;
   title: string;
   description: string;
-  price: string;
-  icon: string;
+  price: string; // Harga dalam format string (sudah formatted)
+  icon: string; // Emoji icon untuk tampilan yang friendly
   category: string;
-  features?: string[];
+  features?: string[]; // Fitur-fitur optional
 }
 
-const MobileHomePage = () => {
-  const [influencers, setInfluencers] = useState<Influencer[]>([]);
-  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+// Interface untuk slide hero - data presentasi utama
+interface HeroSlide {
+  id: number;
+  title: string;
+  subtitle: string;
+  image: string;
+  cta: string; // Call to action text
+}
 
-  // Hero slides data - using desktop slide images
-  const heroSlides = [
+// ======================== HELPER FUNCTIONS ========================
+// Fungsi untuk generate URL navigasi berdasarkan slide
+const getNavigationUrl = (slideId: number): string => {
+  // Slide khusus packages redirect ke halaman packages
+  if (slideId === 3) return '/packages';
+  // Default ke halaman influencer
+  return '/influencer';
+};
+
+// Fungsi untuk filter influencer - extracted untuk reusability
+const filterInfluencers = (influencers: Influencer[], query: string): Influencer[] => {
+  if (!query.trim()) return influencers;
+  
+  const normalizedQuery = query.toLowerCase().trim();
+  
+  return influencers.filter(influencer => {
+    const nameMatch = influencer.name.toLowerCase().includes(normalizedQuery);
+    const contentMatch = influencer.content_type.toLowerCase().includes(normalizedQuery);
+    const cityMatch = influencer.city.toLowerCase().includes(normalizedQuery);
+    
+    return nameMatch || contentMatch || cityMatch;
+  });
+};
+
+// Fungsi untuk filter berdasarkan kategori konten
+const filterByCategory = (influencers: Influencer[], category: string): Influencer[] => {
+  if (category === 'all') return influencers;
+  
+  // Mapping kategori ID ke content_type yang sesuai
+  const categoryMapping: Record<string, string[]> = {
+    'food': ['Food & Travel', 'Food & Beverages'],
+    'tech': ['Tech & Gaming', 'Technology'],
+    'entertainment': ['Music & Entertainment', 'Entertainment'],
+    'lifestyle': ['Lifestyle & Fashion'],
+    'health': ['Beauty & Health', 'Health & Sport'],
+    'sports': ['Sports & Fitness'],
+    'photo': ['Photography'],
+    'education': ['Education'],
+    'art': ['Art & Design']
+  };
+  
+  const validTypes = categoryMapping[category] || [];
+  
+  return influencers.filter(influencer => 
+    validTypes.some(type => 
+      influencer.content_type.toLowerCase().includes(type.toLowerCase())
+    )
+  );
+};
+
+// ======================== MAIN COMPONENT ========================
+const MobileHomePage = () => {
+  // State management untuk data influencer dan UI controls
+  const [influencers, setInfluencers] = useState<Influencer[]>([]);
+  const [currentHeroIndex, setCurrentHeroIndex] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  
+  // State untuk fitur pencarian real-time
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filteredInfluencers, setFilteredInfluencers] = useState<Influencer[]>([]);
+  
+  // State untuk kategori konten yang dipilih
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
+  // Konfigurasi slide hero - menggunakan gambar dari folder public
+  // Data ini bisa dipindah ke config file untuk maintainability
+  const heroSlides: HeroSlide[] = [
     {
       id: 1,
       title: "Find Perfect\nInfluencers",
@@ -74,8 +158,9 @@ const MobileHomePage = () => {
     }
   ];
 
-  // Simple packages data - no API call needed
-  const packages: PackageItem[] = [
+  // Data paket layanan - hardcoded untuk performa yang lebih cepat
+  // TODO: Bisa direfactor untuk fetch dari API jika diperlukan update dinamis
+  const quickPreviewPackages: PackageItem[] = [
     {
       id: 1,
       title: "Starter Package",
@@ -105,41 +190,78 @@ const MobileHomePage = () => {
     }
   ];
 
-  // Fetch influencers
+  // Hook untuk fetch data influencer dari API
+  // Menggunakan async/await pattern untuk readability yang lebih baik
   useEffect(() => {
-    const fetchInfluencers = async () => {
+    const fetchTopInfluencers = async (): Promise<void> => {
       try {
+        setIsLoading(true);
+        
         const response = await fetch('/api/influencers');
-        if (response.ok) {
-          const data = await response.json();
-          setInfluencers(data.slice(0, 4)); // Show top 4 for mobile
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const allInfluencers: Influencer[] = await response.json();
+        
+        // Ambil hanya sejumlah tertentu untuk performa mobile
+        // Bisa ditambah pagination jika diperlukan
+        const topInfluencers = allInfluencers.slice(0, MAX_FEATURED_INFLUENCERS);
+        setInfluencers(topInfluencers);
+        
       } catch (error) {
-        console.error('Error fetching influencers:', error);
+        console.error('Gagal memuat data influencer:', error);
+        // Fallback ke array kosong agar UI tidak crash
+        setInfluencers([]);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchInfluencers();
+    fetchTopInfluencers();
   }, []);
 
-
-  // Auto-rotate hero slides
+  // Hook untuk filter influencer berdasarkan input pencarian dan kategori
+  // Implementasi debouncing bisa ditambahkan untuk performa yang lebih baik
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentHeroIndex((prev) => (prev + 1) % heroSlides.length);
-    }, 4000);
+    // Apply multiple filters in sequence
+    let filtered = influencers;
+    
+    // Filter berdasarkan kategori terlebih dahulu
+    filtered = filterByCategory(filtered, selectedCategory);
+    
+    // Kemudian filter berdasarkan search query
+    filtered = filterInfluencers(filtered, searchQuery);
+    
+    setFilteredInfluencers(filtered);
+  }, [searchQuery, influencers, selectedCategory]);
 
-    return () => clearInterval(interval);
+
+  // Auto-rotate hero slides setiap 4 detik
+  // User bisa manual navigate, auto-rotate akan continue
+  useEffect(() => {
+    // Gunakan konstanta yang sudah didefinisikan
+    
+    const slideInterval = setInterval(() => {
+      setCurrentHeroIndex((currentIndex) => {
+        // Kembali ke slide pertama setelah slide terakhir
+        return (currentIndex + 1) % heroSlides.length;
+      });
+    }, SLIDE_AUTO_DURATION);
+
+    // Cleanup interval saat component unmount
+    return () => clearInterval(slideInterval);
   }, [heroSlides.length]);
 
+  // Slide yang sedang aktif
   const currentSlide = heroSlides[currentHeroIndex];
 
   return (
     <MobileLayout showMenu showNotification showLogo>
       <div className="space-y-6">
-        {/* Hero Section */}
+        {/* ================== HERO SECTION ================== */}
+        {/* Carousel utama dengan auto-rotate dan manual navigation */}
         <section className="relative h-[60vh] overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
@@ -150,9 +272,13 @@ const MobileHomePage = () => {
               transition={{ duration: 0.7, ease: "easeOut" }}
               className="absolute inset-0"
             >
-              <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url(${currentSlide.image})` }}
+              <Image
+                src={currentSlide.image}
+                alt={currentSlide.title}
+                fill
+                style={{ objectFit: 'cover' }}
+                priority={currentSlide.id === 1}
+                className="absolute inset-0"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
               
@@ -182,7 +308,7 @@ const MobileHomePage = () => {
                   transition={{ delay: 0.5, duration: 0.6 }}
                 >
                   <Link
-                    href={currentSlide.id === 3 ? "/packages" : "/influencer"}
+                    href={getNavigationUrl(currentSlide.id)}
                     className="inline-flex items-center px-6 py-3 bg-[#7124a8] rounded-full font-semibold shadow-lg active:scale-95 transition-transform"
                   >
                     {currentSlide.cta}
@@ -207,54 +333,27 @@ const MobileHomePage = () => {
           </div>
         </section>
 
-        {/* Content Selection */}
+        {/* Search Bar */}
         <section className="px-4">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Pilih Konten</h2>
-          <div className="grid grid-cols-2 gap-3">
-            <Link href="/content/lifestyle" className="group">
-              <motion.div
-                whileTap={{ scale: 0.98 }}
-                className="bg-gradient-to-br from-[#7124a8] to-[#7124a8] p-4 rounded-2xl text-white shadow-lg"
-              >
-                <Star className="w-6 h-6 mb-2" />
-                <h3 className="font-semibold text-sm">Lifestyle</h3>
-                <p className="text-white/80 text-xs">Fashion, Beauty, Travel</p>
-              </motion.div>
-            </Link>
-            
-            <Link href="/content/technology" className="group">
-              <motion.div
-                whileTap={{ scale: 0.98 }}
-                className="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-2xl text-white shadow-lg"
-              >
-                <Users className="w-6 h-6 mb-2" />
-                <h3 className="font-semibold text-sm">Technology</h3>
-                <p className="text-blue-100 text-xs">Tech Reviews, Gadgets</p>
-              </motion.div>
-            </Link>
-            
-            <Link href="/content/food" className="group">
-              <motion.div
-                whileTap={{ scale: 0.98 }}
-                className="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-2xl text-white shadow-lg"
-              >
-                <Star className="w-6 h-6 mb-2" />
-                <h3 className="font-semibold text-sm">Food & Culinary</h3>
-                <p className="text-green-100 text-xs">Recipes, Restaurants</p>
-              </motion.div>
-            </Link>
-            
-            <Link href="/content/business" className="group">
-              <motion.div
-                whileTap={{ scale: 0.98 }}
-                className="bg-gradient-to-br from-orange-500 to-orange-600 p-4 rounded-2xl text-white shadow-lg"
-              >
-                <TrendingUp className="w-6 h-6 mb-2" />
-                <h3 className="font-semibold text-sm">Business</h3>
-                <p className="text-orange-100 text-xs">Finance, Startup</p>
-              </motion.div>
-            </Link>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder={SEARCH_PLACEHOLDER}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#7124a8] outline-none transition-colors"
+            />
           </div>
+        </section>
+
+        {/* Content Selection Cards - Komponen baru yang interaktif */}
+        <section className="px-4">
+          <ContentSelectionCards
+            selectedCategory={selectedCategory}
+            onCategorySelect={setSelectedCategory}
+            variant="mobile"
+          />
         </section>
 
         {/* Featured Influencers */}
@@ -282,55 +381,54 @@ const MobileHomePage = () => {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
-              {influencers.map((influencer, index) => (
+            <div className="grid grid-cols-2 gap-4">
+              {filteredInfluencers.map((influencer, index) => (
                 <motion.div
                   key={influencer.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1, duration: 0.5 }}
+                  className="group"
                 >
                   <Link href={`/influencer/${influencer.id}`}>
-                    <motion.div
-                      whileTap={{ scale: 0.98 }}
-                      className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 active:bg-gray-50 transition-colors h-full"
-                    >
-                      <div className="text-center">
-                        <div className="relative mb-3">
-                          <Image
-                            src={influencer.avatar}
-                            alt={influencer.name}
-                            width={64}
-                            height={64}
-                            className="w-16 h-16 rounded-full object-cover mx-auto"
-                          />
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-                        </div>
-                        
-                        <h3 className="font-semibold text-gray-900 text-sm mb-1 truncate">
+                    <div className="relative h-64 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 cursor-pointer">
+                      <Image
+                        src={influencer.avatar}
+                        alt={influencer.name}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        className="transition-transform duration-700 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                      <div className="absolute top-0 left-0 right-0 p-3 bg-black/20 backdrop-blur-sm rounded-t-2xl">
+                        <h3 className="text-sm font-bold text-white text-center drop-shadow-lg">
                           {influencer.name}
                         </h3>
-                        
-                        <p className="text-[#7124a8] text-xs font-medium mb-2">
+                        <p className="text-white/90 text-xs text-center font-medium drop-shadow-md">
                           {influencer.content_type}
                         </p>
-                        
-                        <div className="space-y-1 text-xs text-gray-500">
-                          <div className="flex items-center justify-center">
-                            <MapPin className="w-3 h-3 mr-1" />
-                            <span className="truncate">{influencer.city}</span>
-                          </div>
-                          <div className="flex items-center justify-center">
-                            <Users className="w-3 h-3 mr-1" />
-                            <span>{influencer.instagram_followers}</span>
-                          </div>
-                          <div className="flex items-center justify-center text-green-600 font-medium">
-                            <TrendingUp className="w-3 h-3 mr-1" />
-                            <span>{influencer.instagram_engagement_rate}</span>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <div className="bg-white/30 backdrop-blur-sm rounded-xl p-2 border border-white/40">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <Instagram className="w-3 h-3 text-white" />
+                              <div>
+                                <p className="text-white text-xs font-medium">
+                                  @{influencer.instagram_handle}
+                                </p>
+                                <p className="text-white/80 text-xs">
+                                  {influencer.instagram_followers}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="bg-white hover:bg-gray-50 text-gray-900 text-xs px-2 py-1 rounded-full font-semibold shadow-lg transition-all duration-300">
+                              View
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                   </Link>
                 </motion.div>
               ))}
@@ -367,7 +465,7 @@ const MobileHomePage = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {packages.map((pkg, index) => (
+              {quickPreviewPackages.map((pkg, index) => (
                 <motion.div
                   key={pkg.id}
                   initial={{ opacity: 0, y: 20 }}

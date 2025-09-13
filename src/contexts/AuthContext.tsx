@@ -1,33 +1,57 @@
 'use client';
 
+// React hooks dan context untuk state management
 import React, { createContext, useContext, useEffect, useState } from 'react';
+// Supabase client dan utility functions
 import { supabase, getUserRole } from '@/lib/supabase';
+// Supabase types untuk type safety
 import { User, Session } from '@supabase/supabase-js';
 
+// Enum untuk user roles - lebih maintainable
+type UserRole = 'admin' | 'client' | 'influencer' | 'guest';
+
+// Interface untuk context value - comprehensive auth state management
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  role: 'admin' | 'client' | 'influencer' | 'guest';
-  loading: boolean;
-  signUp: (email: string, password: string, role?: 'admin' | 'client' | 'influencer') => Promise<void>;
+  // User state
+  user: User | null; // Supabase user object
+  session: Session | null; // Current session
+  role: UserRole; // User role untuk authorization
+  loading: boolean; // Loading state untuk UX
+  
+  // Auth actions
+  signUp: (email: string, password: string, role?: UserRole) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  setGuestMode: () => void;
-  setUser: (user: User | null) => void;
-  setRole: (role: 'admin' | 'client' | 'influencer' | 'guest') => void;
+  
+  // Utility functions
+  setGuestMode: () => void; // Mode guest untuk browsing tanpa login
+  setUser: (user: User | null) => void; // Manual user setter
+  setRole: (role: UserRole) => void; // Manual role setter
 }
 
+// Context creation dengan proper typing
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * AuthProvider - Central authentication state management
+ * 
+ * Handles:
+ * - User authentication dengan Supabase
+ * - Role-based authorization
+ * - Session persistence
+ * - Loading states untuk better UX
+ */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  // Authentication state
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [role, setRole] = useState<'admin' | 'client' | 'influencer' | 'guest'>('guest');
-  const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState<UserRole>('guest'); // Default guest mode
+  const [loading, setLoading] = useState<boolean>(true);
 
+  // Effect untuk initialize authentication state
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
+    // Fetch initial session dan setup auth state listener
+    const initializeAuthState = async (): Promise<void> => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       setUser(session?.user ?? null);
@@ -48,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     };
 
-    getInitialSession();
+    initializeAuthState();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -70,13 +94,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, userRole: 'admin' | 'client' | 'influencer' = 'client') => {
+  const signUp = async (email: string, password: string, role: UserRole = 'client') => {
     const response = await fetch('/api/auth', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password, role: userRole }),
+      body: JSON.stringify({ email, password, role }),
     });
 
     const data = await response.json();

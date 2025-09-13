@@ -1,23 +1,40 @@
 'use client';
 
+// Icons yang konsisten dengan design system
 import { ArrowLeft, Menu, Bell, Search } from 'lucide-react';
+// Next.js router untuk navigation
 import { useRouter } from 'next/navigation';
+// Animasi untuk micro-interactions yang smooth
 import { motion } from 'framer-motion';
+// Optimized image component
 import Image from 'next/image';
 
+// Props interface dengan dokumentasi yang jelas
 interface MobileHeaderProps {
-  title?: string;
-  showBack?: boolean;
-  showMenu?: boolean;
-  showSearch?: boolean;
-  showNotification?: boolean;
-  showLogo?: boolean;
+  title?: string; // Judul halaman (optional, bisa diganti dengan logo)
+  
+  // Control visibility berbagai elemen header
+  showBack?: boolean; // Arrow back untuk navigation
+  showMenu?: boolean; // Hamburger menu
+  showSearch?: boolean; // Search icon
+  showNotification?: boolean; // Bell dengan red dot indicator
+  showLogo?: boolean; // Brand logo di center
+  
+  // Event handlers untuk interaksi user
   onMenuClick?: () => void;
   onSearchClick?: () => void;
   onNotificationClick?: () => void;
+  
+  // Custom styling jika diperlukan
   className?: string;
 }
 
+/**
+ * Header component untuk mobile dengan berbagai konfigurasi
+ * Mendukung logo, title, navigation controls, dan action buttons
+ * 
+ * Design: Sticky header dengan backdrop blur untuk modern feel
+ */
 const MobileHeader = ({
   title,
   showBack = false,
@@ -32,7 +49,8 @@ const MobileHeader = ({
 }: MobileHeaderProps) => {
   const router = useRouter();
 
-  const handleBack = () => {
+  // Handler untuk back navigation - menggunakan browser history
+  const handleBackNavigation = (): void => {
     router.back();
   };
 
@@ -49,7 +67,7 @@ const MobileHeader = ({
           <div className="flex items-center">
             {showBack && (
               <motion.button
-                onClick={handleBack}
+                onClick={handleBackNavigation}
                 className="p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors"
                 whileTap={{ scale: 0.95 }}
               >
@@ -67,15 +85,17 @@ const MobileHeader = ({
             )}
           </div>
 
-          {/* Center Section */}
+          {/* ================== CENTER SECTION ================== */}
+          {/* Flexible center area - bisa logo atau title */}
           <div className="flex-1 flex justify-center mx-4">
             {showLogo ? (
               <Image
                 src="/dapur-buzzer-logo.png"
-                alt="Dapur Buzzer"
+                alt="Dapur Buzzer Logo"
                 width={120}
                 height={32}
                 className="h-8 w-auto"
+                priority // Logo penting untuk LCP
               />
             ) : title ? (
               <h1 className="text-lg font-semibold text-gray-900 truncate">
@@ -84,7 +104,8 @@ const MobileHeader = ({
             ) : null}
           </div>
 
-          {/* Right Section */}
+          {/* ================== RIGHT SECTION ================== */}
+          {/* Action buttons area */}
           <div className="flex items-center space-x-2">
             {showSearch && (
               <motion.button
@@ -102,8 +123,8 @@ const MobileHeader = ({
                 whileTap={{ scale: 0.95 }}
               >
                 <Bell className="w-5 h-5 text-gray-700" />
-                {/* Notification dot */}
-                <div className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+                {/* Red dot indicator untuk unread notifications */}
+                <div className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
               </motion.button>
             )}
           </div>

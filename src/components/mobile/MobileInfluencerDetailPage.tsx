@@ -1,7 +1,10 @@
 'use client';
 
+// React hooks untuk state management dan routing
 import { useState, useEffect } from 'react';
+// Animasi yang smooth untuk mobile interactions
 import { motion, AnimatePresence } from 'framer-motion';
+// Icon set yang konsisten untuk UI elements
 import { 
   Share, 
   Heart, 
@@ -14,61 +17,119 @@ import {
   Star,
   ChevronRight
 } from 'lucide-react';
+// Next.js navigation untuk routing dinamis
 import { useParams } from 'next/navigation';
+// Layout wrapper khusus mobile
 import MobileLayout from './MobileLayout';
 
+// ======================== TYPE DEFINITIONS ========================
+// Interface comprehensive untuk data influencer
 interface Influencer {
   id: number;
   name: string;
-  content_type: string;
-  city: string;
-  avatar: string;
+  content_type: string; // Kategori konten specialty
+  city: string; // Lokasi base influencer
+  avatar: string; // URL foto profil
+  
+  // Instagram analytics
   instagram_handle: string;
-  instagram_followers: string;
-  instagram_engagement_rate: string;
+  instagram_followers: string; // Format: "10.5K", "1.2M"
+  instagram_engagement_rate: string; // Format: "3.2%"
   instagram_avg_likes: string;
   instagram_avg_comments: string;
+  
+  // TikTok analytics (optional)
   tiktok_handle?: string;
   tiktok_followers?: string;
   tiktok_engagement_rate?: string;
   tiktok_avg_likes?: string;
   tiktok_avg_views?: string;
-  services?: string[];
+  
+  // Business info
+  services?: string[]; // Layanan yang ditawarkan
   portfolio?: Array<{
     id: string;
     title: string;
     image_url: string;
     description?: string;
   }>[];
+  
+  // Metadata
   user_id?: string;
   created_at: string;
   updated_at: string;
 }
 
+// Type untuk tab navigation
+type TabType = 'stats' | 'services' | 'portfolio';
+
+// ======================== CONSTANTS ========================
+// Konfigurasi tab navigation
+const TAB_CONFIG = [
+  { id: 'stats', label: 'Stats', icon: TrendingUp },
+  { id: 'services', label: 'Services', icon: Star },
+  { id: 'portfolio', label: 'Portfolio', icon: Eye }
+] as const;
+
+// Konfigurasi animasi untuk consistent feel
+const ANIMATION_CONFIG = {
+  TAB_TRANSITION: { duration: 0.3 },
+  STAGGER_DELAY: 0.1,
+  HERO_ANIMATION: {
+    initial: { y: 20, opacity: 0 },
+    animate: { y: 0, opacity: 1 }
+  }
+} as const;
+
+/**
+ * Halaman detail influencer dengan comprehensive profile view
+ * 
+ * Features:
+ * - Hero section dengan foto profil dan basic info
+ * - Quick stats grid untuk metrics overview
+ * - Tab navigation untuk detailed stats, services, portfolio
+ * - Interactive elements (like, share)
+ * - Contact CTA untuk collaboration
+ */
 const MobileInfluencerDetailPage = () => {
+  // ======================== ROUTING & PARAMS ========================
   const params = useParams();
+  
+  // ======================== STATE MANAGEMENT ========================
+  // Data states
   const [influencer, setInfluencer] = useState<Influencer | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'stats' | 'services' | 'portfolio'>('stats');
-  const [isLiked, setIsLiked] = useState(false);
+  
+  // UI states
+  const [activeTab, setActiveTab] = useState<TabType>('stats');
+  const [isLiked, setIsLiked] = useState(false); // Local like state
 
+  // ======================== DATA FETCHING ========================
+  // Effect untuk fetch influencer data berdasarkan ID dari URL
   useEffect(() => {
-    const fetchInfluencer = async () => {
+    const fetchInfluencerData = async (): Promise<void> => {
       try {
         const response = await fetch('/api/influencers');
         if (response.ok) {
-          const data = await response.json();
-          const influencerData = data.find((inf: Influencer) => inf.id === parseInt(params.id as string));
-          setInfluencer(influencerData);
+          const allInfluencers: Influencer[] = await response.json();
+          const targetInfluencer = allInfluencers.find(
+            (inf: Influencer) => inf.id === parseInt(params.id as string)
+          );
+          setInfluencer(targetInfluencer || null);
+        } else {
+          console.error('Failed to fetch influencers:', response.status);
         }
       } catch (error) {
-        console.error('Error fetching influencer:', error);
+        console.error('Error fetching influencer data:', error);
+        // TODO: Bisa ditambahkan error state untuk user feedback
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchInfluencer();
+    if (params.id) {
+      fetchInfluencerData();
+    }
   }, [params.id]);
 
   if (isLoading) {
@@ -94,11 +155,32 @@ const MobileInfluencerDetailPage = () => {
     );
   }
 
-  const tabs = [
-    { id: 'stats', label: 'Stats', icon: TrendingUp },
-    { id: 'services', label: 'Services', icon: Star },
-    { id: 'portfolio', label: 'Portfolio', icon: Eye }
-  ];
+  // ======================== HELPER FUNCTIONS ========================
+  /**
+   * Handle tab switching dengan type safety
+   */
+  const handleTabChange = (tabId: string): void => {
+    setActiveTab(tabId as TabType);
+  };
+
+  /**
+   * Handle share functionality
+   * TODO: Implement native sharing API untuk mobile
+   */
+  const handleShare = (): void => {
+    // Future: Native share API atau custom modal
+    console.log('Share influencer profile');
+  };
+
+  /**
+   * Handle like toggle dengan optimistic update
+   */
+  const toggleLike = (): void => {
+    setIsLiked(prev => !prev);
+    // TODO: Sync dengan backend untuk persistent likes
+  };
+
+  // ======================== RENDER CONDITIONS ========================
 
   return (
     <MobileLayout showBack>
@@ -117,14 +199,19 @@ const MobileInfluencerDetailPage = () => {
             <div className="absolute top-4 right-4 flex space-x-2">
               <motion.button
                 whileTap={{ scale: 0.9 }}
-                onClick={() => setIsLiked(!isLiked)}
-                className="w-10 h-10 bg-black/20 backdrop-blur-lg rounded-full flex items-center justify-center"
+                onClick={toggleLike}
+                className="w-10 h-10 bg-black/20 backdrop-blur-lg rounded-full flex items-center justify-center transition-colors"
+                aria-label={isLiked ? 'Unlike influencer' : 'Like influencer'}
               >
-                <Heart className={`w-5 h-5 ${isLiked ? 'text-red-500 fill-current' : 'text-white'}`} />
+                <Heart className={`w-5 h-5 transition-colors ${
+                  isLiked ? 'text-red-500 fill-current' : 'text-white'
+                }`} />
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.9 }}
+                onClick={handleShare}
                 className="w-10 h-10 bg-black/20 backdrop-blur-lg rounded-full flex items-center justify-center"
+                aria-label="Share influencer profile"
               >
                 <Share className="w-5 h-5 text-white" />
               </motion.button>
@@ -133,24 +220,21 @@ const MobileInfluencerDetailPage = () => {
             {/* Basic Info */}
             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
               <motion.h1
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
+                {...ANIMATION_CONFIG.HERO_ANIMATION}
                 className="text-3xl font-bold mb-2"
               >
                 {influencer.name}
               </motion.h1>
               <motion.p
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
+                {...ANIMATION_CONFIG.HERO_ANIMATION}
+                transition={{ delay: ANIMATION_CONFIG.STAGGER_DELAY }}
                 className="text-white/80 font-medium mb-2"
               >
                 {influencer.content_type}
               </motion.p>
               <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
+                {...ANIMATION_CONFIG.HERO_ANIMATION}
+                transition={{ delay: ANIMATION_CONFIG.STAGGER_DELAY * 2 }}
                 className="flex items-center text-white/80"
               >
                 <MapPin className="w-4 h-4 mr-2" />
@@ -196,14 +280,16 @@ const MobileInfluencerDetailPage = () => {
         {/* Tab Navigation */}
         <section className="px-4 pb-4 bg-white border-b border-gray-100">
           <div className="flex bg-gray-100 rounded-2xl p-1">
-            {tabs.map((tab) => {
+            {TAB_CONFIG.map((tab) => {
               const IconComponent = tab.icon;
+              const isActive = activeTab === tab.id;
+              
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as 'stats' | 'services' | 'portfolio')}
+                  onClick={() => handleTabChange(tab.id)}
                   className={`flex-1 flex items-center justify-center py-3 px-4 rounded-xl font-medium text-sm transition-all duration-300 relative ${
-                    activeTab === tab.id
+                    isActive
                       ? 'bg-white text-[#7124a8] shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}

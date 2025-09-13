@@ -20,64 +20,30 @@ const MobilePackagesPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  // Mock packages data with features
-  const mockPackages: Package[] = [
-    {
-      id: 1,
-      title: "Starter Package",
-      description: "Perfect for small businesses starting their influencer marketing journey",
-      price: "$99",
-      icon: "🚀",
-      category: "Basic",
-      features: ["5 Influencer Connections", "Basic Analytics", "Email Support", "1 Campaign"]
-    },
-    {
-      id: 2,
-      title: "Professional Package",
-      description: "Advanced tools for growing businesses and marketing agencies",
-      price: "$299",
-      icon: "⭐",
-      category: "Professional",
-      features: ["20 Influencer Connections", "Advanced Analytics", "Priority Support", "5 Campaigns", "Custom Reporting"]
-    },
-    {
-      id: 3,
-      title: "Enterprise Package",
-      description: "Full-scale solution for large enterprises and marketing teams",
-      price: "$599",
-      icon: "👑",
-      category: "Enterprise",
-      features: ["Unlimited Connections", "Full Analytics Suite", "24/7 Support", "Unlimited Campaigns", "White Label Solution", "Dedicated Account Manager"]
-    },
-    {
-      id: 4,
-      title: "Content Creation",
-      description: "Professional content creation services by top influencers",
-      price: "$199",
-      icon: "🎨",
-      category: "Services",
-      features: ["5 Custom Posts", "Professional Editing", "Brand Guidelines", "Multi-Platform Content"]
-    }
-  ];
 
   useEffect(() => {
-    // Simulate API call
+    // Fetch packages from API
     const fetchPackages = async () => {
       setIsLoading(true);
       try {
-        // Simulate delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setPackages(mockPackages);
+        const response = await fetch('/api/packages');
+        if (response.ok) {
+          const data = await response.json();
+          setPackages(data);
+        } else {
+          console.error('Failed to fetch packages from API');
+          setPackages([]);
+        }
       } catch (error) {
         console.error('Error fetching packages:', error);
-        setPackages(mockPackages); // Fallback to mock data
+        setPackages([]);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchPackages();
-  }, [mockPackages]);
+  }, []);
 
   const categories = ['All', 'Basic', 'Professional', 'Enterprise', 'Services'];
 
