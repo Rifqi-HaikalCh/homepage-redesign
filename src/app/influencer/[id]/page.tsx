@@ -1,6 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import useMobileView from '@/hooks/useMobileView';
+import MobileInfluencerDetailPage from '@/components/mobile/MobileInfluencerDetailPage';
+
+// Desktop components
 import { motion, AnimatePresence } from 'framer-motion';
 import { Instagram, ChevronLeft, ChevronRight, Music, MapPin, Users, Heart, MessageCircle, Eye, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -36,7 +40,7 @@ interface Influencer {
   updated_at: string;
 }
 
-export default function InfluencerDetail() {
+const DesktopInfluencerDetail = () => {
   const params = useParams();
   const [influencersData, setInfluencersData] = useState<Influencer[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -448,4 +452,14 @@ export default function InfluencerDetail() {
       </AnimatePresence>
     </div>
   );
+};
+
+export default function InfluencerDetail() {
+  const isMobile = useMobileView();
+
+  if (isMobile) {
+    return <MobileInfluencerDetailPage />;
+  }
+
+  return <DesktopInfluencerDetail />;
 }

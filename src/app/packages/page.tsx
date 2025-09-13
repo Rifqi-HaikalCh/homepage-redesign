@@ -1,5 +1,9 @@
 'use client';
 
+import useMobileView from '@/hooks/useMobileView';
+import MobilePackagesPage from '@/components/mobile/MobilePackagesPage';
+
+// Desktop components
 import { useState, useEffect } from 'react';
 import { Search, Filter, ChevronDown, Plus, Edit, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -22,7 +26,7 @@ interface Package {
 const categories = ['Semua', 'Endorsement', 'Paid Promote', 'Review', 'Bundle', 'Viral'];
 const priceRanges = ['Semua', '0-2 Juta', '2-5 Juta', '5-10 Juta', '10 Juta+'];
 
-export default function PackagesPage() {
+const DesktopPackagesPage = () => {
   const [packages, setPackages] = useState<Package[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -412,4 +416,14 @@ export default function PackagesPage() {
       />
     </div>
   );
+};
+
+export default function PackagesPage() {
+  const isMobile = useMobileView();
+
+  if (isMobile) {
+    return <MobilePackagesPage />;
+  }
+
+  return <DesktopPackagesPage />;
 }

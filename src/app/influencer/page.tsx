@@ -2,6 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import useMobileView from '@/hooks/useMobileView';
+import MobileInfluencerPage from '@/components/mobile/MobileInfluencerPage';
+
+// Desktop components
 import { Search, Filter, ChevronDown, Instagram, Plus, Edit, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -27,7 +31,7 @@ const contentTypes = ['Semua', 'Lifestyle & Fashion', 'Beauty & Skincare', 'Tech
 const cities = ['Semua', 'Jakarta', 'Bandung', 'Surabaya', 'Bali', 'Yogyakarta', 'Medan', 'Solo', 'Malang', 'Semarang', 'Palembang'];
 const followerRanges = ['Semua', '0-50K', '50K-100K', '100K-200K', '200K+'];
 
-export default function InfluencerListPage() {
+const DesktopInfluencerListPage = () => {
   const { role } = useAuth();
   const [influencers, setInfluencers] = useState<Influencer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -470,4 +474,14 @@ export default function InfluencerListPage() {
       />
     </div>
   );
+};
+
+export default function InfluencerListPage() {
+  const isMobile = useMobileView();
+
+  if (isMobile) {
+    return <MobileInfluencerPage />;
+  }
+
+  return <DesktopInfluencerListPage />;
 }

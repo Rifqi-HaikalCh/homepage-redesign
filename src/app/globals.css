@@ -138,4 +138,40 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
+  
+  /* Mobile-specific utilities */
+  .safe-area-padding-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-padding-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  
+  /* Touch-friendly interactions */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  .tap-highlight-transparent {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Native-like scrolling */
+  .momentum-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Smooth transitions for mobile */
+  .smooth-transform {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }

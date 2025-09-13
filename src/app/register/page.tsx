@@ -1,5 +1,9 @@
 'use client';
 
+import useMobileView from '@/hooks/useMobileView';
+import MobileRegisterPage from '@/components/mobile/MobileRegisterPage';
+
+// Desktop components
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { Input } from '@/components/ui/input';
@@ -11,7 +15,7 @@ import { useRouter } from 'next/navigation';
 
 type Step = 1 | 2 | 3 | 4;
 
-export default function RegisterPage() {
+const DesktopRegisterPage = () => {
   const [step, setStep] = useState<Step>(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -550,4 +554,14 @@ export default function RegisterPage() {
       </div>
     </div>
   );
+};
+
+export default function RegisterPage() {
+  const isMobile = useMobileView();
+
+  if (isMobile) {
+    return <MobileRegisterPage />;
+  }
+
+  return <DesktopRegisterPage />;
 }

@@ -1,5 +1,9 @@
 'use client';
 
+import useMobileView from '@/hooks/useMobileView';
+import MobileLoginPage from '@/components/mobile/MobileLoginPage';
+
+// Desktop components
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
@@ -10,7 +14,7 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
-export default function LoginPage() {
+const DesktopLoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -347,4 +351,14 @@ export default function LoginPage() {
       </div>
     </div>
   );
+};
+
+export default function LoginPage() {
+  const isMobile = useMobileView();
+
+  if (isMobile) {
+    return <MobileLoginPage />;
+  }
+
+  return <DesktopLoginPage />;
 }

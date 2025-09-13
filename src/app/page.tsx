@@ -1,6 +1,10 @@
 'use client';
 
 import { useAuth } from '@/contexts/AuthContext';
+import useMobileView from '@/hooks/useMobileView';
+import MobileHomePage from '@/components/mobile/MobileHomePage';
+
+// Desktop components
 import Header from '@/components/header';
 import HeroCarousel from '@/components/hero-carousel';
 import ContentCarousel from '@/components/content-carousel';
@@ -10,20 +14,8 @@ import RecommendationCards from '@/components/recommendation-cards';
 import TestimonialStack from '@/components/testimonial-stack';
 import Footer from '@/components/footer';
 
-export default function Home() {
-  const { user, role, loading } = useAuth();
-
-  // Show loading state while checking authentication
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7124A8] mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+const DesktopHomePage = () => {
+  const { user, role } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 transition-all duration-500">
@@ -63,4 +55,27 @@ export default function Home() {
       </div>
     </div>
   );
+};
+
+export default function Home() {
+  const { loading } = useAuth();
+  const isMobile = useMobileView();
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7124A8] mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isMobile) {
+    return <MobileHomePage />;
+  }
+
+  return <DesktopHomePage />;
 }

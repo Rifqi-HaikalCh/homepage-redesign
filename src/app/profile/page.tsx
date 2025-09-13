@@ -1,5 +1,9 @@
 'use client';
 
+import useMobileView from '@/hooks/useMobileView';
+import MobileProfilePage from '@/components/mobile/MobileProfilePage';
+
+// Desktop components
 import { motion, Variants } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -407,7 +411,7 @@ const ClientProfile = ({ user, onSignOut }: { user: { email?: string }, onSignOu
   );
 };
 
-export default function ProfilePage() {
+const DesktopProfilePage = () => {
   const { user, role, loading, signOut } = useAuth();
   const router = useRouter();
   const [profileData, setProfileData] = useState<ProfileData>(defaultUserData);
@@ -731,4 +735,14 @@ export default function ProfilePage() {
       />
     </div>
   );
+};
+
+export default function ProfilePage() {
+  const isMobile = useMobileView();
+
+  if (isMobile) {
+    return <MobileProfilePage />;
+  }
+
+  return <DesktopProfilePage />;
 }
