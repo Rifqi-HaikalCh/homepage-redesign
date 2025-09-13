@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Quote } from 'lucide-react';
+import Image from 'next/image';
+
 
 interface Testimonial {
   id: number;
@@ -78,12 +80,14 @@ const MobileTestimonialStack = () => {
                 >
                     <Quote className="w-8 h-8 text-[#7124a8]/30 mb-2" />
                     <blockquote className="text-gray-700 text-sm leading-relaxed flex-grow">
-                        "{testimonials[currentIndex].quote}"
+                        &quot;{testimonials[currentIndex].quote}&quot;
                     </blockquote>
                     <div className="flex items-center mt-4">
-                        <img
+                        <Image
                             src={testimonials[currentIndex].avatar}
                             alt={testimonials[currentIndex].author}
+                            width={40}
+                            height={40}
                             className="w-10 h-10 rounded-full object-cover mr-3 border-2 border-[#7124a8]/20"
                         />
                         <div>

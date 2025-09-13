@@ -174,10 +174,10 @@ const MobileInfluencerPage = () => {
 
   // ======================== EFFECTS ========================
   // Effect untuk apply filters setiap ada perubahan
-  useEffect(() => {
+useEffect(() => {
     const filtered = applyFilters(influencers);
     setFilteredInfluencers(filtered);
-  }, [influencers, searchQuery, selectedCategory, selectedCity]);
+}, [influencers, searchQuery, selectedCategory, selectedCity, applyFilters]);
 
   return (
     <MobileLayout
