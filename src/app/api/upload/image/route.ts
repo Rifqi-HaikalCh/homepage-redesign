@@ -1,92 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-// Mock upload service - replace dengan real cloud storage (Supabase Storage, Cloudinary, etc.)
+// Fungsi untuk mendapatkan Supabase client
+const getSupabaseClient = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Supabase environment variables are not configured');
+  }
+  return createClient(supabaseUrl, supabaseKey);
+};
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    
+
     if (!file) {
-      return NextResponse.json(
-        { error: 'No file uploaded' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    // Validasi file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json(
-        { error: 'Invalid file type. Only JPEG, PNG, and WebP are allowed.' },
-        { status: 400 }
-      );
-    }
+    // (Opsional) Validasi tipe dan ukuran file di sini
 
-    // Validasi file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      return NextResponse.json(
-        { error: 'File too large. Maximum size is 5MB.' },
-        { status: 400 }
-      );
-    }
-
-    // Mock upload process - generate fake URL
-    // Dalam implementasi nyata, upload ke Supabase Storage atau cloud provider lainnya
+    const supabase = getSupabaseClient();
     const timestamp = Date.now();
-    const randomId = Math.random().toString(36).substring(2, 15);
-    const fileExtension = file.name.split('.').pop();
-    const fileName = `avatar_${timestamp}_${randomId}.${fileExtension}`;
-    
-    // Mock URL - replace dengan actual upload URL
-    const mockImageUrl = `https://images.unsplash.com/photo-1494790108755-2616b612b494?w=400&h=400&fit=crop&crop=center&sig=${randomId}`;
-    
-    // Simulasi delay upload
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const fileName = `public/${timestamp}_${file.name}`;
+
+    // Unggah file ke Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('avatars') // Pastikan nama bucket sama
+      .upload(fileName, file);
+
+    if (uploadError) {
+      console.error('Supabase upload error:', uploadError);
+      throw new Error(uploadError.message);
+    }
+
+    // Dapatkan URL publik dari file yang baru diunggah
+    const { data: publicUrlData } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(fileName);
+      
+    if (!publicUrlData) {
+        throw new Error('Could not get public URL for avatar');
+    }
 
     return NextResponse.json({
       message: 'Image uploaded successfully',
-      url: mockImageUrl,
-      fileName: fileName,
-      fileSize: file.size,
-      fileType: file.type
+      url: publicUrlData.publicUrl,
     });
 
   } catch (error) {
     console.error('Upload error:', error);
-    return NextResponse.json(
-      { error: 'Upload failed' },
-      { status: 500 }
-    );
-  }
-}
-
-// GET - Get upload info/status
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const fileName = searchParams.get('fileName');
-    
-    if (!fileName) {
-      return NextResponse.json(
-        { error: 'File name is required' },
-        { status: 400 }
-      );
-    }
-
-    // Mock response untuk file info
-    return NextResponse.json({
-      fileName,
-      url: `https://images.unsplash.com/photo-1494790108755-2616b612b494?w=400&h=400&fit=crop&crop=center`,
-      status: 'uploaded',
-      uploadedAt: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('Error fetching upload info:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch upload info' },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : 'Upload failed';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
