@@ -54,10 +54,11 @@ export default function ForgotPasswordPage() {
             <CardContent className="p-8">
               <div className="text-center mb-8">
                 <div className="flex justify-center mb-4">
-                  <img 
-                    src="/dapur-buzzer-logo.png" 
-                    alt="Dapur Buzzer Logo" 
-                    className="h-12 w-auto object-contain"
+                  <img
+                    src="/dapur-buzzer-logo.png"
+                    alt="Dapur Buzzer Logo"
+                    className="h-12 object-contain"
+                    style={{ width: "auto" }}
                   />
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">

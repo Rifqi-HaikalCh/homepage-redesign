@@ -43,15 +43,20 @@ const MobileLoginPage = () => {
         >
           {/* Header */}
           <div className="text-center">
-            <div className="w-20 h-20 bg-gradient-to-r from-[#7124a8] to-[#7124a8] rounded-2xl mx-auto mb-6 flex items-center justify-center">
-              <div className="text-white text-2xl font-bold">I</div>
+            <div className="w-24 h-24 bg-white rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-lg border border-gray-100">
+              <img
+                src="/dapur-buzzer-logo.png"
+                alt="Dapur Buzzer Indonesia"
+                className="h-16"
+                style={{ width: "auto" }}
+              />
             </div>
-            
+
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome Back
+              Selamat Datang Kembali
             </h1>
             <p className="text-gray-600">
-              Sign in to continue your journey
+              Masuk untuk melanjutkan perjalanan Anda
             </p>
           </div>
 
@@ -70,14 +75,14 @@ const MobileLoginPage = () => {
             {/* Email Field */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
-                Email Address
+                Alamat Email
               </label>
               <div className="relative">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
+                  placeholder="Masukkan email Anda"
                   className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#7124a8] focus:border-transparent outline-none transition-colors"
                   required
                 />
@@ -88,14 +93,14 @@ const MobileLoginPage = () => {
             {/* Password Field */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">
-                Password
+                Kata Sandi
               </label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder="Masukkan kata sandi Anda"
                   className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#7124a8] focus:border-transparent outline-none transition-colors"
                   required
                 />
@@ -120,7 +125,7 @@ const MobileLoginPage = () => {
                 href="/forgot-password"
                 className="text-[#7124a8] text-sm font-medium hover:text-[#7124a8]/80"
               >
-                Forgot Password?
+                Lupa Kata Sandi?
               </Link>
             </div>
 
@@ -135,7 +140,7 @@ const MobileLoginPage = () => {
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>Sign In</span>
+                  <span>Masuk</span>
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </>
               )}
@@ -149,7 +154,7 @@ const MobileLoginPage = () => {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">or continue with</span>
+                <span className="px-4 bg-white text-gray-500">atau lanjutkan dengan</span>
               </div>
             </div>
 
@@ -162,7 +167,7 @@ const MobileLoginPage = () => {
                 }}
                 className="w-full bg-gray-100 text-gray-700 font-medium py-3 rounded-xl hover:bg-gray-200 transition-colors"
               >
-                Test as Admin
+                Test sebagai Admin
               </button>
               <button
                 onClick={() => {
@@ -171,7 +176,7 @@ const MobileLoginPage = () => {
                 }}
                 className="w-full bg-gray-100 text-gray-700 font-medium py-3 rounded-xl hover:bg-gray-200 transition-colors"
               >
-                Test as Influencer
+                Test sebagai Influencer
               </button>
             </div>
           </div>
@@ -179,12 +184,12 @@ const MobileLoginPage = () => {
           {/* Sign Up Link */}
           <div className="text-center">
             <p className="text-gray-600">
-              Don&apos;t have an account?{' '}
+              Belum punya akun?{' '}
               <Link
                 href="/register"
                 className="text-[#7124a8] font-semibold hover:text-[#7124a8]/80"
               >
-                Sign Up
+                Daftar Sekarang
               </Link>
             </p>
           </div>

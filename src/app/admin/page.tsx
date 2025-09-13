@@ -393,10 +393,11 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             {/* Logo - Left */}
             <div className="flex items-center">
-              <img 
-                src="/dapur-buzzer-logo.png" 
-                alt="Dapur Buzzer Logo" 
-                className="h-10 w-auto object-contain"
+              <img
+                src="/dapur-buzzer-logo.png"
+                alt="Dapur Buzzer Logo"
+                className="h-10 object-contain"
+                style={{ width: "auto" }}
               />
             </div>
             
@@ -732,16 +733,19 @@ export default function AdminDashboard() {
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#7124A8]/50"
                       >
                         <option value="">Select content type</option>
-                        <option value="Beauty & Skincare">Beauty & Skincare</option>
-                        <option value="Lifestyle & Fashion">Lifestyle & Fashion</option>
-                        <option value="Travel & Food">Travel & Food</option>
-                        <option value="Tech & Gaming">Tech & Gaming</option>
-                        <option value="Fitness & Health">Fitness & Health</option>
-                        <option value="Art & Creative">Art & Creative</option>
-                        <option value="Business & Finance">Business & Finance</option>
-                        <option value="Education">Education</option>
+                        <option value="Food & Beverages">Food & Beverages</option>
+                        <option value="Technology">Technology</option>
                         <option value="Entertainment">Entertainment</option>
-                        <option value="Music">Music</option>
+                        <option value="Travel & Lifestyle">Travel & Lifestyle</option>
+                        <option value="Health & Sport">Health & Sport</option>
+                        <option value="Gaming">Gaming</option>
+                        <option value="Content Creator">Content Creator</option>
+                        <option value="Beauty & Fashion">Beauty & Fashion</option>
+                        <option value="Youtuber">Youtuber</option>
+                        <option value="DJ & Penyanyi">DJ & Penyanyi</option>
+                        <option value="Tiktok">Tiktok</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Mom & Kids">Mom & Kids</option>
                       </select>
                     </div>
 

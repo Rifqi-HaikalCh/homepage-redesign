@@ -47,15 +47,19 @@ const filterByCategory = (influencers: Influencer[], category: string): Influenc
   
   // Mapping kategori ID ke content_type yang sesuai
   const categoryMapping: Record<string, string[]> = {
-    'food': ['Food & Travel', 'Food & Beverages'],
-    'tech': ['Tech & Gaming', 'Technology'],
-    'entertainment': ['Music & Entertainment', 'Entertainment'],
-    'lifestyle': ['Lifestyle & Fashion'],
-    'health': ['Beauty & Health', 'Health & Sport'],
-    'sports': ['Sports & Fitness'],
-    'photo': ['Photography'],
-    'education': ['Education'],
-    'art': ['Art & Design']
+    'food': ['Food & Beverages'],
+    'tech': ['Technology'],
+    'entertainment': ['Entertainment'],
+    'travel': ['Travel & Lifestyle'],
+    'health': ['Health & Sport'],
+    'gaming': ['Gaming'],
+    'creator': ['Content Creator'],
+    'beauty': ['Beauty & Fashion'],
+    'youtube': ['Youtuber'],
+    'dj-singer': ['DJ & Penyanyi'],
+    'tiktok': ['Tiktok'],
+    'instagram': ['Instagram'],
+    'mom-kids': ['Mom & Kids']
   };
   
   const validTypes = categoryMapping[category] || [];
@@ -237,15 +241,19 @@ const ContentSelectionWithFiltering = ({
                 }`}>
                   {selectedCategory === 'all' 
                     ? 'Semua Influencer' 
-                    : `Influencer ${selectedCategory === 'food' ? 'Food & Travel' :
-                        selectedCategory === 'tech' ? 'Tech & Gaming' :
+                    : `Influencer ${selectedCategory === 'food' ? 'Food & Beverages' :
+                        selectedCategory === 'tech' ? 'Technology' :
                         selectedCategory === 'entertainment' ? 'Entertainment' :
-                        selectedCategory === 'lifestyle' ? 'Lifestyle & Fashion' :
-                        selectedCategory === 'health' ? 'Beauty & Health' :
-                        selectedCategory === 'sports' ? 'Sports & Fitness' :
-                        selectedCategory === 'photo' ? 'Photography' :
-                        selectedCategory === 'education' ? 'Education' :
-                        selectedCategory === 'art' ? 'Art & Design' : selectedCategory
+                        selectedCategory === 'travel' ? 'Travel & Lifestyle' :
+                        selectedCategory === 'health' ? 'Health & Sport' :
+                        selectedCategory === 'gaming' ? 'Gaming' :
+                        selectedCategory === 'creator' ? 'Content Creator' :
+                        selectedCategory === 'beauty' ? 'Beauty & Fashion' :
+                        selectedCategory === 'youtube' ? 'Youtuber' :
+                        selectedCategory === 'dj-singer' ? 'DJ & Penyanyi' :
+                        selectedCategory === 'tiktok' ? 'Tiktok' :
+                        selectedCategory === 'instagram' ? 'Instagram' :
+                        selectedCategory === 'mom-kids' ? 'Mom & Kids' : selectedCategory
                       }`
                   }
                 </h3>

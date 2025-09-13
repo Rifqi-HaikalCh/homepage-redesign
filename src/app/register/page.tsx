@@ -211,10 +211,11 @@ const DesktopRegisterPage = () => {
           <div className="p-8">
             <div className="text-center mb-8">
               <div className="flex justify-center mb-4">
-                <img 
-                  src="/dapur-buzzer-logo.png" 
-                  alt="Dapur Buzzer Logo" 
-                  className="h-12 w-auto object-contain"
+                <img
+                  src="/dapur-buzzer-logo.png"
+                  alt="Dapur Buzzer Logo"
+                  className="h-12 object-contain"
+                  style={{ width: "auto" }}
                 />
               </div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
@@ -381,14 +382,19 @@ const DesktopRegisterPage = () => {
                         required
                       >
                         <option value="">Pilih Content Type</option>
-                        <option value="Lifestyle & Beauty">Lifestyle & Beauty</option>
-                        <option value="Tech & Gaming">Tech & Gaming</option>
-                        <option value="Food & Culinary">Food & Culinary</option>
-                        <option value="Travel & Adventure">Travel & Adventure</option>
-                        <option value="Fashion & Style">Fashion & Style</option>
-                        <option value="Health & Fitness">Health & Fitness</option>
-                        <option value="Business & Finance">Business & Finance</option>
+                        <option value="Food & Beverages">Food & Beverages</option>
+                        <option value="Technology">Technology</option>
                         <option value="Entertainment">Entertainment</option>
+                        <option value="Travel & Lifestyle">Travel & Lifestyle</option>
+                        <option value="Health & Sport">Health & Sport</option>
+                        <option value="Gaming">Gaming</option>
+                        <option value="Content Creator">Content Creator</option>
+                        <option value="Beauty & Fashion">Beauty & Fashion</option>
+                        <option value="Youtuber">Youtuber</option>
+                        <option value="DJ & Penyanyi">DJ & Penyanyi</option>
+                        <option value="Tiktok">Tiktok</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Mom & Kids">Mom & Kids</option>
                       </select>
                     </div>
 

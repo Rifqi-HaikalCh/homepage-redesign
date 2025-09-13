@@ -56,10 +56,11 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <img 
-                src="/dapur-buzzer-logo.png" 
-                alt="Dapur Buzzer Logo" 
-                className="h-10 w-auto object-contain"
+              <img
+                src="/dapur-buzzer-logo.png"
+                alt="Dapur Buzzer Logo"
+                className="h-10 object-contain"
+                style={{ width: "auto" }}
               />
             </Link>
           </div>

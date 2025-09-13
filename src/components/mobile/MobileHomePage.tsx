@@ -12,6 +12,11 @@ import Image from 'next/image';
 import MobileLayout from './MobileLayout';
 // Import komponen baru untuk seleksi konten
 import ContentSelectionCards from '@/components/ContentSelectionCards';
+// Import Lottie untuk animasi
+import Lottie from 'lottie-react';
+import contactData from '../../../public/contact.json';
+// Import Mobile Expanding Cards
+import MobileExpandingCards from './MobileExpandingCards';
 
 // ======================== CONSTANTS ========================
 // Konfigurasi untuk komponen - mudah diubah tanpa touching logic
@@ -84,15 +89,19 @@ const filterByCategory = (influencers: Influencer[], category: string): Influenc
   
   // Mapping kategori ID ke content_type yang sesuai
   const categoryMapping: Record<string, string[]> = {
-    'food': ['Food & Travel', 'Food & Beverages'],
-    'tech': ['Tech & Gaming', 'Technology'],
-    'entertainment': ['Music & Entertainment', 'Entertainment'],
-    'lifestyle': ['Lifestyle & Fashion'],
-    'health': ['Beauty & Health', 'Health & Sport'],
-    'sports': ['Sports & Fitness'],
-    'photo': ['Photography'],
-    'education': ['Education'],
-    'art': ['Art & Design']
+    'food': ['Food & Beverages'],
+    'tech': ['Technology'],
+    'entertainment': ['Entertainment'],
+    'travel': ['Travel & Lifestyle'],
+    'health': ['Health & Sport'],
+    'gaming': ['Gaming'],
+    'creator': ['Content Creator'],
+    'beauty': ['Beauty & Fashion'],
+    'youtube': ['Youtuber'],
+    'dj-singer': ['DJ & Penyanyi'],
+    'tiktok': ['Tiktok'],
+    'instagram': ['Instagram'],
+    'mom-kids': ['Mom & Kids']
   };
   
   const validTypes = categoryMapping[category] || [];
@@ -123,38 +132,38 @@ const MobileHomePage = () => {
   const heroSlides: HeroSlide[] = [
     {
       id: 1,
-      title: "Find Perfect\nInfluencers",
-      subtitle: "Connect with top creators for your brand",
+      title: "Temukan Influencer\nTerbaik",
+      subtitle: "Hubungkan brand Anda dengan kreator terpilih",
       image: "/Slide 1.png",
-      cta: "Explore Now"
+      cta: "Jelajahi Sekarang"
     },
     {
       id: 2,
-      title: "Grow Your\nBusiness",
-      subtitle: "Reach millions through authentic partnerships",
+      title: "Kembangkan\nBisnis Anda",
+      subtitle: "Jangkau jutaan audiens melalui kemitraan autentik",
       image: "/Slide 2.png",
-      cta: "Get Started"
+      cta: "Mulai Sekarang"
     },
     {
       id: 3,
-      title: "Premium\nPackages",
-      subtitle: "Professional services tailored for you",
+      title: "Paket\nPremium",
+      subtitle: "Layanan profesional yang disesuaikan untuk Anda",
       image: "/Slide 3.png",
-      cta: "View Packages"
+      cta: "Lihat Paket"
     },
     {
       id: 4,
-      title: "Quality\nContent",
-      subtitle: "Professional content creation services",
+      title: "Konten\nBerkualitas",
+      subtitle: "Layanan pembuatan konten profesional",
       image: "/Slide 4.png",
-      cta: "Learn More"
+      cta: "Pelajari Lebih Lanjut"
     },
     {
       id: 5,
-      title: "Success\nStories",
-      subtitle: "Join thousands of satisfied clients",
+      title: "Kisah\nSukses",
+      subtitle: "Bergabunglah dengan ribuan klien yang puas",
       image: "/Slide 5.png",
-      cta: "View Stories"
+      cta: "Lihat Testimoni"
     }
   ];
 
@@ -361,7 +370,7 @@ const MobileHomePage = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-gray-900">Top Influencers</h2>
             <Link href="/influencer" className="text-[#7124a8] text-sm font-medium flex items-center">
-              See All
+              Lihat Semua
               <ChevronRight className="w-4 h-4 ml-1" />
             </Link>
           </div>
@@ -436,108 +445,82 @@ const MobileHomePage = () => {
           )}
         </section>
 
-        {/* Packages Section */}
-        <section className="px-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Premium Packages</h2>
-            <Link href="/packages" className="text-[#7124a8] text-sm font-medium flex items-center">
-              See All
-              <ChevronRight className="w-4 h-4 ml-1" />
-            </Link>
-          </div>
+        {/* Mobile Expanding Cards Section */}
+        <MobileExpandingCards />
 
-          {false ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-10 h-10 bg-gray-300 rounded-xl"></div>
-                      <div className="flex-1">
-                        <div className="h-4 bg-gray-300 rounded w-32 mb-2"></div>
-                        <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
-                        <div className="h-5 bg-gray-300 rounded w-20"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {quickPreviewPackages.map((pkg, index) => (
+        {/* Clients Section */}
+        <section className="px-4 mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+          >
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Klien Terpercaya</h2>
+
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              {[
+                { name: 'DANA', logo: '💰', color: 'from-blue-500 to-blue-600' },
+                { name: 'Shopee', logo: '🛍️', color: 'from-orange-500 to-red-500' },
+                { name: 'Gojek', logo: '🏍️', color: 'from-green-500 to-green-600' },
+                { name: 'MS Glow', logo: '✨', color: 'from-pink-500 to-rose-500' }
+              ].map((client, index) => (
                 <motion.div
-                  key={pkg.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  key={client.name}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1, duration: 0.4 }}
+                  className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center"
                 >
-                  <Link href={`/packages`}>
-                    <motion.div
-                      whileTap={{ scale: 0.98 }}
-                      className={`bg-white rounded-2xl p-4 shadow-sm border border-gray-100 active:bg-gray-50 transition-colors ${
-                        pkg.category === 'Professional' ? 'ring-2 ring-[#7124a8]' : ''
-                      }`}
-                    >
-                      {/* Popular Badge */}
-                      {pkg.category === 'Professional' && (
-                        <div className="bg-[#7124a8] text-white text-center py-1 px-3 rounded-full text-xs font-medium mb-3 w-fit">
-                          🔥 Most Popular
-                        </div>
-                      )}
-
-                      <div className="flex items-start space-x-4">
-                        <div className="w-10 h-10 rounded-xl bg-[#7124a8] flex items-center justify-center text-white">
-                          <span className="text-lg">{pkg.icon}</span>
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-2">
-                            <h3 className="font-semibold text-gray-900 text-sm">
-                              {pkg.title}
-                            </h3>
-                            <div className="text-right">
-                              <div className="text-lg font-bold text-gray-900">
-                                {pkg.price}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                /month
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <p className="text-gray-600 text-xs mb-3 line-clamp-2">
-                            {pkg.description}
-                          </p>
-                          
-                          {/* Features */}
-                          {pkg.features && (
-                            <div className="space-y-1">
-                              {pkg.features.slice(0, 2).map((feature, idx) => (
-                                <div key={idx} className="flex items-center space-x-2">
-                                  <div className="w-3 h-3 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <Check className="w-2 h-2 text-green-600" />
-                                  </div>
-                                  <span className="text-xs text-gray-700">{feature}</span>
-                                </div>
-                              ))}
-                              {pkg.features.length > 2 && (
-                                <div className="text-xs text-gray-500 ml-5">
-                                  +{pkg.features.length - 2} more features
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        
-                        <ChevronRight className="w-4 h-4 text-gray-400 mt-1" />
-                      </div>
-                    </motion.div>
-                  </Link>
+                  <div className={`w-12 h-12 mx-auto mb-2 rounded-xl bg-gradient-to-r ${client.color} flex items-center justify-center text-xl`}>
+                    {client.logo}
+                  </div>
+                  <h3 className="font-semibold text-gray-900 text-sm">{client.name}</h3>
                 </motion.div>
               ))}
             </div>
-          )}
+
+            <div className="bg-gradient-to-r from-[#7124a8] to-[#7124a8] rounded-xl p-4 text-center text-white">
+              <h3 className="font-bold text-lg mb-2">500+ Brand Partners</h3>
+              <p className="text-white/90 text-sm">Dipercaya oleh brand-brand terkemuka Indonesia</p>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* Contact Section */}
+        <section className="px-4 mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 shadow-sm border border-gray-100"
+          >
+            <div className="grid grid-cols-5 gap-4 items-center">
+              <div className="col-span-2 flex justify-center">
+                <div className="w-24 h-24">
+                  <Lottie
+                    animationData={contactData}
+                    loop={true}
+                    autoplay={true}
+                    className="w-full h-full"
+                  />
+                </div>
+              </div>
+
+              <div className="col-span-3">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Hubungi Kami</h3>
+                <p className="text-gray-600 text-sm mb-3">
+                  Siap memulai kampanye influencer marketing Anda?
+                </p>
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-[#7124a8] text-white px-4 py-2 rounded-xl font-semibold text-sm w-full flex items-center justify-center space-x-2"
+                >
+                  <span>Contact Us</span>
+                  <ChevronRight className="w-4 h-4" />
+                </motion.button>
+              </div>
+            </div>
+          </motion.div>
         </section>
 
         {/* Testimonials or Recommendations Section */}
@@ -548,7 +531,7 @@ const MobileHomePage = () => {
             transition={{ delay: 0.4, duration: 0.6 }}
             className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-6"
           >
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Why Choose Us?</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Mengapa Memilih Kami?</h3>
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-[#7124a8]">500+</div>

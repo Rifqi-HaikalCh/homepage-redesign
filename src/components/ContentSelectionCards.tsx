@@ -5,17 +5,19 @@ import { useState } from 'react';
 // Animasi yang smooth untuk interactions
 import { motion } from 'framer-motion';
 // Icon set yang konsisten
-import { 
-  Utensils, 
-  Cpu, 
-  Music, 
-  Heart, 
+import {
+  Utensils,
+  Cpu,
+  Music,
+  Heart,
   Shirt,
   Dumbbell,
   Camera,
   BookOpen,
   Palette,
-  Users
+  Users,
+  ChevronRight,
+  ChevronDown
 } from 'lucide-react';
 
 // ======================== TYPE DEFINITIONS ========================
@@ -38,87 +40,119 @@ interface ContentSelectionCardsProps {
 }
 
 // ======================== CONSTANTS ========================
-// Mapping kategori konten dengan detail lengkap
+// Mapping kategori konten dengan detail lengkap - Brand identity colors
 const CONTENT_CATEGORIES: ContentCategory[] = [
   {
     id: 'all',
     name: 'All',
     displayName: 'Semua Kategori',
     icon: Users,
-    gradient: 'from-gray-500 to-gray-600',
+    gradient: 'from-[#7124A8] to-[#8B35B8]',
     description: 'Lihat semua influencer dari berbagai kategori'
   },
   {
     id: 'food',
-    name: 'Food & Travel',
-    displayName: 'Food & Travel',
+    name: 'Food & Beverages',
+    displayName: 'Food & Beverages',
     icon: Utensils,
-    gradient: 'from-orange-500 to-orange-600',
-    description: 'Kuliner dan wisata'
+    gradient: 'from-[#7124A8]/80 to-[#9147C4]/80',
+    description: 'Kuliner dan minuman'
   },
   {
     id: 'tech',
-    name: 'Tech & Gaming',
-    displayName: 'Tech & Gaming',
+    name: 'Technology',
+    displayName: 'Technology',
     icon: Cpu,
-    gradient: 'from-blue-500 to-blue-600',
-    description: 'Teknologi dan gaming'
+    gradient: 'from-[#7124A8]/70 to-[#A165D1]/70',
+    description: 'Teknologi dan inovasi'
   },
   {
     id: 'entertainment',
-    name: 'Music & Entertainment',
+    name: 'Entertainment',
     displayName: 'Entertainment',
     icon: Music,
-    gradient: 'from-purple-500 to-purple-600',
-    description: 'Musik dan hiburan'
+    gradient: 'from-[#8B35B8]/80 to-[#7124A8]/80',
+    description: 'Hiburan dan musik'
   },
   {
-    id: 'lifestyle',
-    name: 'Lifestyle & Fashion',
-    displayName: 'Lifestyle & Fashion',
+    id: 'travel',
+    name: 'Travel & Lifestyle',
+    displayName: 'Travel & Lifestyle',
     icon: Shirt,
-    gradient: 'from-pink-500 to-pink-600',
-    description: 'Gaya hidup dan mode'
+    gradient: 'from-[#9147C4]/70 to-[#7124A8]/70',
+    description: 'Travel dan gaya hidup'
   },
   {
     id: 'health',
-    name: 'Beauty & Health',
-    displayName: 'Beauty & Health',
+    name: 'Health & Sport',
+    displayName: 'Health & Sport',
     icon: Heart,
-    gradient: 'from-red-500 to-red-600',
-    description: 'Kecantikan dan kesehatan'
+    gradient: 'from-[#A165D1]/80 to-[#8B35B8]/80',
+    description: 'Kesehatan dan olahraga'
   },
   {
-    id: 'sports',
-    name: 'Sports & Fitness',
-    displayName: 'Sports & Fitness',
+    id: 'gaming',
+    name: 'Gaming',
+    displayName: 'Gaming',
     icon: Dumbbell,
-    gradient: 'from-green-500 to-green-600',
-    description: 'Olahraga dan kebugaran'
+    gradient: 'from-[#7124A8]/60 to-[#9147C4]/60',
+    description: 'Gaming dan esport'
   },
   {
-    id: 'photo',
-    name: 'Photography',
-    displayName: 'Photography',
+    id: 'creator',
+    name: 'Content Creator',
+    displayName: 'Content Creator',
     icon: Camera,
-    gradient: 'from-indigo-500 to-indigo-600',
-    description: 'Fotografi dan visual'
+    gradient: 'from-[#8B35B8]/70 to-[#A165D1]/70',
+    description: 'Content creator umum'
   },
   {
-    id: 'education',
-    name: 'Education',
-    displayName: 'Education',
-    icon: BookOpen,
-    gradient: 'from-teal-500 to-teal-600',
-    description: 'Edukasi dan pembelajaran'
-  },
-  {
-    id: 'art',
-    name: 'Art & Design',
-    displayName: 'Art & Design',
+    id: 'beauty',
+    name: 'Beauty & Fashion',
+    displayName: 'Beauty & Fashion',
     icon: Palette,
-    gradient: 'from-amber-500 to-amber-600',
-    description: 'Seni dan desain'
+    gradient: 'from-[#9147C4]/80 to-[#7124A8]/80',
+    description: 'Kecantikan dan fashion'
+  },
+  {
+    id: 'youtube',
+    name: 'Youtuber',
+    displayName: 'Youtuber',
+    icon: BookOpen,
+    gradient: 'from-[#A165D1]/70 to-[#7124A8]/70',
+    description: 'Content creator YouTube'
+  },
+  {
+    id: 'dj-singer',
+    name: 'DJ & Penyanyi',
+    displayName: 'DJ & Penyanyi',
+    icon: Music,
+    gradient: 'from-[#7124A8]/75 to-[#8B35B8]/75',
+    description: 'DJ dan penyanyi'
+  },
+  {
+    id: 'tiktok',
+    name: 'Tiktok',
+    displayName: 'Tiktok',
+    icon: Users,
+    gradient: 'from-[#8B35B8]/65 to-[#9147C4]/65',
+    description: 'Content creator TikTok'
+  },
+  {
+    id: 'instagram',
+    name: 'Instagram',
+    displayName: 'Instagram',
+    icon: Camera,
+    gradient: 'from-[#9147C4]/75 to-[#A165D1]/75',
+    description: 'Content creator Instagram'
+  },
+  {
+    id: 'mom-kids',
+    name: 'Mom & Kids',
+    displayName: 'Mom & Kids',
+    icon: Heart,
+    gradient: 'from-[#A165D1]/80 to-[#7124A8]/80',
+    description: 'Konten ibu dan anak'
   }
 ];
 
@@ -149,6 +183,7 @@ const ContentSelectionCards = ({
 
   // ======================== STATE MANAGEMENT ========================
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // ======================== HELPER FUNCTIONS ========================
   /**
@@ -191,10 +226,14 @@ const ContentSelectionCards = ({
     return variant === 'mobile' ? 'text-xs' : 'text-sm';
   };
 
-  // ======================== RENDER ========================
-  const gridCols = variant === 'mobile' ? 'grid-cols-3' : 'grid-cols-5';
-  const gap = variant === 'mobile' ? 'gap-3' : 'gap-4';
+  // ======================== HELPER FUNCTIONS ========================
+  const getCompactCategories = () => {
+    // Tampilkan 6 kategori pertama dalam mode compact
+    return CONTENT_CATEGORIES.slice(0, 6);
+  };
 
+
+  // ======================== RENDER ========================
   return (
     <div className={`${className}`}>
       {/* Header dengan informasi */}
@@ -211,86 +250,205 @@ const ContentSelectionCards = ({
         </p>
       </div>
 
-      {/* Grid kartu kategori */}
-      <div className={`grid ${gridCols} ${gap}`}>
-        {CONTENT_CATEGORIES.map((category, index) => {
-          const IconComponent = category.icon;
-          const isSelected = selectedCategory === category.id;
-          const isHovered = hoveredCard === category.id;
+      {/* Compact Row Layout */}
+      {!isExpanded ? (
+        <div className="space-y-4">
+          {/* Single Row Scrollable Categories */}
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 momentum-scroll"
+               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {getCompactCategories().map((category, index) => {
+              const IconComponent = category.icon;
+              const isSelected = selectedCategory === category.id;
+              const isHovered = hoveredCard === category.id;
 
-          return (
-            <motion.div
-              key={category.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ 
-                delay: index * ANIMATION_CONFIG.STAGGER_DELAY,
-                duration: 0.3 
-              }}
-              whileHover={ANIMATION_CONFIG.CARD_HOVER}
-              whileTap={ANIMATION_CONFIG.CARD_TAP}
-              className={getCardClassName(category, isSelected)}
-              onClick={() => handleCategoryClick(category.id)}
-              onMouseEnter={() => setHoveredCard(category.id)}
-              onMouseLeave={() => setHoveredCard(null)}
-              role="button"
-              tabIndex={0}
-              aria-label={`Pilih kategori ${category.displayName}`}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleCategoryClick(category.id);
-                }
-              }}
-            >
-              {/* Icon dengan animasi */}
-              <motion.div
-                animate={{
-                  scale: isSelected || isHovered ? 1.1 : 1,
-                  rotate: isSelected ? 360 : 0
-                }}
-                transition={{ duration: 0.3 }}
-                className="mb-2 mx-auto"
-              >
-                <IconComponent 
-                  className={`${getIconSize()} mx-auto ${
-                    isSelected ? 'text-white' : 'text-gray-600'
-                  }`} 
-                />
-              </motion.div>
-
-              {/* Label kategori */}
-              <h3 className={`font-semibold ${getTextSize()} mb-1 ${
-                isSelected ? 'text-white' : 'text-gray-900'
-              }`}>
-                {category.displayName}
-              </h3>
-
-              {/* Description untuk desktop */}
-              {variant === 'desktop' && (
-                <p className={`text-xs opacity-80 ${
-                  isSelected ? 'text-white' : 'text-gray-500'
-                }`}>
-                  {category.description}
-                </p>
-              )}
-
-              {/* Selected indicator */}
-              {isSelected && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full shadow-md"
+              return (
+                <motion.button
+                  key={category.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{
+                    delay: index * 0.05,
+                    duration: 0.3
+                  }}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`
+                    flex-shrink-0 px-4 py-3 rounded-2xl flex items-center space-x-3
+                    transition-all duration-200 cursor-pointer touch-manipulation
+                    min-w-max tap-highlight-transparent
+                    ${isSelected
+                      ? `bg-gradient-to-r ${category.gradient} text-white shadow-lg`
+                      : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:shadow-md'
+                    }
+                  `}
+                  onClick={() => handleCategoryClick(category.id)}
+                  onMouseEnter={() => setHoveredCard(category.id)}
+                  onMouseLeave={() => setHoveredCard(null)}
                 >
-                  <div className="w-full h-full bg-green-500 rounded-full flex items-center justify-center">
-                    <div className="w-1 h-1 bg-white rounded-full"></div>
-                  </div>
+                  <motion.div
+                    animate={{
+                      scale: isSelected || isHovered ? 1.1 : 1,
+                      rotate: isSelected ? 360 : 0
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <IconComponent
+                      className={`w-5 h-5 ${
+                        isSelected ? 'text-white' : 'text-gray-600'
+                      }`}
+                    />
+                  </motion.div>
+                  <span className={`font-medium text-sm whitespace-nowrap ${
+                    isSelected ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {category.displayName}
+                  </span>
+                  {isSelected && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="w-2 h-2 bg-white rounded-full"
+                    />
+                  )}
+                </motion.button>
+              );
+            })}
+          </div>
+
+          {/* Show All Button */}
+          <div className="flex justify-center pt-2">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setIsExpanded(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-[#7124A8]/10 hover:bg-[#7124A8]/20
+                         text-[#7124A8] rounded-xl border border-[#7124A8]/20 hover:border-[#7124A8]/40
+                         transition-all duration-200 group touch-manipulation tap-highlight-transparent
+                         min-h-[44px]"
+            >
+              <span className="font-medium text-sm">Tampilkan Semua Kategori</span>
+              <motion.div
+                animate={{ x: 0 }}
+                whileHover={{ x: 4 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronRight className="w-4 h-4 group-hover:text-[#7124A8]" />
+              </motion.div>
+            </motion.button>
+          </div>
+        </div>
+      ) : (
+        /* Expanded Grid Layout */
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="space-y-4"
+        >
+          {/* Grid kartu kategori */}
+          <div className={`grid ${variant === 'mobile' ? 'grid-cols-3' : 'grid-cols-5'} ${variant === 'mobile' ? 'gap-3' : 'gap-4'}`}>
+            {CONTENT_CATEGORIES.map((category, index) => {
+              const IconComponent = category.icon;
+              const isSelected = selectedCategory === category.id;
+              const isHovered = hoveredCard === category.id;
+
+              return (
+                <motion.div
+                  key={category.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    delay: index * ANIMATION_CONFIG.STAGGER_DELAY,
+                    duration: 0.3
+                  }}
+                  whileHover={ANIMATION_CONFIG.CARD_HOVER}
+                  whileTap={ANIMATION_CONFIG.CARD_TAP}
+                  className={`${getCardClassName(category, isSelected)} relative touch-manipulation tap-highlight-transparent`}
+                  onClick={() => handleCategoryClick(category.id)}
+                  onMouseEnter={() => setHoveredCard(category.id)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Pilih kategori ${category.displayName}`}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleCategoryClick(category.id);
+                    }
+                  }}
+                >
+                  {/* Icon dengan animasi */}
+                  <motion.div
+                    animate={{
+                      scale: isSelected || isHovered ? 1.1 : 1,
+                      rotate: isSelected ? 360 : 0
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="mb-2 mx-auto"
+                  >
+                    <IconComponent
+                      className={`${getIconSize()} mx-auto ${
+                        isSelected ? 'text-white' : 'text-gray-600'
+                      }`}
+                    />
+                  </motion.div>
+
+                  {/* Label kategori */}
+                  <h3 className={`font-semibold ${getTextSize()} mb-1 ${
+                    isSelected ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {category.displayName}
+                  </h3>
+
+                  {/* Description untuk desktop */}
+                  {variant === 'desktop' && (
+                    <p className={`text-xs opacity-80 ${
+                      isSelected ? 'text-white' : 'text-gray-500'
+                    }`}>
+                      {category.description}
+                    </p>
+                  )}
+
+                  {/* Selected indicator */}
+                  {isSelected && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full shadow-md"
+                    >
+                      <div className="w-full h-full bg-green-500 rounded-full flex items-center justify-center">
+                        <div className="w-1 h-1 bg-white rounded-full"></div>
+                      </div>
+                    </motion.div>
+                  )}
                 </motion.div>
-              )}
-            </motion.div>
-          );
-        })}
-      </div>
+              );
+            })}
+          </div>
+
+          {/* Collapse Button */}
+          <div className="flex justify-center pt-4">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setIsExpanded(false)}
+              className="flex items-center space-x-2 px-6 py-3 bg-gray-100 hover:bg-gray-200
+                         text-gray-700 rounded-xl border border-gray-200 hover:border-gray-300
+                         transition-all duration-200 group touch-manipulation tap-highlight-transparent
+                         min-h-[44px]"
+            >
+              <span className="font-medium text-sm">Sembunyikan</span>
+              <motion.div
+                animate={{ rotate: 0 }}
+                whileHover={{ rotate: 180 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronDown className="w-4 h-4" />
+              </motion.div>
+            </motion.button>
+          </div>
+        </motion.div>
+      )}
 
       {/* Selected category info */}
       {selectedCategory !== 'all' && (

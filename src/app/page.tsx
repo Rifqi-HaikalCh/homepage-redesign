@@ -10,6 +10,9 @@ import HeroCarousel from '@/components/hero-carousel';
 import ContentSelectionWithFiltering from '@/components/ContentSelectionWithFiltering';
 import RecommendedInfluencer from '@/components/recommended-influencer';
 import RecommendationCards from '@/components/recommendation-cards';
+import ExpandingCardsPackages from '@/components/ExpandingCardsPackages';
+import ClientsSection from '@/components/clients-section';
+import ContactSection from '@/components/contact-section';
 import TestimonialStack from '@/components/testimonial-stack';
 import Footer from '@/components/footer';
 
@@ -44,13 +47,15 @@ const DesktopHomePage = () => {
         
         <main>
           <HeroCarousel />
-          <ContentSelectionWithFiltering 
-            variant="desktop" 
+          <ContentSelectionWithFiltering
+            variant="desktop"
             showInfluencerResults={true}
             maxInfluencersToShow={8}
           />
           <RecommendedInfluencer />
-          <RecommendationCards />
+          <ExpandingCardsPackages />
+          <ClientsSection />
+          <ContactSection />
           <TestimonialStack />
         </main>
         <Footer />

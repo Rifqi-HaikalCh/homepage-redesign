@@ -1,429 +1,294 @@
 'use client';
 
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Check, ArrowRight, Star, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
 import useMobileView from '@/hooks/useMobileView';
-import MobilePackagesPage from '@/components/mobile/MobilePackagesPage';
-
-// Desktop components
-import { useState, useEffect } from 'react';
-import { Search, Filter, ChevronDown, Plus, Edit, Trash2 } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
-import SecondaryHeader from '@/components/secondary-header';
-import Footer from '@/components/footer';
-import { ConfirmDeleteModal } from '@/components/glassmorphism-modal';
-import { PackageFormModal } from '@/components/package-modal';
 
 interface Package {
   id: number;
+  name: string;
   title: string;
-  description: string;
+  subtitle: string;
   price: string;
+  originalPrice?: string;
+  popular?: boolean;
+  features: string[];
+  image: string;
+  color: string;
+  description: string;
 }
 
+const PackagesPage = () => {
+  const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
+  const isMobile = useMobileView();
 
-const categories = ['Semua', 'Endorsement', 'Paid Promote', 'Review', 'Bundle', 'Viral'];
-const priceRanges = ['Semua', '0-2 Juta', '2-5 Juta', '5-10 Juta', '10 Juta+'];
-
-const DesktopPackagesPage = () => {
-  const [packages, setPackages] = useState<Package[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('Semua');
-  const [selectedPriceRange, setSelectedPriceRange] = useState('Semua');
-  
-  // Modal states
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-  const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
-  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isDataLoading, setIsDataLoading] = useState(true);
-
-  // Fetch packages data
-  const fetchPackages = async () => {
-    try {
-      setIsDataLoading(true);
-      const response = await fetch('/api/packages');
-      if (response.ok) {
-        const data = await response.json();
-        setPackages(data);
-      } else {
-        console.error('Failed to fetch packages');
-        setPackages([]);
-      }
-    } catch (error) {
-      console.error('Error fetching packages:', error);
-      setPackages([]);
-    } finally {
-      setIsDataLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchPackages();
-  }, []);
-
-  // CRUD functions
-  const handleAddPackage = () => {
-    setFormMode('add');
-    setSelectedPackage(null);
-    setIsFormModalOpen(true);
-  };
-
-  const handleEditPackage = (pkg: Package) => {
-    setFormMode('edit');
-    setSelectedPackage(pkg);
-    setIsFormModalOpen(true);
-  };
-
-  const handleDeletePackage = (pkg: Package) => {
-    setSelectedPackage(pkg);
-    setIsDeleteModalOpen(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!selectedPackage) return;
-    
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/packages?id=${selectedPackage.id}`, {
-        method: 'DELETE'
-      });
-      
-      if (response.ok) {
-        // Refresh the data
-        await fetchPackages();
-      } else {
-        console.error('Failed to delete package');
-      }
-    } catch (error) {
-      console.error('Error deleting package:', error);
-    }
-    
-    setIsDeleteModalOpen(false);
-    setSelectedPackage(null);
-    setIsLoading(false);
-  };
-
-  const handleSavePackage = async (data: Partial<Package>) => {
-    setIsLoading(true);
-    
-    try {
-      let response;
-      
-      if (formMode === 'add') {
-        response = await fetch('/api/packages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-      } else {
-        response = await fetch('/api/packages', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ ...data, id: selectedPackage?.id })
-        });
-      }
-      
-      if (response.ok) {
-        // Refresh the data
-        await fetchPackages();
-      } else {
-        console.error('Failed to save package');
-      }
-    } catch (error) {
-      console.error('Error saving package:', error);
-    }
-    
-    setIsFormModalOpen(false);
-    setSelectedPackage(null);
-    setIsLoading(false);
-  };
-
-  const parsePrice = (priceStr: string) => {
-    const numStr = priceStr.replace(/[^0-9]/g, '');
-    return parseInt(numStr) || 0;
-  };
-
-  const filterPackages = () => {
-    return packages.filter(pkg => {
-      const matchesSearch = pkg.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           pkg.description.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesCategory = true; // Remove category filtering since it's not in the database
-      
-      let matchesPrice = true;
-      if (selectedPriceRange !== 'Semua') {
-        const price = parsePrice(pkg.price);
-        switch (selectedPriceRange) {
-          case '0-2 Juta':
-            matchesPrice = price <= 2000000;
-            break;
-          case '2-5 Juta':
-            matchesPrice = price > 2000000 && price <= 5000000;
-            break;
-          case '5-10 Juta':
-            matchesPrice = price > 5000000 && price <= 10000000;
-            break;
-          case '10 Juta+':
-            matchesPrice = price > 10000000;
-            break;
-        }
-      }
-      
-      return matchesSearch && matchesCategory && matchesPrice;
-    });
-  };
-
-  const filteredPackages = filterPackages();
-
-  const cardVariants: Variants = {
-    hidden: { 
-      opacity: 0, 
-      y: 30,
-      scale: 0.95
+  const packages: Package[] = [
+    {
+      id: 1,
+      name: "Starter",
+      title: "Starter Package",
+      subtitle: "Paket Pemula untuk UMKM",
+      price: "Rp 2,500,000",
+      originalPrice: "Rp 3,000,000",
+      description: "Paket ideal untuk bisnis kecil yang baru memulai perjalanan influencer marketing",
+      features: [
+        "5 Konten Video Premium",
+        "10 Konten Foto Berkualitas",
+        "Strategi Konten Dasar",
+        "Report Analytics Mingguan",
+        "Support Email 24/7",
+        "Konsultasi Awal Gratis"
+      ],
+      image: "/paket 1.png",
+      color: "from-blue-500 to-blue-600"
     },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
+    {
+      id: 2,
+      name: "Professional",
+      title: "Professional Package",
+      subtitle: "Solusi Lengkap Bisnis Menengah",
+      price: "Rp 5,000,000",
+      originalPrice: "Rp 6,000,000",
+      popular: true,
+      description: "Paket terpopuler untuk bisnis yang ingin meningkatkan reach dan engagement",
+      features: [
+        "15 Konten Video Premium",
+        "25 Konten Foto Berkualitas",
+        "Strategi Konten Lanjutan",
+        "Report Analytics Harian",
+        "Konsultasi 1-on-1 Mingguan",
+        "Brand Guidelines",
+        "Support Priority WhatsApp",
+        "Influencer Collaboration"
+      ],
+      image: "/paket 2.png",
+      color: "from-purple-500 to-purple-600"
+    },
+    {
+      id: 3,
+      name: "Business",
+      title: "Business Package",
+      subtitle: "Paket Enterprise yang Powerful",
+      price: "Rp 8,500,000",
+      originalPrice: "Rp 10,000,000",
+      description: "Solusi komprehensif untuk perusahaan yang ingin mendominasi pasar digital",
+      features: [
+        "25 Konten Video Premium",
+        "40 Konten Foto Berkualitas",
+        "Strategi Konten Expert",
+        "Real-time Analytics Dashboard",
+        "Dedicated Account Manager",
+        "Campaign Management",
+        "Multi-platform Distribution",
+        "Competitor Analysis",
+        "Monthly Strategy Review"
+      ],
+      image: "/paket 3.png",
+      color: "from-green-500 to-green-600"
+    },
+    {
+      id: 4,
+      name: "Premium",
+      title: "Premium Package",
+      subtitle: "Solusi Custom untuk Kebutuhan Khusus",
+      price: "Rp 15,000,000",
+      description: "Paket premium dengan layanan full-service dan personalisasi maksimal",
+      features: [
+        "50+ Konten Video Premium",
+        "100+ Konten Foto Berkualitas",
+        "Custom Content Strategy",
+        "Advanced Analytics Suite",
+        "Dedicated Creative Team",
+        "White-label Solutions",
+        "API Integration",
+        "Custom Reporting",
+        "24/7 Priority Support",
+        "Quarterly Business Review"
+      ],
+      image: "/paket 4.png",
+      color: "from-orange-500 to-red-500"
+    },
+    {
+      id: 5,
+      name: "Enterprise",
+      title: "Enterprise Package",
+      subtitle: "Solusi Khusus Skala Besar",
+      price: "Custom Quote",
+      description: "Solusi enterprise dengan fleksibilitas penuh sesuai kebutuhan korporat",
+      features: [
+        "Unlimited Premium Content",
+        "Custom Development",
+        "Enterprise-grade Security",
+        "Dedicated Development Team",
+        "Global Campaign Support",
+        "Advanced Integration",
+        "Custom Analytics Platform",
+        "Executive Reporting",
+        "SLA Guarantee",
+        "Training & Onboarding"
+      ],
+      image: "/paket 5.png",
+      color: "from-indigo-500 to-purple-600"
     }
-  };
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 transition-all duration-500">
-      <div className="fixed inset-0 bg-gradient-to-br from-white/30 via-transparent to-purple-100/20 dark:from-gray-900/50 dark:via-transparent dark:to-purple-900/10 pointer-events-none" />
-      <div className="fixed inset-0 backdrop-blur-[0.5px] pointer-events-none" />
-      
-      <div className="relative z-10">
-        <SecondaryHeader title="Semua Paket" backUrl="/" />
-        <main className="container mx-auto px-6 py-8">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Package Micro Influencer
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-[#7124A8] to-purple-600 text-white">
+        <div className="container mx-auto px-6 py-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <Link href="/" className="inline-flex items-center text-white/80 hover:text-white mb-6 text-sm">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Kembali ke Beranda
+            </Link>
+            <h1 className={`font-bold mb-4 ${isMobile ? 'text-3xl' : 'text-5xl'}`}>
+              Paket Influencer Marketing
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              Paket kolaborasi dengan micro influencer terpilih untuk meningkatkan brand awareness
+            <p className={`text-white/90 max-w-3xl mx-auto ${isMobile ? 'text-lg' : 'text-xl'}`}>
+              Pilih paket yang tepat untuk mengembangkan bisnis Anda dengan strategi
+              influencer marketing yang terbukti efektif
             </p>
-          </div>
-
-          <div className="flex flex-col md:flex-row gap-4 mb-8">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
-              <Input
-                className="pl-10 pr-4 py-3 w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm focus:bg-white dark:focus:bg-gray-800 focus:border-[#7124A8]/50 transition-all duration-300 text-gray-900 dark:text-gray-100"
-                placeholder="Cari paket berdasarkan nama atau deskripsi..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-
-            <div className="relative">
-              <Button
-                variant="outline"
-                onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:bg-white dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-              >
-                <Filter className="w-4 h-4" />
-                Filter
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`} />
-              </Button>
-
-              <AnimatePresence>
-                {isFilterOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute top-full mt-2 right-0 w-80 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-4 z-50"
-                  >
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Kategori
-                        </label>
-                        <select
-                          value={selectedCategory}
-                          onChange={(e) => setSelectedCategory(e.target.value)}
-                          className="w-full p-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                        >
-                          {categories.map(category => (
-                            <option key={category} value={category}>{category}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Rentang Harga
-                        </label>
-                        <select
-                          value={selectedPriceRange}
-                          onChange={(e) => setSelectedPriceRange(e.target.value)}
-                          className="w-full p-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                        >
-                          {priceRanges.map(range => (
-                            <option key={range} value={range}>{range}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center mb-6">
-            <p className="text-gray-600 dark:text-gray-400">
-              Menampilkan {filteredPackages.length} dari {packages.length} paket
-            </p>
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Button
-                onClick={handleAddPackage}
-                className="bg-[#7124A8] hover:bg-[#5a1d87] text-white flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Tambah Paket
-              </Button>
-            </motion.div>
-          </div>
-
-          {isDataLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="animate-pulse">
-                  <div className="h-72 bg-gray-200 dark:bg-gray-700 rounded-3xl"></div>
-                </div>
-              ))}
-            </div>
-          ) : filteredPackages.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-xl mx-auto mb-4 flex items-center justify-center">
-                <span className="text-gray-400 dark:text-gray-500 text-2xl">📦</span>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Tidak Ada Paket
-              </h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">
-                Belum ada paket yang tersedia atau sesuai dengan filter yang dipilih
-              </p>
-            </div>
-          ) : (
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              initial="hidden"
-              animate="visible"
-              variants={{
-                visible: {
-                  transition: {
-                    staggerChildren: 0.1
-                  }
-                }
-              }}
-            >
-              {filteredPackages.map((pkg) => (
-              <motion.div
-                key={pkg.id}
-                variants={cardVariants}
-                whileHover={{ 
-                  y: -8,
-                  transition: { duration: 0.3 }
-                }}
-                className="group"
-              >
-                <Card className="overflow-hidden bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl shadow-2xl border border-white/30 dark:border-gray-700/30 rounded-3xl hover:shadow-2xl transition-shadow duration-300">
-                  <CardContent className="p-6">
-                    <div className="text-center mb-6">
-                      <div className="text-4xl mb-4">📦</div>
-                      <div className="bg-[#7124A8]/10 dark:bg-[#7124A8]/20 text-[#7124A8] px-4 py-2 rounded-full text-lg font-bold mb-4">
-                        {pkg.price}
-                      </div>
-                    </div>
-                    
-                    <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-3 text-center group-hover:text-[#7124A8] transition-colors duration-300">
-                      {pkg.title}
-                    </h3>
-                    
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 text-center line-clamp-2">
-                      {pkg.description}
-                    </p>
-
-                    <div className="flex gap-2">
-                      <Button 
-                        className="flex-1 bg-[#7124A8] hover:bg-[#5a1d87] text-white transition-colors duration-300"
-                        size="sm"
-                      >
-                        Pilih Paket
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEditPackage(pkg)}
-                        className="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                      >
-                        <Edit className="w-4 h-4 text-blue-600" />
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDeletePackage(pkg)}
-                        className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-              ))}
-            </motion.div>
-          )}
-        </main>
-        <Footer />
+          </motion.div>
+        </div>
       </div>
-      
-      {/* Modals */}
-      <ConfirmDeleteModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={confirmDelete}
-        itemName={selectedPackage?.title || ''}
-        isLoading={isLoading}
-      />
-      
-      <PackageFormModal
-        isOpen={isFormModalOpen}
-        onClose={() => setIsFormModalOpen(false)}
-        onSave={handleSavePackage}
-        initialData={selectedPackage || {}}
-        isLoading={isLoading}
-        mode={formMode}
-      />
+
+      {/* Packages Grid */}
+      <div className="container mx-auto px-6 py-20">
+        <div className={`grid gap-8 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
+          {packages.map((pkg, index) => (
+            <motion.div
+              key={pkg.id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              className={`relative bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border-2 transition-all duration-300 ${
+                selectedPackage === pkg.id
+                  ? 'border-[#7124A8] scale-105'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+              }`}
+            >
+              {/* Popular Badge */}
+              {pkg.popular && (
+                <div className="absolute top-0 right-0 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-bl-2xl font-bold text-sm flex items-center z-10">
+                  <Star className="w-4 h-4 mr-1" />
+                  Most Popular
+                </div>
+              )}
+
+              {/* Image */}
+              <div className="relative h-48 overflow-hidden">
+                <Image
+                  src={pkg.image}
+                  alt={pkg.title}
+                  fill
+                  className="object-cover"
+                />
+                <div className={`absolute inset-0 bg-gradient-to-t ${pkg.color} opacity-80`}></div>
+                <div className="absolute inset-0 bg-black/30"></div>
+
+                <div className="absolute top-4 left-4">
+                  <h3 className="text-2xl font-bold text-white mb-1">{pkg.name}</h3>
+                  <p className="text-white/90">{pkg.subtitle}</p>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <div className="text-3xl font-bold text-gray-900 dark:text-white">
+                      {pkg.price}
+                    </div>
+                    {pkg.originalPrice && (
+                      <div className="text-sm text-gray-500 line-through">
+                        {pkg.originalPrice}
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">per bulan</div>
+                  </div>
+                </div>
+
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
+                  {pkg.description}
+                </p>
+
+                {/* Features */}
+                <div className="space-y-3 mb-6">
+                  {pkg.features.slice(0, selectedPackage === pkg.id ? pkg.features.length : 4).map((feature, idx) => (
+                    <div key={idx} className="flex items-center space-x-3">
+                      <div className="w-5 h-5 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
+                      </div>
+                      <span className="text-gray-700 dark:text-gray-300 text-sm">{feature}</span>
+                    </div>
+                  ))}
+                  {pkg.features.length > 4 && selectedPackage !== pkg.id && (
+                    <button
+                      onClick={() => setSelectedPackage(pkg.id)}
+                      className="text-[#7124A8] text-sm font-medium hover:underline ml-8"
+                    >
+                      +{pkg.features.length - 4} fitur lainnya
+                    </button>
+                  )}
+                </div>
+
+                {/* CTA Button */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`w-full font-semibold py-4 rounded-xl flex items-center justify-center space-x-2 transition-all ${
+                    pkg.popular
+                      ? 'bg-gradient-to-r from-[#7124A8] to-purple-600 text-white shadow-lg'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  <span>Pilih {pkg.name}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </motion.button>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom CTA */}
+      <div className="bg-gray-100 dark:bg-gray-800 py-16">
+        <div className="container mx-auto px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className={`font-bold text-gray-900 dark:text-white mb-4 ${isMobile ? 'text-2xl' : 'text-3xl'}`}>
+              Tidak Yakin Paket Mana yang Tepat?
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+              Konsultasikan kebutuhan bisnis Anda dengan tim ahli kami.
+              Dapatkan rekomendasi paket yang paling sesuai secara gratis.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-r from-[#7124A8] to-purple-600 text-white px-8 py-4 rounded-xl font-semibold flex items-center space-x-2 mx-auto shadow-lg"
+            >
+              <span>Konsultasi Gratis</span>
+              <ArrowRight className="w-5 h-5" />
+            </motion.button>
+          </motion.div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default function PackagesPage() {
-  const isMobile = useMobileView();
-
-  if (isMobile) {
-    return <MobilePackagesPage />;
-  }
-
-  return <DesktopPackagesPage />;
-}
+export default PackagesPage;
