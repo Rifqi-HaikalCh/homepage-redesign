@@ -11,16 +11,7 @@ export default function Footer() {
   ];
 
   const footerSections = [
-    {
-      title: 'Courses',
-      links: [
-        { name: 'Web Development', href: '#' },
-        { name: 'UI/UX Design', href: '#' },
-        { name: 'Data Science', href: '#' },
-        { name: 'Digital Marketing', href: '#' }
-      ]
-    },
-    {
+       {
       title: 'Company',
       links: [
         { name: 'About Us', href: '#' },
@@ -54,7 +45,7 @@ export default function Footer() {
             >
               <h3 className="text-2xl font-bold text-[#7124A8] mb-4">BrandLogo</h3>
               <p className="text-gray-400 mb-6 leading-relaxed">
-                Dapur Buzzer Indonesia - Platform pembelajaran online terdepan yang menyediakan kursus berkualitas tinggi untuk mengembangkan karir Anda di era digital.
+                Dapur Buzzer Indonesia - Platform Agensi Digital yang menghubungkan antara brand dan influencer.
               </p>
               
               {/* Contact Info */}
