@@ -17,6 +17,7 @@ import Lottie from 'lottie-react';
 import contactData from '../../../public/contact.json';
 // Import Mobile Expanding Cards
 import MobileExpandingCards from './MobileExpandingCards';
+import MobileTestimonialStack from './MobileTestimonialStack';
 
 // ======================== CONSTANTS ========================
 // Konfigurasi untuk komponen - mudah diubah tanpa touching logic
@@ -164,38 +165,6 @@ const MobileHomePage = () => {
       subtitle: "Bergabunglah dengan ribuan klien yang puas",
       image: "/Slide 5.png",
       cta: "Lihat Testimoni"
-    }
-  ];
-
-  // Data paket layanan - hardcoded untuk performa yang lebih cepat
-  // TODO: Bisa direfactor untuk fetch dari API jika diperlukan update dinamis
-  const quickPreviewPackages: PackageItem[] = [
-    {
-      id: 1,
-      title: "Starter Package",
-      description: "Perfect for small businesses",
-      price: "$99",
-      icon: "🚀",
-      category: "Basic",
-      features: ["5 Connections", "Basic Analytics"]
-    },
-    {
-      id: 2,
-      title: "Professional Package",
-      description: "Advanced tools for agencies",
-      price: "$299",
-      icon: "⭐",
-      category: "Professional",
-      features: ["20 Connections", "Advanced Analytics"]
-    },
-    {
-      id: 3,
-      title: "Enterprise Package",
-      description: "Full-scale solution",
-      price: "$599",
-      icon: "👑",
-      category: "Enterprise",
-      features: ["Unlimited Connections", "Full Analytics"]
     }
   ];
 
@@ -459,29 +428,27 @@ const MobileHomePage = () => {
 
             <div className="grid grid-cols-2 gap-3 mb-4">
               {[
-                { name: 'DANA', logo: '💰', color: 'from-blue-500 to-blue-600' },
-                { name: 'Shopee', logo: '🛍️', color: 'from-orange-500 to-red-500' },
-                { name: 'Gojek', logo: '🏍️', color: 'from-green-500 to-green-600' },
-                { name: 'MS Glow', logo: '✨', color: 'from-pink-500 to-rose-500' }
+                { name: 'DANA', logo: '/Dana logo.png' },
+                { name: 'Gojek', logo: '/gojek-logo.png' },
+                { name: 'MS Glow', logo: '/ms-glow.png' },
+                { name: 'Shopee', logo: '/Shopee-Logo.png' }
               ].map((client, index) => (
                 <motion.div
                   key={client.name}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1, duration: 0.4 }}
-                  className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center"
+                  className="bg-white flex justify-center items-center p-4 h-20 rounded-xl shadow-sm border border-gray-100"
                 >
-                  <div className={`w-12 h-12 mx-auto mb-2 rounded-xl bg-gradient-to-r ${client.color} flex items-center justify-center text-xl`}>
-                    {client.logo}
-                  </div>
-                  <h3 className="font-semibold text-gray-900 text-sm">{client.name}</h3>
+                  <Image
+                    src={client.logo}
+                    alt={client.name}
+                    width={100}
+                    height={40}
+                    className="object-contain"
+                  />
                 </motion.div>
               ))}
-            </div>
-
-            <div className="bg-gradient-to-r from-[#7124a8] to-[#7124a8] rounded-xl p-4 text-center text-white">
-              <h3 className="font-bold text-lg mb-2">500+ Brand Partners</h3>
-              <p className="text-white/90 text-sm">Dipercaya oleh brand-brand terkemuka Indonesia</p>
             </div>
           </motion.div>
         </section>
@@ -522,32 +489,8 @@ const MobileHomePage = () => {
             </div>
           </motion.div>
         </section>
-
-        {/* Testimonials or Recommendations Section */}
-        <section className="px-4 pb-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-6"
-          >
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Mengapa Memilih Kami?</h3>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#7124a8]">500+</div>
-                <div className="text-gray-600 text-xs">Influencers</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#7124a8]">10M+</div>
-                <div className="text-gray-600 text-xs">Reach</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#7124a8]">98%</div>
-                <div className="text-gray-600 text-xs">Success Rate</div>
-              </div>
-            </div>
-          </motion.div>
-        </section>
+        {/* Testimonial Section */}
+        <MobileTestimonialStack />
       </div>
     </MobileLayout>
   );

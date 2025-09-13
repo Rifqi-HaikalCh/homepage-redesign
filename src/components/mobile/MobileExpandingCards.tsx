@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image'; // Import komponen Image
 
 const MobileExpandingCards = () => {
   const [activePanel, setActivePanel] = useState(0);
@@ -65,15 +66,24 @@ const MobileExpandingCards = () => {
                 ${activePanel === index ? 'flex-[3]' : 'flex-[0.5]'}
               `}
               style={{
-                backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.7)), url(${pkg.image})`,
                 borderRadius: activePanel === index ? '16px' : '12px'
               }}
               onClick={() => handlePanelClick(index)}
             >
+              {/* Menggunakan komponen Image sebagai background */}
+              <Image
+                src={pkg.image}
+                alt={pkg.title}
+                layout="fill"
+                objectFit="cover"
+                className="z-0"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
+
               {/* Content */}
               <div
                 className={`
-                  absolute bottom-4 left-4 transition-opacity duration-300
+                  absolute bottom-4 left-4 transition-opacity duration-300 z-20
                   ${activePanel === index
                     ? 'opacity-100 transition-delay-[0.4s]'
                     : 'opacity-0'
@@ -91,7 +101,7 @@ const MobileExpandingCards = () => {
               {/* Panel Number for inactive panels */}
               <div
                 className={`
-                  absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                  absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20
                   transition-opacity duration-300
                   ${activePanel === index ? 'opacity-0' : 'opacity-100'}
                 `}

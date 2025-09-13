@@ -42,71 +42,23 @@ export default function RecommendedInfluencer() {
   const [isAutoRotating, setIsAutoRotating] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fallback sample data
-  const sampleInfluencers: Influencer[] = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      content_type: "Lifestyle & Fashion",
-      instagram_handle: "sarahjohnson",
-      instagram_followers: "85.2K",
-      instagram_engagement_rate: "6.8%",
-      instagram_avg_likes: "5.8K",
-      instagram_avg_comments: "234",
-      city: "Jakarta",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=400&h=400&fit=crop",
-      created_at: "",
-      updated_at: ""
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      content_type: "Tech & Gaming",
-      instagram_handle: "michaelchen",
-      instagram_followers: "120.5K",
-      instagram_engagement_rate: "5.4%",
-      instagram_avg_likes: "6.5K",
-      instagram_avg_comments: "189",
-      city: "Bandung",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-      created_at: "",
-      updated_at: ""
-    },
-    {
-      id: 3,
-      name: "Jessica Lee",
-      content_type: "Food & Travel",
-      instagram_handle: "jessicalee",
-      instagram_followers: "95.8K",
-      instagram_engagement_rate: "7.2%",
-      instagram_avg_likes: "6.9K",
-      instagram_avg_comments: "312",
-      city: "Bali",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
-      created_at: "",
-      updated_at: ""
-    }
-  ];
-
-  // Utility function to convert follower string to number for sorting
+  // Fungsi untuk mengubah string followers (e.g., "85.2K") menjadi angka
   const parseFollowerCount = (followerStr: string): number => {
     if (!followerStr) return 0;
     
-    const numStr = followerStr.toLowerCase().replace(/[^0-9.kmb]/g, '');
+    const numStr = followerStr.toLowerCase().replace(/[^0-9.]/g, '');
     const num = parseFloat(numStr);
     
     if (followerStr.toLowerCase().includes('m')) {
       return num * 1000000;
     } else if (followerStr.toLowerCase().includes('k')) {
       return num * 1000;
-    } else if (followerStr.toLowerCase().includes('b')) {
-      return num * 1000000000;
     }
     
     return num || 0;
   };
 
-  // Fetch influencers from API with fallback
+  // Fetch, urutkan, dan ambil 3 influencer teratas
   useEffect(() => {
     const fetchInfluencers = async () => {
       try {
@@ -114,22 +66,16 @@ export default function RecommendedInfluencer() {
         if (response.ok) {
           const data = await response.json();
           if (data && data.length > 0) {
-            // Sort by followers (highest first) and get top 3
+            // Urutkan influencer berdasarkan jumlah followers dari terbanyak ke terkecil
             const sortedData = data.sort((a: Influencer, b: Influencer) => 
               parseFollowerCount(b.instagram_followers) - parseFollowerCount(a.instagram_followers)
             );
+            // Ambil 3 influencer teratas
             setInfluencersData(sortedData.slice(0, 3));
-          } else {
-            // Use sample data if no data in database
-            setInfluencersData(sampleInfluencers);
           }
-        } else {
-          console.warn('API returned error, using sample data');
-          setInfluencersData(sampleInfluencers);
         }
       } catch (error) {
-        console.error('Error fetching influencers, using sample data:', error);
-        setInfluencersData(sampleInfluencers);
+        console.error('Error fetching influencers:', error);
       } finally {
         setIsLoading(false);
       }
@@ -146,21 +92,21 @@ export default function RecommendedInfluencer() {
     setCurrentIndex(prev => (prev - 1 + influencersData.length) % influencersData.length);
   };
   
-  // EFEK UNTUK OTOMATISASI
+  // Efek untuk rotasi otomatis
   useEffect(() => {
-    if (!isAutoRotating) return;
+    if (!isAutoRotating || influencersData.length === 0) return;
 
     const interval = setInterval(() => {
       nextInfluencer();
     }, 5000); // Bergerak setiap 5 detik
 
-    return () => clearInterval(interval); // Membersihkan interval saat komponen dibongkar
-  }, [isAutoRotating, currentIndex]);
+    return () => clearInterval(interval);
+  }, [isAutoRotating, currentIndex, influencersData.length]);
 
 
   const activeInfluencer = influencersData[currentIndex];
   
-  // Show loading or empty state
+  // Tampilan Loading
   if (isLoading) {
     return (
       <section className="py-16 bg-gray-50 dark:bg-gray-800">
