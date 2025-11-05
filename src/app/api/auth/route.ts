@@ -1,4 +1,4 @@
-import { supabase, signUp, signIn } from '@/lib/supabase';
+import { supabase, signUp, signIn, getUserRole } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
 
 // Register new user
@@ -80,11 +80,14 @@ export async function PUT(request: Request) {
 
     const result = await signIn(email, password);
 
+    // Get user role separately
+    const role = await getUserRole(result.user.id);
+
     return NextResponse.json({
       message: 'Login berhasil',
       session: result.session,
       user: result.user,
-      role: result.role
+      role: role
     });
 
   } catch (error: unknown) {
