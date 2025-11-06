@@ -11,8 +11,8 @@ interface CacheEntry<T> {
 }
 
 class APICache {
-  private cache: Map<string, CacheEntry<any>> = new Map();
-  private pendingRequests: Map<string, Promise<any>> = new Map();
+  private cache: Map<string, CacheEntry<unknown>> = new Map();
+  private pendingRequests: Map<string, Promise<unknown>> = new Map();
   private readonly CACHE_DURATION = 30 * 1000; // 30 seconds
 
   /**
@@ -26,14 +26,14 @@ class APICache {
     const cachedEntry = this.cache.get(cacheKey);
     if (cachedEntry && this.isFresh(cachedEntry.timestamp)) {
       console.log(`📦 Cache HIT: ${url}`);
-      return cachedEntry.data;
+      return cachedEntry.data as T;
     }
 
     // Check if there's already a pending request for this URL
     const pendingRequest = this.pendingRequests.get(cacheKey);
     if (pendingRequest) {
       console.log(`⏳ Reusing pending request: ${url}`);
-      return pendingRequest;
+      return pendingRequest as Promise<T>;
     }
 
     // Create new request
@@ -114,7 +114,7 @@ export const apiCache = new APICache();
  * Cached fetch function - drop-in replacement for fetch()
  * Usage: const data = await cachedFetch<Influencer[]>('/api/influencers')
  */
-export async function cachedFetch<T = any>(
+export async function cachedFetch<T = unknown>(
   url: string,
   init?: RequestInit
 ): Promise<T> {

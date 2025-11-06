@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Instagram, MapPin, Users, TrendingUp, X, Send, Calendar, MessageCircle, Mail, Phone } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Instagram, MapPin, Users, TrendingUp, X, Send, Calendar, Mail, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -48,18 +48,11 @@ export default function RecommendedInfluencer() {
 
   // Modal states
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [showContactModal, setShowContactModal] = useState(false);
   const [bookingFormData, setBookingFormData] = useState({
     name: '',
     email: '',
     phone: '',
     date: '',
-    message: ''
-  });
-  const [contactFormData, setContactFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
     message: ''
   });
 
@@ -125,30 +118,16 @@ export default function RecommendedInfluencer() {
     setShowBookingModal(false);
   };
 
-  // Handler for contact modal
-  const handleContact = () => {
-    setShowContactModal(true);
-  };
-
-  const handleContactSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Contact submitted:', contactFormData);
-    // TODO: Send to API
-    alert(`Message sent to ${activeInfluencer?.name}!\n\nThey'll respond to ${contactFormData.email} soon.`);
-    setContactFormData({ name: '', email: '', phone: '', message: '' });
-    setShowContactModal(false);
-  };
-
   // Efek untuk rotasi otomatis
   useEffect(() => {
     if (!isAutoRotating || influencersData.length === 0) return;
 
     const interval = setInterval(() => {
-      nextInfluencer();
+      setCurrentIndex(prev => (prev + 1) % influencersData.length);
     }, 5000); // Bergerak setiap 5 detik
 
     return () => clearInterval(interval);
-  }, [isAutoRotating, currentIndex, influencersData.length]);
+  }, [isAutoRotating, influencersData.length]);
 
 
   const activeInfluencer = influencersData[currentIndex];
@@ -533,125 +512,6 @@ export default function RecommendedInfluencer() {
                   >
                     <Send className="w-4 h-4 mr-2" />
                     Send Booking Request
-                  </Button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Contact Modal */}
-      <AnimatePresence>
-        {showContactModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-            onClick={() => setShowContactModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", duration: 0.5 }}
-              className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Contact {activeInfluencer?.name}
-                </h3>
-                <button
-                  onClick={() => setShowContactModal(false)}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-
-              <form onSubmit={handleContactSubmit} className="p-6 space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Your Name
-                  </label>
-                  <Input
-                    type="text"
-                    required
-                    value={contactFormData.name}
-                    onChange={(e) => setContactFormData({ ...contactFormData, name: e.target.value })}
-                    placeholder="Enter your name"
-                    className="w-full"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <Input
-                      type="email"
-                      required
-                      value={contactFormData.email}
-                      onChange={(e) => setContactFormData({ ...contactFormData, email: e.target.value })}
-                      placeholder="your@email.com"
-                      className="w-full pl-10"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Phone Number
-                  </label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <Input
-                      type="tel"
-                      required
-                      value={contactFormData.phone}
-                      onChange={(e) => setContactFormData({ ...contactFormData, phone: e.target.value })}
-                      placeholder="+62 xxx xxxx xxxx"
-                      className="w-full pl-10"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Message
-                  </label>
-                  <div className="relative">
-                    <MessageCircle className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                    <Textarea
-                      required
-                      value={contactFormData.message}
-                      onChange={(e) => setContactFormData({ ...contactFormData, message: e.target.value })}
-                      placeholder="What would you like to discuss with this influencer?"
-                      rows={5}
-                      className="w-full resize-none pl-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowContactModal(false)}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="flex-1 bg-[#7124A8] hover:bg-[#5a1d87] text-white"
-                  >
-                    <Send className="w-4 h-4 mr-2" />
-                    Send Message
                   </Button>
                 </div>
               </form>
