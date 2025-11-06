@@ -8,6 +8,7 @@ import { useTheme } from '@/components/theme-provider';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -56,11 +57,13 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <img
+              <Image
                 src="/dapur-buzzer-logo.png"
                 alt="Dapur Buzzer Logo"
-                className="h-10 object-contain"
-                style={{ width: "auto" }}
+                width={120}
+                height={40}
+                className="h-10 w-auto object-contain"
+                priority
               />
             </Link>
           </div>

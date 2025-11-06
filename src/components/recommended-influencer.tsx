@@ -2,10 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Instagram, MapPin, Users, TrendingUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Instagram, MapPin, Users, TrendingUp, X, Send, Calendar, MessageCircle, Mail, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import Link from 'next/link';
+import Image from 'next/image';
+import { cachedFetch } from '@/lib/apiCache';
 
 
 interface Influencer {
@@ -42,6 +46,23 @@ export default function RecommendedInfluencer() {
   const [isAutoRotating, setIsAutoRotating] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Modal states
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [bookingFormData, setBookingFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    date: '',
+    message: ''
+  });
+  const [contactFormData, setContactFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
+
   // Fungsi untuk mengubah string followers (e.g., "85.2K") menjadi angka
   const parseFollowerCount = (followerStr: string): number => {
     if (!followerStr) return 0;
@@ -58,21 +79,19 @@ export default function RecommendedInfluencer() {
     return num || 0;
   };
 
-  // Fetch, urutkan, dan ambil 3 influencer teratas
+  // Fetch, urutkan, dan ambil 3 influencer teratas with caching
   useEffect(() => {
     const fetchInfluencers = async () => {
       try {
-        const response = await fetch('/api/influencers');
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.length > 0) {
-            // Urutkan influencer berdasarkan jumlah followers dari terbanyak ke terkecil
-            const sortedData = data.sort((a: Influencer, b: Influencer) => 
-              parseFollowerCount(b.instagram_followers) - parseFollowerCount(a.instagram_followers)
-            );
-            // Ambil 3 influencer teratas
-            setInfluencersData(sortedData.slice(0, 3));
-          }
+        // Use cachedFetch to prevent duplicate API calls
+        const data = await cachedFetch<Influencer[]>('/api/influencers');
+        if (data && data.length > 0) {
+          // Urutkan influencer berdasarkan jumlah followers dari terbanyak ke terkecil
+          const sortedData = data.sort((a: Influencer, b: Influencer) =>
+            parseFollowerCount(b.instagram_followers) - parseFollowerCount(a.instagram_followers)
+          );
+          // Ambil 3 influencer teratas
+          setInfluencersData(sortedData.slice(0, 3));
         }
       } catch (error) {
         console.error('Error fetching influencers:', error);
@@ -91,7 +110,35 @@ export default function RecommendedInfluencer() {
   const prevInfluencer = () => {
     setCurrentIndex(prev => (prev - 1 + influencersData.length) % influencersData.length);
   };
-  
+
+  // Handler for booking modal
+  const handleBookNow = () => {
+    setShowBookingModal(true);
+  };
+
+  const handleBookingSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Booking submitted:', bookingFormData);
+    // TODO: Send to API
+    alert(`Booking request sent for ${activeInfluencer?.name}!\n\nWe'll contact you at ${bookingFormData.email} soon.`);
+    setBookingFormData({ name: '', email: '', phone: '', date: '', message: '' });
+    setShowBookingModal(false);
+  };
+
+  // Handler for contact modal
+  const handleContact = () => {
+    setShowContactModal(true);
+  };
+
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Contact submitted:', contactFormData);
+    // TODO: Send to API
+    alert(`Message sent to ${activeInfluencer?.name}!\n\nThey'll respond to ${contactFormData.email} soon.`);
+    setContactFormData({ name: '', email: '', phone: '', message: '' });
+    setShowContactModal(false);
+  };
+
   // Efek untuk rotasi otomatis
   useEffect(() => {
     if (!isAutoRotating || influencersData.length === 0) return;
@@ -150,15 +197,74 @@ export default function RecommendedInfluencer() {
       position = offset + totalItems;
     }
 
+    // Improved stack animation with depth effect
     switch (position) {
       case 0:
-        return { x: 80, scale: 1.2, zIndex: 3, opacity: 1 };
+        // Active card - center front
+        return {
+          x: 0,
+          y: 0,
+          scale: 1.15,
+          zIndex: 30,
+          opacity: 1,
+          rotateY: 0,
+          rotateZ: 0
+        };
       case -1:
-        return { x: -120, scale: 1, zIndex: 2, opacity: 0.8 };
+        // Behind left
+        return {
+          x: -180,
+          y: 10,
+          scale: 0.95,
+          zIndex: 20,
+          opacity: 0.85,
+          rotateY: 15,
+          rotateZ: -3
+        };
+      case 1:
+        // Behind right
+        return {
+          x: 180,
+          y: 10,
+          scale: 0.95,
+          zIndex: 20,
+          opacity: 0.85,
+          rotateY: -15,
+          rotateZ: 3
+        };
       case -2:
-        return { x: -280, scale: 0.8, zIndex: 1, opacity: 0.5 };
+        // Far behind left
+        return {
+          x: -280,
+          y: 20,
+          scale: 0.8,
+          zIndex: 10,
+          opacity: 0.5,
+          rotateY: 25,
+          rotateZ: -5
+        };
+      case 2:
+        // Far behind right
+        return {
+          x: 280,
+          y: 20,
+          scale: 0.8,
+          zIndex: 10,
+          opacity: 0.5,
+          rotateY: -25,
+          rotateZ: 5
+        };
       default:
-        return { x: position < 0 ? -320 : 320, scale: 0.5, zIndex: 0, opacity: 0 };
+        // Hidden cards
+        return {
+          x: position < 0 ? -350 : 350,
+          y: 30,
+          scale: 0.6,
+          zIndex: 0,
+          opacity: 0,
+          rotateY: position < 0 ? 30 : -30,
+          rotateZ: 0
+        };
     }
   };
 
@@ -187,23 +293,37 @@ export default function RecommendedInfluencer() {
           onMouseEnter={() => setIsAutoRotating(false)}
           onMouseLeave={() => setIsAutoRotating(true)}
         >
-          <div className="w-2/3 h-full flex justify-end items-center" style={{ perspective: '1500px' }}>
+          <div className="w-2/3 h-full flex justify-end items-center" style={{ perspective: '2000px' }}>
             <div className="relative w-[500px] h-80" style={{ transformStyle: 'preserve-3d' }}>
               {influencersData.map((influencer, index) => (
                 <motion.div
                   key={influencer.id}
                   className="absolute w-48 h-72 cursor-pointer"
-                  style={{ top: '50%', left: '50%', marginTop: '-144px', marginLeft: '-96px' }}
+                  style={{
+                    top: '50%',
+                    left: '50%',
+                    marginTop: '-144px',
+                    marginLeft: '-96px',
+                    transformStyle: 'preserve-3d'
+                  }}
                   initial={false}
                   animate={getInfluencerStyle(index)}
-                  transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+                  transition={{
+                    duration: 0.7,
+                    ease: [0.34, 1.56, 0.64, 1], // Elastic ease for smoother feel
+                    opacity: { duration: 0.4 }
+                  }}
                   onClick={() => setCurrentIndex(index)}
                 >
                   <div className="w-full h-full rounded-2xl overflow-hidden border-4 border-white dark:border-gray-700 shadow-xl relative group">
-                    <img
-                      src={influencer?.avatar}
-                      alt={influencer?.name}
-                      className="w-full h-full object-cover"
+                    <Image
+                      src={influencer?.avatar || '/placeholder-avatar.png'}
+                      alt={influencer?.name || 'Influencer'}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 192px"
+                      loading="lazy"
+                      quality={75}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
@@ -235,7 +355,7 @@ export default function RecommendedInfluencer() {
                     <div className="space-y-4 mb-8 text-sm">
                       <div className="flex items-center text-gray-600 dark:text-gray-300">
                         <Instagram className="w-4 h-4 mr-3 text-[#7124A8]" />
-                        <span className="font-medium">@{activeInfluencer?.instagram_handle}</span>
+                        <span className="font-medium">{activeInfluencer?.instagram_handle}</span>
                       </div>
                       <div className="flex items-center text-gray-600 dark:text-gray-300">
                         <Users className="w-4 h-4 mr-3 text-[#7124A8]" />
@@ -256,7 +376,13 @@ export default function RecommendedInfluencer() {
                             View Profile
                           </Button>
                        </Link>
-                       <Button variant="outline" className="w-full">Book Now</Button>
+                       <Button
+                         variant="outline"
+                         className="w-full"
+                         onClick={handleBookNow}
+                       >
+                         Book Now
+                       </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -283,6 +409,256 @@ export default function RecommendedInfluencer() {
           </Button>
         </div>
       </div>
+
+      {/* Booking Modal */}
+      <AnimatePresence>
+        {showBookingModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowBookingModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Book {activeInfluencer?.name}
+                </h3>
+                <button
+                  onClick={() => setShowBookingModal(false)}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              <form onSubmit={handleBookingSubmit} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Your Name
+                  </label>
+                  <Input
+                    type="text"
+                    required
+                    value={bookingFormData.name}
+                    onChange={(e) => setBookingFormData({ ...bookingFormData, name: e.target.value })}
+                    placeholder="Enter your name"
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Input
+                      type="email"
+                      required
+                      value={bookingFormData.email}
+                      onChange={(e) => setBookingFormData({ ...bookingFormData, email: e.target.value })}
+                      placeholder="your@email.com"
+                      className="w-full pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Input
+                      type="tel"
+                      required
+                      value={bookingFormData.phone}
+                      onChange={(e) => setBookingFormData({ ...bookingFormData, phone: e.target.value })}
+                      placeholder="+62 xxx xxxx xxxx"
+                      className="w-full pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Preferred Date
+                  </label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Input
+                      type="date"
+                      required
+                      value={bookingFormData.date}
+                      onChange={(e) => setBookingFormData({ ...bookingFormData, date: e.target.value })}
+                      className="w-full pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Message
+                  </label>
+                  <Textarea
+                    value={bookingFormData.message}
+                    onChange={(e) => setBookingFormData({ ...bookingFormData, message: e.target.value })}
+                    placeholder="Tell us about your project or campaign..."
+                    rows={4}
+                    className="w-full resize-none"
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowBookingModal(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-[#7124A8] hover:bg-[#5a1d87] text-white"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Send Booking Request
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Contact Modal */}
+      <AnimatePresence>
+        {showContactModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowContactModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Contact {activeInfluencer?.name}
+                </h3>
+                <button
+                  onClick={() => setShowContactModal(false)}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              <form onSubmit={handleContactSubmit} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Your Name
+                  </label>
+                  <Input
+                    type="text"
+                    required
+                    value={contactFormData.name}
+                    onChange={(e) => setContactFormData({ ...contactFormData, name: e.target.value })}
+                    placeholder="Enter your name"
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Input
+                      type="email"
+                      required
+                      value={contactFormData.email}
+                      onChange={(e) => setContactFormData({ ...contactFormData, email: e.target.value })}
+                      placeholder="your@email.com"
+                      className="w-full pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Input
+                      type="tel"
+                      required
+                      value={contactFormData.phone}
+                      onChange={(e) => setContactFormData({ ...contactFormData, phone: e.target.value })}
+                      placeholder="+62 xxx xxxx xxxx"
+                      className="w-full pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Message
+                  </label>
+                  <div className="relative">
+                    <MessageCircle className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                    <Textarea
+                      required
+                      value={contactFormData.message}
+                      onChange={(e) => setContactFormData({ ...contactFormData, message: e.target.value })}
+                      placeholder="What would you like to discuss with this influencer?"
+                      rows={5}
+                      className="w-full resize-none pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowContactModal(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-[#7124A8] hover:bg-[#5a1d87] text-white"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Send Message
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

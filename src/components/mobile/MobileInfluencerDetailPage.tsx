@@ -5,22 +5,31 @@ import { useState, useEffect } from 'react';
 // Animasi yang smooth untuk mobile interactions
 import { motion, AnimatePresence } from 'framer-motion';
 // Icon set yang konsisten untuk UI elements
-import { 
-  Share, 
-  Heart, 
-  Instagram, 
-  Music, 
-  MapPin, 
-  Users, 
-  TrendingUp, 
+import {
+  Share,
+  Heart,
+  Instagram,
+  Music,
+  MapPin,
+  Users,
+  TrendingUp,
   Eye,
   Star,
-  ChevronRight
+  ChevronRight,
+  X,
+  Send,
+  Mail,
+  Phone,
+  MessageCircle
 } from 'lucide-react';
 // Next.js navigation untuk routing dinamis
 import { useParams } from 'next/navigation';
 // Layout wrapper khusus mobile
 import MobileLayout from './MobileLayout';
+// UI components for form
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 
 // ======================== TYPE DEFINITIONS ========================
 // Interface comprehensive untuk data influencer
@@ -99,10 +108,17 @@ const MobileInfluencerDetailPage = () => {
   // Data states
   const [influencer, setInfluencer] = useState<Influencer | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // UI states
   const [activeTab, setActiveTab] = useState<TabType>('stats');
   const [isLiked, setIsLiked] = useState(false); // Local like state
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [contactFormData, setContactFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
 
   // ======================== DATA FETCHING ========================
   // Effect untuk fetch influencer data berdasarkan ID dari URL
@@ -178,6 +194,25 @@ const MobileInfluencerDetailPage = () => {
   const toggleLike = (): void => {
     setIsLiked(prev => !prev);
     // TODO: Sync dengan backend untuk persistent likes
+  };
+
+  /**
+   * Handle contact modal open
+   */
+  const handleContact = (): void => {
+    setShowContactModal(true);
+  };
+
+  /**
+   * Handle contact form submission
+   */
+  const handleContactSubmit = (e: React.FormEvent): void => {
+    e.preventDefault();
+    console.log('Contact submitted:', contactFormData);
+    // TODO: Send to API
+    alert(`Message sent to ${influencer?.name}!\n\nThey'll respond to ${contactFormData.email} soon.`);
+    setContactFormData({ name: '', email: '', phone: '', message: '' });
+    setShowContactModal(false);
   };
 
   // ======================== RENDER CONDITIONS ========================
@@ -323,7 +358,7 @@ const MobileInfluencerDetailPage = () => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                       <span className="text-gray-600">Handle</span>
-                      <span className="font-medium text-gray-900">@{influencer.instagram_handle}</span>
+                      <span className="font-medium text-gray-900">{influencer.instagram_handle}</span>
                     </div>
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                       <span className="text-gray-600">Followers</span>
@@ -449,6 +484,7 @@ const MobileInfluencerDetailPage = () => {
             </p>
             <motion.button
               whileTap={{ scale: 0.98 }}
+              onClick={handleContact}
               className="w-full bg-white text-[#7124a8] font-semibold py-3 rounded-xl flex items-center justify-center"
             >
               Contact Influencer
@@ -457,6 +493,125 @@ const MobileInfluencerDetailPage = () => {
           </div>
         </section>
       </div>
+
+      {/* Contact Modal */}
+      <AnimatePresence>
+        {showContactModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowContactModal(false)}
+          >
+            <motion.div
+              initial={{ y: '100%', opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: '100%', opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between rounded-t-3xl">
+                <h3 className="text-xl font-bold text-gray-900">
+                  Contact {influencer?.name}
+                </h3>
+                <button
+                  onClick={() => setShowContactModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              <form onSubmit={handleContactSubmit} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Your Name
+                  </label>
+                  <Input
+                    type="text"
+                    required
+                    value={contactFormData.name}
+                    onChange={(e) => setContactFormData({ ...contactFormData, name: e.target.value })}
+                    placeholder="Enter your name"
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Input
+                      type="email"
+                      required
+                      value={contactFormData.email}
+                      onChange={(e) => setContactFormData({ ...contactFormData, email: e.target.value })}
+                      placeholder="your@email.com"
+                      className="w-full pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Input
+                      type="tel"
+                      required
+                      value={contactFormData.phone}
+                      onChange={(e) => setContactFormData({ ...contactFormData, phone: e.target.value })}
+                      placeholder="+62 xxx xxxx xxxx"
+                      className="w-full pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Message
+                  </label>
+                  <div className="relative">
+                    <MessageCircle className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                    <Textarea
+                      required
+                      value={contactFormData.message}
+                      onChange={(e) => setContactFormData({ ...contactFormData, message: e.target.value })}
+                      placeholder="What would you like to discuss with this influencer?"
+                      rows={5}
+                      className="w-full resize-none pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowContactModal(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-[#7124a8] hover:bg-[#5a1d87] text-white"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Send Message
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </MobileLayout>
   );
 };

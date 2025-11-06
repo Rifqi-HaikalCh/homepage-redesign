@@ -41,6 +41,7 @@ interface ContentSelectionCardsProps {
 
 // ======================== CONSTANTS ========================
 // Mapping kategori konten dengan detail lengkap - Brand identity colors
+// IMPORTANT: Category names MUST match the content_type in mockInfluencers.ts
 const CONTENT_CATEGORIES: ContentCategory[] = [
   {
     id: 'all',
@@ -51,108 +52,52 @@ const CONTENT_CATEGORIES: ContentCategory[] = [
     description: 'Lihat semua influencer dari berbagai kategori'
   },
   {
-    id: 'food',
-    name: 'Food & Beverages',
-    displayName: 'Food & Beverages',
-    icon: Utensils,
+    id: 'lifestyle-fashion',
+    name: 'Lifestyle & Fashion',  // ✅ Matches mockInfluencers.ts
+    displayName: 'Lifestyle & Fashion',
+    icon: Shirt,
     gradient: 'from-[#7124A8]/80 to-[#9147C4]/80',
-    description: 'Kuliner dan minuman'
+    description: 'Fashion dan gaya hidup'
   },
   {
-    id: 'tech',
-    name: 'Technology',
-    displayName: 'Technology',
+    id: 'tech-gaming',
+    name: 'Tech & Gaming',  // ✅ Matches mockInfluencers.ts
+    displayName: 'Tech & Gaming',
     icon: Cpu,
     gradient: 'from-[#7124A8]/70 to-[#A165D1]/70',
-    description: 'Teknologi dan inovasi'
+    description: 'Teknologi dan gaming'
   },
   {
-    id: 'entertainment',
-    name: 'Entertainment',
-    displayName: 'Entertainment',
-    icon: Music,
-    gradient: 'from-[#8B35B8]/80 to-[#7124A8]/80',
-    description: 'Hiburan dan musik'
-  },
-  {
-    id: 'travel',
-    name: 'Travel & Lifestyle',
-    displayName: 'Travel & Lifestyle',
-    icon: Shirt,
-    gradient: 'from-[#9147C4]/70 to-[#7124A8]/70',
-    description: 'Travel dan gaya hidup'
-  },
-  {
-    id: 'health',
-    name: 'Health & Sport',
-    displayName: 'Health & Sport',
-    icon: Heart,
-    gradient: 'from-[#A165D1]/80 to-[#8B35B8]/80',
-    description: 'Kesehatan dan olahraga'
-  },
-  {
-    id: 'gaming',
-    name: 'Gaming',
-    displayName: 'Gaming',
-    icon: Dumbbell,
-    gradient: 'from-[#7124A8]/60 to-[#9147C4]/60',
-    description: 'Gaming dan esport'
-  },
-  {
-    id: 'creator',
-    name: 'Content Creator',
-    displayName: 'Content Creator',
-    icon: Camera,
-    gradient: 'from-[#8B35B8]/70 to-[#A165D1]/70',
-    description: 'Content creator umum'
-  },
-  {
-    id: 'beauty',
-    name: 'Beauty & Fashion',
-    displayName: 'Beauty & Fashion',
+    id: 'beauty-skincare',
+    name: 'Beauty & Skincare',  // ✅ Matches mockInfluencers.ts
+    displayName: 'Beauty & Skincare',
     icon: Palette,
     gradient: 'from-[#9147C4]/80 to-[#7124A8]/80',
-    description: 'Kecantikan dan fashion'
+    description: 'Kecantikan dan perawatan kulit'
   },
   {
-    id: 'youtube',
-    name: 'Youtuber',
-    displayName: 'Youtuber',
-    icon: BookOpen,
-    gradient: 'from-[#A165D1]/70 to-[#7124A8]/70',
-    description: 'Content creator YouTube'
+    id: 'travel-food',
+    name: 'Travel & Food',  // ✅ Matches mockInfluencers.ts
+    displayName: 'Travel & Food',
+    icon: Utensils,
+    gradient: 'from-[#9147C4]/70 to-[#7124A8]/70',
+    description: 'Perjalanan dan kuliner'
   },
   {
-    id: 'dj-singer',
-    name: 'DJ & Penyanyi',
-    displayName: 'DJ & Penyanyi',
-    icon: Music,
-    gradient: 'from-[#7124A8]/75 to-[#8B35B8]/75',
-    description: 'DJ dan penyanyi'
+    id: 'fitness-health',
+    name: 'Fitness & Health',  // ✅ Matches mockInfluencers.ts
+    displayName: 'Fitness & Health',
+    icon: Dumbbell,
+    gradient: 'from-[#A165D1]/80 to-[#8B35B8]/80',
+    description: 'Kebugaran dan kesehatan'
   },
   {
-    id: 'tiktok',
-    name: 'Tiktok',
-    displayName: 'Tiktok',
-    icon: Users,
-    gradient: 'from-[#8B35B8]/65 to-[#9147C4]/65',
-    description: 'Content creator TikTok'
-  },
-  {
-    id: 'instagram',
-    name: 'Instagram',
-    displayName: 'Instagram',
+    id: 'art-creative',
+    name: 'Art & Creative',  // ✅ Matches mockInfluencers.ts
+    displayName: 'Art & Creative',
     icon: Camera,
-    gradient: 'from-[#9147C4]/75 to-[#A165D1]/75',
-    description: 'Content creator Instagram'
-  },
-  {
-    id: 'mom-kids',
-    name: 'Mom & Kids',
-    displayName: 'Mom & Kids',
-    icon: Heart,
-    gradient: 'from-[#A165D1]/80 to-[#7124A8]/80',
-    description: 'Konten ibu dan anak'
+    gradient: 'from-[#8B35B8]/70 to-[#A165D1]/70',
+    description: 'Seni dan kreativitas'
   }
 ];
 

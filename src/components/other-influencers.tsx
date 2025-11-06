@@ -102,20 +102,25 @@ export default function OtherInfluencers() {
   };
 
   const cardVariants: Variants = {
-    hidden: { 
-      opacity: 0, 
-      y: 30,
-      scale: 0.95
+    hidden: {
+      opacity: 0,
+      y: 50,
+      scale: 0.9,
+      rotateY: -15
     },
-    visible: {
+    visible: (index: number) => ({
       opacity: 1,
       y: 0,
       scale: 1,
+      rotateY: 0,
       transition: {
-        duration: 0.6,
-        ease: "easeOut" 
+        duration: 0.8,
+        delay: index * 0.15, // Staggered animation
+        ease: [0.34, 1.56, 0.64, 1], // Elastic bounce
+        opacity: { duration: 0.5 },
+        scale: { duration: 0.7, ease: "easeOut" }
       }
-    }
+    })
   };
 
   return (
@@ -140,19 +145,27 @@ export default function OtherInfluencers() {
 
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          style={{ perspective: '1500px' }}
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
         >
-          {influencers.map((influencer) => (
+          {influencers.map((influencer, index) => (
             <motion.div
               key={influencer.id}
+              custom={index}
               variants={cardVariants}
-              whileHover={{ 
-                y: -8,
-                transition: { duration: 0.3 }
+              whileHover={{
+                y: -12,
+                scale: 1.05,
+                rotateY: 5,
+                transition: {
+                  duration: 0.4,
+                  ease: "easeOut"
+                }
               }}
+              style={{ transformStyle: 'preserve-3d' }}
               className="group"
             >
               <Link href={`/influencer/${influencer.id}`}>

@@ -11,8 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import Footer from '@/components/footer';
-import SecondaryHeader from '@/components/secondary-header';
+import UnifiedHeader from '@/components/UnifiedHeader';
 import { ConfirmDeleteModal, InfluencerFormModal } from '@/components/glassmorphism-modal';
 
 interface Influencer {
@@ -224,7 +225,13 @@ const DesktopInfluencerListPage = () => {
       <div className="fixed inset-0 backdrop-blur-[0.5px] pointer-events-none" />
       
       <div className="relative z-10">
-        <SecondaryHeader title="Semua Influencer" backUrl="/" />
+        <UnifiedHeader
+          variant="secondary"
+          title="Semua Influencer"
+          showBackButton={true}
+          showHomeButton={true}
+          backUrl="/"
+        />
         <main className="container mx-auto px-6 py-8">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
@@ -378,11 +385,14 @@ const DesktopInfluencerListPage = () => {
                 >
                   <Link href={`/influencer/${influencer.id}`}>
                     <div className="relative h-96 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer">
-                      <img
+                      <Image
                         src={influencer.avatar || 'https://images.unsplash.com/photo-1494790108755-2616b612b1ea?w=680&h=1020&fit=crop&crop=center'}
                         alt={influencer.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        style={{ aspectRatio: '680/1020' }}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        loading="lazy"
+                        quality={75}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
                       <div className="absolute top-0 left-0 right-0 p-4 bg-black/20 backdrop-blur-sm rounded-t-3xl">

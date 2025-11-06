@@ -1,6 +1,6 @@
 'use client';
 
-import useMobileView from '@/hooks/useMobileView';
+import ResponsiveWrapper from '@/components/ResponsiveWrapper';
 import MobileLoginPage from '@/components/mobile/MobileLoginPage';
 
 // Desktop components
@@ -355,11 +355,10 @@ const DesktopLoginPage = () => {
 };
 
 export default function LoginPage() {
-  const isMobile = useMobileView();
-
-  if (isMobile) {
-    return <MobileLoginPage />;
-  }
-
-  return <DesktopLoginPage />;
+  return (
+    <ResponsiveWrapper
+      mobileComponent={<MobileLoginPage />}
+      desktopComponent={<DesktopLoginPage />}
+    />
+  );
 }

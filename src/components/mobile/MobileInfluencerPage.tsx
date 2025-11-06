@@ -11,6 +11,8 @@ import Link from 'next/link';
 // Layout wrapper khusus mobile
 import MobileLayout from './MobileLayout';
 import { Button } from '@/components/ui/button';
+// Import cached fetch untuk performance
+import { cachedFetch } from '@/lib/apiCache';
 
 // ======================== TYPE DEFINITIONS ========================
 // Interface untuk data influencer dari API
@@ -28,14 +30,15 @@ interface Influencer {
 
 // ======================== CONSTANTS ========================
 // Kategori konten untuk filtering - mudah maintain dan extend
+// MUST match the content_type values in mockInfluencers.ts
 const CONTENT_CATEGORIES = [
-  'All', 
-  'Lifestyle & Fashion', 
-  'Tech & Gaming', 
-  'Food & Travel', 
-  'Beauty & Health', 
-  'Sports & Fitness', 
-  'Music & Entertainment'
+  'All',
+  'Lifestyle & Fashion',
+  'Tech & Gaming',
+  'Travel & Food',        // Fixed: was 'Food & Travel'
+  'Beauty & Skincare',    // Fixed: was 'Beauty & Health'
+  'Fitness & Health',     // Fixed: was 'Sports & Fitness'
+  'Art & Creative'        // Fixed: was 'Music & Entertainment'
 ] as const;
 
 // Konfigurasi animasi untuk consistent feel
@@ -75,18 +78,14 @@ const MobileInfluencerPage = () => {
   const [selectedCity, setSelectedCity] = useState('All');
 
   // ======================== DATA FETCHING ========================
-  // Effect untuk load initial data dari API
+  // Effect untuk load initial data dari API with caching
   useEffect(() => {
     const fetchInfluencers = async (): Promise<void> => {
       try {
-        const response = await fetch('/api/influencers');
-        if (response.ok) {
-          const data: Influencer[] = await response.json();
-          setInfluencers(data);
-          setFilteredInfluencers(data); // Initial state sama dengan semua data
-        } else {
-          console.error('Failed to fetch influencers:', response.status);
-        }
+        // Use cachedFetch to prevent duplicate API calls
+        const data = await cachedFetch<Influencer[]>('/api/influencers');
+        setInfluencers(data);
+        setFilteredInfluencers(data); // Initial state sama dengan semua data
       } catch (error) {
         console.error('Error fetching influencers:', error);
         // TODO: Bisa ditambahkan error state untuk user feedback

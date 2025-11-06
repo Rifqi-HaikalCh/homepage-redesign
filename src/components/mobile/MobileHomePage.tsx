@@ -393,7 +393,7 @@ const MobileHomePage = () => {
                               <Instagram className="w-3 h-3 text-white" />
                               <div>
                                 <p className="text-white text-xs font-medium">
-                                  @{influencer.instagram_handle}
+                                  {influencer.instagram_handle}
                                 </p>
                                 <p className="text-white/80 text-xs">
                                   {influencer.instagram_followers}

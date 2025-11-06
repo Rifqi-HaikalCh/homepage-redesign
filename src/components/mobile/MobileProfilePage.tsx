@@ -286,7 +286,7 @@ const MobileProfilePage = () => {
                 <div className="flex-1">
                   <div className="font-medium text-gray-900">Instagram</div>
                   <div className="text-sm text-gray-600">
-                    @{profileData?.instagram_handle || 'Not set'}
+                    {profileData?.instagram_handle || 'Not set'}
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-gray-400" />

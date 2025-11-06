@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Instagram, Twitter, Facebook, Mail, Phone, MapPin } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Footer() {
   const socialLinks = [
@@ -44,11 +45,12 @@ export default function Footer() {
               transition={{ duration: 0.6 }}
             >
               <div className="flex items-center mb-4">
-                <img
+                <Image
                   src="/dapur-buzzer-logo.png"
                   alt="Dapur Buzzer Indonesia"
-                  className="h-10 mr-3"
-                  style={{ width: "auto" }}
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto mr-3"
                 />
               </div>
               <p className="text-gray-400 mb-6 leading-relaxed">

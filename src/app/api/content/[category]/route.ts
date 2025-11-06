@@ -54,11 +54,11 @@ const contentData = {
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ category: string }> | { category: string } }
+  { params }: { params: Promise<{ category: string }> }
 ) {
   try {
-    // Handle both async and sync params for Next.js compatibility
-    const resolvedParams = 'category' in params ? params : await params;
+    // In Next.js 15, params is always a Promise
+    const resolvedParams = await params;
     const category = resolvedParams.category as keyof typeof contentData;
     
     console.log('API Content - Category requested:', category);

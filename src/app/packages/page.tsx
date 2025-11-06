@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Check, ArrowRight, Star, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check, ArrowRight, Star, X, Send, Phone, Mail } from 'lucide-react';
 import Image from 'next/image';
 import useMobileView from '@/hooks/useMobileView';
+import UnifiedHeader from '@/components/UnifiedHeader';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 interface Package {
   id: number;
@@ -23,6 +26,15 @@ interface Package {
 
 const PackagesPage = () => {
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
+  const [showConsultationModal, setShowConsultationModal] = useState(false);
+  const [showPackageModal, setShowPackageModal] = useState(false);
+  const [selectedPackageForModal, setSelectedPackageForModal] = useState<Package | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
   const isMobile = useMobileView();
 
   const packages: Package[] = [
@@ -135,20 +147,41 @@ const PackagesPage = () => {
     }
   ];
 
+  const handlePackageSelect = (pkg: Package) => {
+    setSelectedPackageForModal(pkg);
+    setShowPackageModal(true);
+  };
+
+  const handleConsultationSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle form submission here
+    console.log('Consultation form submitted:', formData);
+    // Reset form and close modal
+    setFormData({ name: '', email: '', phone: '', message: '' });
+    setShowConsultationModal(false);
+    // You can add toast notification here
+    alert('Terima kasih! Tim kami akan segera menghubungi Anda.');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#7124A8] to-purple-600 text-white">
-        <div className="container mx-auto px-6 py-16">
+      {/* Unified Header */}
+      <UnifiedHeader
+        variant="secondary"
+        title="Paket Influencer Marketing"
+        showBackButton={true}
+        showHomeButton={true}
+        backUrl="/"
+      />
+
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-[#7124A8] to-purple-600 text-white pt-24 pb-12">
+        <div className="container mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <Link href="/" className="inline-flex items-center text-white/80 hover:text-white mb-6 text-sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Kembali ke Beranda
-            </Link>
             <h1 className={`font-bold mb-4 ${isMobile ? 'text-3xl' : 'text-5xl'}`}>
               Paket Influencer Marketing
             </h1>
@@ -244,6 +277,7 @@ const PackagesPage = () => {
 
                 {/* CTA Button */}
                 <motion.button
+                  onClick={() => handlePackageSelect(pkg)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className={`w-full font-semibold py-4 rounded-xl flex items-center justify-center space-x-2 transition-all ${
@@ -277,6 +311,7 @@ const PackagesPage = () => {
               Dapatkan rekomendasi paket yang paling sesuai secara gratis.
             </p>
             <motion.button
+              onClick={() => setShowConsultationModal(true)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-gradient-to-r from-[#7124A8] to-purple-600 text-white px-8 py-4 rounded-xl font-semibold flex items-center space-x-2 mx-auto shadow-lg"
@@ -287,6 +322,248 @@ const PackagesPage = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Consultation Modal */}
+      <AnimatePresence>
+        {showConsultationModal && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              onClick={() => setShowConsultationModal(false)}
+            />
+
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            >
+              <div className={`bg-white dark:bg-gray-800 rounded-3xl shadow-2xl ${isMobile ? 'w-full' : 'max-w-2xl w-full'} max-h-[90vh] overflow-y-auto`}>
+                {/* Modal Header */}
+                <div className="sticky top-0 bg-gradient-to-r from-[#7124A8] to-purple-600 text-white p-6 rounded-t-3xl flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-1">Konsultasi Gratis</h2>
+                    <p className="text-white/90 text-sm">Isi form di bawah dan tim kami akan menghubungi Anda</p>
+                  </div>
+                  <button
+                    onClick={() => setShowConsultationModal(false)}
+                    className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+
+                {/* Modal Body */}
+                <form onSubmit={handleConsultationSubmit} className="p-6 space-y-6">
+                  {/* Name Input */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                      Nama Lengkap *
+                    </label>
+                    <Input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Masukkan nama lengkap Anda"
+                      className="w-full"
+                    />
+                  </div>
+
+                  {/* Email Input */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                      Email *
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <Input
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="email@example.com"
+                        className="w-full pl-11"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Phone Input */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                      Nomor Telepon *
+                    </label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <Input
+                        type="tel"
+                        required
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        placeholder="08123456789"
+                        className="w-full pl-11"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Message Input */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                      Pesan (Opsional)
+                    </label>
+                    <Textarea
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      placeholder="Ceritakan kebutuhan bisnis Anda..."
+                      rows={4}
+                      className="w-full resize-none"
+                    />
+                  </div>
+
+                  {/* Submit Button */}
+                  <div className="flex gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowConsultationModal(false)}
+                      className="flex-1"
+                    >
+                      Batal
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="flex-1 bg-gradient-to-r from-[#7124A8] to-purple-600 hover:from-[#5f1f8f] hover:to-purple-700"
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      Kirim Konsultasi
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Package Selection Modal */}
+      <AnimatePresence>
+        {showPackageModal && selectedPackageForModal && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+              onClick={() => setShowPackageModal(false)}
+            />
+
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            >
+              <div className={`bg-white dark:bg-gray-800 rounded-3xl shadow-2xl ${isMobile ? 'w-full' : 'max-w-2xl w-full'} max-h-[90vh] overflow-y-auto`}>
+                {/* Modal Header with Package Image */}
+                <div className="relative h-48 overflow-hidden rounded-t-3xl">
+                  <Image
+                    src={selectedPackageForModal.image}
+                    alt={selectedPackageForModal.title}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className={`absolute inset-0 bg-gradient-to-t ${selectedPackageForModal.color} opacity-80`}></div>
+                  <div className="absolute inset-0 bg-black/30"></div>
+
+                  <button
+                    onClick={() => setShowPackageModal(false)}
+                    className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full transition-colors"
+                  >
+                    <X className="w-6 h-6 text-white" />
+                  </button>
+
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                    <h2 className="text-3xl font-bold mb-2">{selectedPackageForModal.name}</h2>
+                    <p className="text-white/90">{selectedPackageForModal.subtitle}</p>
+                  </div>
+                </div>
+
+                {/* Modal Body */}
+                <div className="p-6 space-y-6">
+                  {/* Price Section */}
+                  <div className="text-center pb-6 border-b border-gray-200 dark:border-gray-700">
+                    <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+                      {selectedPackageForModal.price}
+                    </div>
+                    {selectedPackageForModal.originalPrice && (
+                      <div className="text-lg text-gray-500 line-through">
+                        {selectedPackageForModal.originalPrice}
+                      </div>
+                    )}
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">per bulan</div>
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                      Deskripsi Paket
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {selectedPackageForModal.description}
+                    </p>
+                  </div>
+
+                  {/* All Features */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                      Fitur Lengkap
+                    </h3>
+                    <div className="space-y-3">
+                      {selectedPackageForModal.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-start space-x-3">
+                          <div className="w-6 h-6 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                          </div>
+                          <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowPackageModal(false)}
+                      className="flex-1"
+                    >
+                      Tutup
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setShowPackageModal(false);
+                        setShowConsultationModal(true);
+                      }}
+                      className="flex-1 bg-gradient-to-r from-[#7124A8] to-purple-600 hover:from-[#5f1f8f] hover:to-purple-700"
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      Hubungi Kami
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

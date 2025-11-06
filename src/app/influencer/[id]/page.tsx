@@ -6,11 +6,13 @@ import MobileInfluencerDetailPage from '@/components/mobile/MobileInfluencerDeta
 
 // Desktop components
 import { motion, AnimatePresence } from 'framer-motion';
-import { Instagram, ChevronLeft, ChevronRight, Music, MapPin, Users, Heart, MessageCircle, Eye, Zap } from 'lucide-react';
+import { Instagram, ChevronLeft, ChevronRight, Music, MapPin, Users, Heart, MessageCircle, Eye, Zap, X, Send, Mail, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useParams } from 'next/navigation';
-import SecondaryHeader from '@/components/secondary-header';
+import UnifiedHeader from '@/components/UnifiedHeader';
 
 interface Influencer {
   id: number;
@@ -46,6 +48,13 @@ const DesktopInfluencerDetail = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [contactFormData, setContactFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
   
   useEffect(() => {
     const fetchInfluencers = async () => {
@@ -81,6 +90,19 @@ const DesktopInfluencerDetail = () => {
     setSelectedIndex(index);
   };
 
+  const handleContact = () => {
+    setShowContactModal(true);
+  };
+
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Contact submitted:', contactFormData);
+    // TODO: Send to API
+    alert(`Message sent to ${selectedInfluencer?.name}!\n\nThey'll respond to ${contactFormData.email} soon.`);
+    setContactFormData({ name: '', email: '', phone: '', message: '' });
+    setShowContactModal(false);
+  };
+
   const slideVariants = {
     enter: (direction: number) => ({
       x: direction > 0 ? 300 : -300,
@@ -105,7 +127,13 @@ const DesktopInfluencerDetail = () => {
         <div className="fixed inset-0 backdrop-blur-[0.5px] pointer-events-none" />
         
         <div className="relative z-10">
-          <SecondaryHeader title="Loading..." backUrl="/influencer" />
+          <UnifiedHeader
+            variant="secondary"
+            title="Loading..."
+            showBackButton={true}
+            showHomeButton={true}
+            backUrl="/influencer"
+          />
           <div className="flex justify-center items-center min-h-[60vh]">
             <div className="animate-pulse">
               <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64 mx-auto"></div>
@@ -123,7 +151,13 @@ const DesktopInfluencerDetail = () => {
         <div className="fixed inset-0 backdrop-blur-[0.5px] pointer-events-none" />
         
         <div className="relative z-10">
-          <SecondaryHeader title="Influencer Detail" backUrl="/influencer" />
+          <UnifiedHeader
+            variant="secondary"
+            title="Influencer Detail"
+            showBackButton={true}
+            showHomeButton={true}
+            backUrl="/influencer"
+          />
           <div className="flex justify-center items-center min-h-[60vh]">
             <div className="text-center">
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
@@ -148,7 +182,13 @@ const DesktopInfluencerDetail = () => {
       <div className="fixed inset-0 backdrop-blur-[0.5px] pointer-events-none" />
       
       <div className="relative z-10">
-        <SecondaryHeader title="Influencer Detail" backUrl="/influencer" />
+        <UnifiedHeader
+          variant="secondary"
+          title="Influencer Detail"
+          showBackButton={true}
+          showHomeButton={true}
+          backUrl="/influencer"
+        />
       </div>
 
       {/* 3D Coverflow Carousel */}
@@ -310,7 +350,10 @@ const DesktopInfluencerDetail = () => {
                       <MapPin className="w-4 h-4 mr-1" />
                       {selectedInfluencer.city}
                     </div>
-                    <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl py-3">
+                    <Button
+                      onClick={handleContact}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl py-3"
+                    >
                       Contact Influencer
                     </Button>
                   </CardContent>
@@ -332,7 +375,7 @@ const DesktopInfluencerDetail = () => {
                       <div className="space-y-6">
                         <div className="text-center mb-6">
                           <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
-                            @{selectedInfluencer.instagram_handle}
+                            {selectedInfluencer.instagram_handle}
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4 mb-4">
@@ -449,6 +492,125 @@ const DesktopInfluencerDetail = () => {
             </div>
           </div>
         </motion.section>
+      </AnimatePresence>
+
+      {/* Contact Modal */}
+      <AnimatePresence>
+        {showContactModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowContactModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Contact {selectedInfluencer?.name}
+                </h3>
+                <button
+                  onClick={() => setShowContactModal(false)}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              <form onSubmit={handleContactSubmit} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Your Name
+                  </label>
+                  <Input
+                    type="text"
+                    required
+                    value={contactFormData.name}
+                    onChange={(e) => setContactFormData({ ...contactFormData, name: e.target.value })}
+                    placeholder="Enter your name"
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Input
+                      type="email"
+                      required
+                      value={contactFormData.email}
+                      onChange={(e) => setContactFormData({ ...contactFormData, email: e.target.value })}
+                      placeholder="your@email.com"
+                      className="w-full pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Phone Number
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Input
+                      type="tel"
+                      required
+                      value={contactFormData.phone}
+                      onChange={(e) => setContactFormData({ ...contactFormData, phone: e.target.value })}
+                      placeholder="+62 xxx xxxx xxxx"
+                      className="w-full pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Message
+                  </label>
+                  <div className="relative">
+                    <MessageCircle className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                    <Textarea
+                      required
+                      value={contactFormData.message}
+                      onChange={(e) => setContactFormData({ ...contactFormData, message: e.target.value })}
+                      placeholder="What would you like to discuss with this influencer?"
+                      rows={5}
+                      className="w-full resize-none pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowContactModal(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Send Message
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );

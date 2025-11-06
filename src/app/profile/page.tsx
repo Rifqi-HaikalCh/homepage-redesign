@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import SecondaryHeader from '@/components/secondary-header';
+import UnifiedHeader from '@/components/UnifiedHeader';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Interface untuk profile data - Updated to match correct structure
@@ -82,7 +82,13 @@ const GuestLoginPrompt = () => (
     <div className="fixed inset-0 backdrop-blur-[0.5px] pointer-events-none" />
     
     <div className="relative z-10">
-      <SecondaryHeader title="Profile" backUrl="/" />
+      <UnifiedHeader
+        variant="secondary"
+        title="Profile"
+        showBackButton={true}
+        showHomeButton={true}
+        backUrl="/"
+      />
       
       <div className="flex items-center justify-center min-h-[80vh] p-4">
         <motion.div
@@ -236,7 +242,13 @@ const ClientProfile = ({ user, onSignOut }: { user: { email?: string }, onSignOu
       <div className="fixed inset-0 backdrop-blur-[0.5px] pointer-events-none" />
       
       <div className="relative z-10">
-        <SecondaryHeader title="Profile" backUrl="/" />
+        <UnifiedHeader
+        variant="secondary"
+        title="Profile"
+        showBackButton={true}
+        showHomeButton={true}
+        backUrl="/"
+      />
         
         <div className="flex items-center justify-center min-h-[80vh] p-4">
           <motion.div
@@ -403,7 +415,13 @@ const DesktopProfilePage = () => {
       <div className="fixed inset-0 backdrop-blur-[0.5px] pointer-events-none" />
       
       <div className="relative z-10">
-        <SecondaryHeader title="Profile" backUrl="/" />
+        <UnifiedHeader
+        variant="secondary"
+        title="Profile"
+        showBackButton={true}
+        showHomeButton={true}
+        backUrl="/"
+      />
         
         <div className="p-4 sm:p-6 lg:p-8">
           <motion.div

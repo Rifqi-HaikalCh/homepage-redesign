@@ -5,15 +5,17 @@ import { useState, useEffect, useCallback } from 'react';
 // Animasi yang smooth untuk interactions
 import { motion, AnimatePresence } from 'framer-motion';
 // Icon set yang konsisten
-import { 
-  Users, 
-  Instagram, 
+import {
+  Users,
+  Instagram,
   Eye,
   TrendingUp
 } from 'lucide-react';
 import Link from 'next/link';
 // Import komponen content selection cards
 import ContentSelectionCards from '@/components/ContentSelectionCards';
+// Import cached fetch untuk performance
+import { cachedFetch } from '@/lib/apiCache';
 
 // ======================== TYPE DEFINITIONS ========================
 // Interface untuk data influencer
@@ -44,30 +46,22 @@ interface ContentSelectionWithFilteringProps {
 // Fungsi untuk filter berdasarkan kategori konten
 const filterByCategory = (influencers: Influencer[], category: string): Influencer[] => {
   if (category === 'all') return influencers;
-  
-  // Mapping kategori ID ke content_type yang sesuai
-  const categoryMapping: Record<string, string[]> = {
-    'food': ['Food & Beverages'],
-    'tech': ['Technology'],
-    'entertainment': ['Entertainment'],
-    'travel': ['Travel & Lifestyle'],
-    'health': ['Health & Sport'],
-    'gaming': ['Gaming'],
-    'creator': ['Content Creator'],
-    'beauty': ['Beauty & Fashion'],
-    'youtube': ['Youtuber'],
-    'dj-singer': ['DJ & Penyanyi'],
-    'tiktok': ['Tiktok'],
-    'instagram': ['Instagram'],
-    'mom-kids': ['Mom & Kids']
+
+  // Mapping kategori ID ke content_type yang sesuai dengan mockInfluencers.ts
+  const categoryMapping: Record<string, string> = {
+    'lifestyle-fashion': 'Lifestyle & Fashion',
+    'tech-gaming': 'Tech & Gaming',
+    'beauty-skincare': 'Beauty & Skincare',
+    'travel-food': 'Travel & Food',
+    'fitness-health': 'Fitness & Health',
+    'art-creative': 'Art & Creative'
   };
-  
-  const validTypes = categoryMapping[category] || [];
-  
-  return influencers.filter(influencer => 
-    validTypes.some(type => 
-      influencer.content_type.toLowerCase().includes(type.toLowerCase())
-    )
+
+  const targetType = categoryMapping[category];
+
+  // Filter exact match untuk content_type
+  return influencers.filter(influencer =>
+    influencer.content_type === targetType
   );
 };
 
@@ -97,18 +91,14 @@ const ContentSelectionWithFiltering = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   // ======================== DATA FETCHING ========================
-  // Effect untuk fetch influencer data dari API
+  // Effect untuk fetch influencer data dari API with caching
   useEffect(() => {
     const fetchInfluencers = async (): Promise<void> => {
       try {
-        const response = await fetch('/api/influencers');
-        if (response.ok) {
-          const data: Influencer[] = await response.json();
-          setInfluencers(data);
-          setFilteredInfluencers(data.slice(0, maxInfluencersToShow));
-        } else {
-          console.error('Failed to fetch influencers:', response.status);
-        }
+        // Use cachedFetch to prevent duplicate API calls
+        const data = await cachedFetch<Influencer[]>('/api/influencers');
+        setInfluencers(data);
+        setFilteredInfluencers(data.slice(0, maxInfluencersToShow));
       } catch (error) {
         console.error('Error fetching influencers:', error);
       } finally {
@@ -180,7 +170,7 @@ const ContentSelectionWithFiltering = ({
                   <Instagram className="w-4 h-4 text-white" />
                   <div>
                     <p className="text-white text-xs font-medium">
-                      @{influencer.instagram_handle}
+                      {influencer.instagram_handle}
                     </p>
                     <p className="text-white/80 text-xs">
                       {influencer.instagram_followers}
